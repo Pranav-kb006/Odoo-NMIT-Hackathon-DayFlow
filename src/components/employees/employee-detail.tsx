@@ -25,9 +25,17 @@ import {
   type EmployeePrivateInfo,
   type EmployeeBio,
 } from "@/lib/private-info-store";
-import { calculateSalaryBreakdown, estimateMonthlyWage } from "@/lib/payroll";
+import { calculateSalaryBreakdown } from "@/lib/payroll";
 import { Modal, ModalHeader, ModalBody, ModalFooter } from "@/components/ui/modal";
 import { showToast } from "@/components/ui/Toast";
+
+type SalaryStructure = {
+  base_salary: number;
+  hra?: number | null;
+  allowances?: Record<string, number> | null;
+  deduction_pct?: number | null;
+  effective_from?: string | null;
+};
 
 type UserDocument = {
   id: string;
@@ -65,6 +73,7 @@ function mask(value: string | null): string {
 export function EmployeeDetail({
   employee,
   documents = [],
+  salary = null,
   canViewPrivateInfo = true,
   isCurrentUser = false,
   isAdmin = false,
@@ -73,6 +82,7 @@ export function EmployeeDetail({
   companyName?: string;
   privateInfo?: EmployeePrivateInfo | null;
   documents?: UserDocument[];
+  salary?: SalaryStructure | null;
   canViewPrivateInfo?: boolean;
   isCurrentUser?: boolean;
   isAdmin?: boolean;
@@ -87,8 +97,15 @@ export function EmployeeDetail({
     getStoredBio(employee.id)
   );
 
+  // Real wage comes from the salary structure; fall back to a guess only when
+  // HR hasn't configured one yet (so the breakdown still renders something).
   const [monthlyWage, setMonthlyWage] = useState<number>(() =>
-    estimateMonthlyWage(employee.job_position, employee.department)
+    salary?.base_salary != null && salary.base_salary > 0
+      ? Number(salary.base_salary)
+      : 0
+  );
+  const [hasSalary, setHasSalary] = useState<boolean>(() =>
+    salary?.base_salary != null && salary.base_salary > 0
   );
 
   // Modals
@@ -140,13 +157,29 @@ export function EmployeeDetail({
     setBioForm({ ...bioForm, skills: updatedSkills });
   };
 
-  const handleSaveWage = (e: React.FormEvent) => {
+  const handleSaveWage = async (e: React.FormEvent) => {
     e.preventDefault();
     const wage = parseFloat(wageInput);
-    if (!isNaN(wage) && wage > 0) {
-      setMonthlyWage(wage);
+    if (isNaN(wage) || wage <= 0) return;
+
+    try {
+      const res = await fetch(`/api/employees/${employee.id}/salary`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ baseSalary: wage }),
+      });
+      if (!res.ok) {
+        const d = await res.json().catch(() => ({}));
+        throw new Error(d.error || "Salary update failed");
+      }
+      const d = await res.json();
+      const base = Number(d?.salary?.base_salary ?? wage);
+      setMonthlyWage(base);
+      setHasSalary(true);
       setEditWageModalOpen(false);
-      showToast("Salary Structure Updated", `Base monthly wage set to $${wage.toLocaleString()}`, "success");
+      showToast("Salary Structure Updated", `Base monthly wage set to ${formatCurrency(base)}`, "success");
+    } catch (err: unknown) {
+      showToast("Update Failed", err instanceof Error ? err.message : "Could not save salary", "error");
     }
   };
 
@@ -685,6 +718,14 @@ export function EmployeeDetail({
               </button>
             )}
           </div>
+
+          {!hasSalary && (
+            <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+              No salary structure has been configured for this employee yet. An admin can set the
+              base wage using <span className="font-semibold">Edit Base Wage</span> above — it will
+              then appear here and in the Payroll tab.
+            </div>
+          )}
 
           {/* 4 Summary Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

@@ -110,12 +110,22 @@ export default async function EmployeeProfilePage({
       .eq("user_id", id)
       .eq("company_id", callerCompanyId);
 
+    // Latest salary structure for this employee (admin or the employee sees it).
+    const { data: salaryRow } = await db
+      .from("salary_structures")
+      .select("base_salary, hra, allowances, deduction_pct, effective_from")
+      .eq("profile_id", id)
+      .order("effective_from", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
     return (
       <main className="p-2 sm:p-4">
         <EmployeeDetail
           employee={employee}
           companyName={companyRow?.name || "Dayflow Global"}
           documents={(docs as DocumentRow[]) ?? []}
+          salary={salaryRow}
           canViewPrivateInfo={canViewPrivateInfo}
           isCurrentUser={me.id === id}
           isAdmin={me.role === "admin"}

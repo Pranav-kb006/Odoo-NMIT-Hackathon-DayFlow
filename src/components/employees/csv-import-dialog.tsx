@@ -345,7 +345,7 @@ export function CsvImportDialog({ open, onClose, onImport }: Props) {
                         </span>
                       </span>
                       <span className="font-mono text-slate-800">
-                        {item.credentials.login_id} /{" "}
+                        {item.credentials.login_email} /{" "}
                         {item.credentials.temporary_password}
                       </span>
                     </li>

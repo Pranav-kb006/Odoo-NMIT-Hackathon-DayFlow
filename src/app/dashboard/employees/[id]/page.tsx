@@ -43,17 +43,15 @@ type AttendanceRow = {
   work_date: string;
   check_in: string | null;
   check_out: string | null;
-  status: string;
 };
 
 type LeaveRow = {
   id: string;
-  leave_type: string;
   start_date: string;
   end_date: string;
-  days_requested: number;
+  reason: string;
   status: string;
-  reviewer_comment: string | null;
+  created_at: string;
 };
 
 function splitName(full: string): { first: string; last: string } {
@@ -127,47 +125,32 @@ export default async function EmployeeProfilePage({
 
     const employee = mapRow(empRow as ProfileRow);
 
-    let privateInfo: PrivateInfoRow | null = null;
-    if (canViewPrivateInfo) {
-      const { data: pi } = await db
-        .from("user_private_info")
-        .select("*")
-        .eq("user_id", id)
-        .maybeSingle();
-      privateInfo = (pi as PrivateInfoRow) ?? null;
-    }
-
-    const { data: docs } = await db
-      .from("user_documents")
-      .select("id, doc_type, file_url, file_size_bytes, uploaded_at")
-      .eq("user_id", id)
-      .eq("company_id", callerCompanyId);
+    // NOTE: user_private_info / user_documents tables don't exist yet —
+    // those queries removed rather than 500-ing the page. Re-add when the
+    // schema lands (PRD §48 private info + documents tabs).
 
     const { data: attendance } = await db
       .from("attendance")
-      .select("work_date, check_in, check_out, status")
+      .select("work_date, check_in, check_out")
       .eq("user_id", id)
-      .eq("company_id", callerCompanyId)
       .order("work_date", { ascending: false })
       .limit(50);
 
     const { data: leaves } = await db
       .from("leave_requests")
-      .select("id, leave_type, start_date, end_date, days_requested, status, reviewer_comment")
+      .select("id, start_date, end_date, reason, status, created_at")
       .eq("user_id", id)
-      .eq("company_id", callerCompanyId)
       .order("start_date", { ascending: false })
       .limit(50);
 
     const fullName = `${employee.first_name} ${employee.last_name}`.trim();
 
     return (
-      <main className="p-6">
-        <h1 className="mb-4 text-xl font-semibold">{fullName}</h1>
+      <main className="p-2 sm:p-4">
         <EmployeeDetail
           employee={employee}
-          privateInfo={privateInfo}
-          documents={(docs as DocumentRow[]) ?? []}
+          privateInfo={null}
+          documents={[]}
           attendance={(attendance as AttendanceRow[]) ?? []}
           leaveRequests={(leaves as LeaveRow[]) ?? []}
           canViewPrivateInfo={canViewPrivateInfo}

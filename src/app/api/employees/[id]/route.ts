@@ -14,6 +14,27 @@ const updateSchema = z.object({
   status: z.enum(["active", "inactive"]).optional(),
 });
 
+/** Map the directory form's snake_case fields onto profiles columns. */
+function normalizeUpdateInput(raw: Record<string, unknown>) {
+  const out: Record<string, unknown> = {};
+  const fullName =
+    typeof raw.fullName === "string" && raw.fullName.trim()
+      ? raw.fullName
+      : [raw.first_name, raw.last_name].filter(Boolean).join(" ").trim();
+  if (fullName) out.fullName = fullName;
+  const email =
+    typeof raw.email === "string" && raw.email ? raw.email : raw.work_email;
+  if (typeof email === "string" && email) out.email = email;
+  if (typeof raw.department === "string") out.department = raw.department;
+  if (typeof raw.job_position === "string") out.designation = raw.job_position;
+  else if (typeof raw.designation === "string") out.designation = raw.designation;
+  if (typeof raw.mobile === "string") out.phone = raw.mobile;
+  else if (typeof raw.phone === "string") out.phone = raw.phone;
+  if (raw.role === "admin" || raw.role === "employee") out.role = raw.role;
+  if (raw.status === "active" || raw.status === "inactive") out.status = raw.status;
+  return out;
+}
+
 /** PATCH /api/employees/[id] — admin-only profile edit. */
 export async function PATCH(request: Request, { params }: { params: { id: string } }) {
   const db = createClient();
@@ -32,7 +53,9 @@ export async function PATCH(request: Request, { params }: { params: { id: string
   if (me.role !== "admin") return NextResponse.json({ error: "Forbidden: Admin access required" }, { status: 403 });
 
   try {
-    const patch = updateSchema.parse(await request.json());
+    const patch = updateSchema.parse(
+      normalizeUpdateInput((await request.json()) as Record<string, unknown>),
+    );
 
     const dbUpdate: Record<string, unknown> = {};
     if (patch.fullName !== undefined) dbUpdate.full_name = patch.fullName;

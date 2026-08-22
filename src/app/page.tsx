@@ -50,14 +50,6 @@ export default function Landing() {
         </div>
 
         <div className="mx-auto max-w-6xl px-6 pb-20 pt-20 text-center lg:pb-28 lg:pt-28">
-          {/* Badge */}
-          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-accent/20 bg-accent/5 px-4 py-1.5">
-            <Zap className="h-3.5 w-3.5 text-accent" />
-            <span className="text-xs font-semibold text-accent">
-              Built for the Odoo × NMIT Hackathon
-            </span>
-          </div>
-
           <h1 className="mx-auto max-w-3xl text-5xl font-bold tracking-tight text-slate-900 sm:text-6xl lg:text-7xl">
             <span className="bg-gradient-to-r from-accent to-blue-600 bg-clip-text text-transparent">
               Dayflow
@@ -287,7 +279,7 @@ export default function Landing() {
               </span>
             </div>
             <p className="text-xs text-slate-400">
-              Dayflow · Odoo × NMIT Hackathon · Built with ♥ by Team DayFlow
+              Dayflow · Built with ♥ by Team DayFlow
             </p>
           </div>
         </div>

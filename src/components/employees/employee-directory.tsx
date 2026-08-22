@@ -11,6 +11,7 @@ import { EmployeeFormModal } from "./employee-form-modal";
 import { CredentialDialog } from "./credential-dialog";
 import { CsvImportDialog } from "./csv-import-dialog";
 import { serializeEmployeesCsv } from "@/lib/csv";
+import { mapProfileToEmployee, type ProfileRow } from "@/lib/employees";
 import type {
   CsvEmployeeRow,
   CsvImportSummary,
@@ -78,7 +79,9 @@ export function EmployeeDirectory({
     setError(null);
     try {
       const data = await postEmployee(values);
-      const next = [...employees, data.employee];
+      // API returns a raw profiles row — map to UI shape BEFORE state
+      const mapped = mapProfileToEmployee(data.employee as unknown as ProfileRow);
+      const next = [...employees, mapped];
       setEmployees(next);
       setStats(deriveStats(next, initialStats));
       setFormOpen(false);
@@ -112,10 +115,14 @@ export function EmployeeDirectory({
         );
       }
       const body = await res.json();
-      const updated: Employee =
+      const rawEmployee =
         body && typeof body === "object" && "employee" in body
-          ? (body as { employee: Employee }).employee
+          ? (body as { employee: unknown }).employee
           : (body as Employee);
+      // map raw profiles row → UI shape before it hits the table
+      const updated: Employee = mapProfileToEmployee(
+        rawEmployee as unknown as ProfileRow,
+      );
       const next = employees.map((e) => (e.id === id ? updated : e));
       setEmployees(next);
       setStats(deriveStats(next, initialStats));

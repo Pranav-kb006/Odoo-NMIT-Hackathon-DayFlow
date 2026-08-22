@@ -15,6 +15,7 @@ import {
   TableCell,
 } from "@/components/ui/table";
 import { EmptyState } from "@/components/ui/empty-state";
+import { workingDaysBetween } from "@/lib/utils";
 import type { Employee } from "@/components/employees/types";
 
 type PrivateInfo = {
@@ -42,17 +43,15 @@ type AttendanceHistoryRow = {
   work_date: string;
   check_in: string | null;
   check_out: string | null;
-  status: string;
 };
 
 type LeaveHistoryRow = {
   id: string;
-  leave_type: string;
   start_date: string;
   end_date: string;
-  days_requested: number;
+  reason: string;
   status: string;
-  reviewer_comment: string | null;
+  created_at: string;
 };
 
 const dateFmt = new Intl.DateTimeFormat("en-IN", {
@@ -354,7 +353,6 @@ export function EmployeeDetail({
                   <TableHead>Work date</TableHead>
                   <TableHead>Check in</TableHead>
                   <TableHead>Check out</TableHead>
-                  <TableHead>Status</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -363,14 +361,6 @@ export function EmployeeDetail({
                     <TableCell>{formatDate(row.work_date)}</TableCell>
                     <TableCell>{formatDateTime(row.check_in)}</TableCell>
                     <TableCell>{formatDateTime(row.check_out)}</TableCell>
-                    <TableCell>
-                      <Badge
-                        variant={attendanceStatusVariant(row.status)}
-                        className="capitalize"
-                      >
-                        {row.status}
-                      </Badge>
-                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -394,23 +384,20 @@ export function EmployeeDetail({
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Type</TableHead>
                   <TableHead>Start</TableHead>
                   <TableHead>End</TableHead>
                   <TableHead>Days</TableHead>
+                  <TableHead>Reason</TableHead>
                   <TableHead>Status</TableHead>
-                  <TableHead>Reviewer comment</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {leaveRequests.map((row) => (
                   <TableRow key={row.id}>
-                    <TableCell className="capitalize">
-                      {row.leave_type}
-                    </TableCell>
                     <TableCell>{formatDate(row.start_date)}</TableCell>
                     <TableCell>{formatDate(row.end_date)}</TableCell>
-                    <TableCell>{row.days_requested}</TableCell>
+                    <TableCell>{workingDaysBetween(row.start_date, row.end_date)}</TableCell>
+                    <TableCell className="max-w-48 truncate">{row.reason}</TableCell>
                     <TableCell>
                       <Badge
                         variant={leaveStatusVariant(row.status)}
@@ -419,7 +406,6 @@ export function EmployeeDetail({
                         {row.status}
                       </Badge>
                     </TableCell>
-                    <TableCell>{row.reviewer_comment ?? "—"}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>

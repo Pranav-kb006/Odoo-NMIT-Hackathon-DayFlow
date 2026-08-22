@@ -46,6 +46,40 @@ const createEmployeeSchema = z.object({
 });
 
 /**
+ * Accept BOTH contracts: camelCase (API-native) and the directory form's
+ * snake_case EmployeeFormValues (first_name/last_name/work_email/...).
+ * Mapped here so neither side has to know about the other.
+ */
+function normalizeCreateInput(raw: Record<string, unknown>) {
+  const fullName =
+    typeof raw.fullName === "string" && raw.fullName.trim()
+      ? raw.fullName
+      : [raw.first_name, raw.last_name].filter(Boolean).join(" ").trim();
+  const email =
+    typeof raw.email === "string" && raw.email ? raw.email : raw.work_email;
+
+  return {
+    fullName: typeof fullName === "string" ? fullName : "",
+    email: typeof email === "string" ? email : "",
+    password: typeof raw.password === "string" ? raw.password : undefined,
+    department: typeof raw.department === "string" ? raw.department : "",
+    designation:
+      typeof raw.job_position === "string"
+        ? raw.job_position
+        : typeof raw.designation === "string"
+          ? raw.designation
+          : null,
+    phone:
+      typeof raw.mobile === "string"
+        ? raw.mobile
+        : typeof raw.phone === "string"
+          ? raw.phone
+          : null,
+    role: raw.role === "admin" ? "admin" : "employee",
+  };
+}
+
+/**
  * POST /api/employees — admin-only. Creates an auth user (confirmed, with the
  * given or generated password), then their profile row. Email is mirrored onto
  * profiles because PostgREST can't join auth.users.
@@ -71,7 +105,13 @@ export async function POST(request: Request) {
   }
 
   try {
-    const parsed = createEmployeeSchema.parse(await request.json());
+    const raw = (await request.json()) as Record<string, unknown>;
+    const parsed = createEmployeeSchema.parse(normalizeCreateInput(raw));
+    // honor the form's date_of_joining when provided, else today
+    const joinedOn =
+      typeof raw.date_of_joining === "string" && /^\d{4}-\d{2}-\d{2}$/.test(raw.date_of_joining)
+        ? raw.date_of_joining
+        : new Date().toISOString().slice(0, 10);
     const password = parsed.password ?? "Dayflow#2026"; // demo default; admin should reset
 
     const admin = createAdminClient();
@@ -99,7 +139,7 @@ export async function POST(request: Request) {
         department: parsed.department,
         designation: parsed.designation ?? null,
         phone: parsed.phone ?? null,
-        joined_on: new Date().toISOString().slice(0, 10),
+        joined_on: joinedOn,
         status: "active",
       })
       .select()
@@ -110,7 +150,14 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: profileError.message }, { status: 500 });
     }
 
-    return NextResponse.json({ employee: profile }, { status: 201 });
+    // Directory UI expects credentials to show in a dialog after creation.
+    return NextResponse.json(
+      {
+        employee: profile,
+        credentials: { login_id: created.user.id.slice(0, 8), temporary_password: password },
+      },
+      { status: 201 },
+    );
   } catch (err: unknown) {
     if (err instanceof z.ZodError) {
       return NextResponse.json({ error: err.issues[0]?.message ?? "Invalid input" }, { status: 400 });

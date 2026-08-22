@@ -3,15 +3,26 @@
 import { useState, useTransition, type FormEvent } from "react";
 
 import { signUpAction } from "@/app/actions/auth";
+import { uploadLogo } from "@/lib/storage";
 
 export default function SignupForm() {
   const [error, setError] = useState<string | undefined>();
   const [pending, startTransition] = useTransition();
+  const [logoUrl, setLogoUrl] = useState<string | null>(null);
 
-  const onSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget as HTMLFormElement);
     setError(undefined);
+
+    const file = formData.get("logo") as File | null;
+    if (file && file.size > 0) {
+      const res = await uploadLogo(file);
+      if (!res.ok) return setError(`Logo upload failed: ${res.error}`);
+      setLogoUrl(res.url);
+      formData.set("logoUrl", res.url);
+    }
+
     startTransition(async () => {
       const result = await signUpAction(undefined, formData);
       if (result?.error) setError(result.error);
@@ -45,6 +56,20 @@ export default function SignupForm() {
           maxLength={4}
           className="h-10 w-full rounded-lg border border-slate-300 px-3 text-sm uppercase focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/40"
         />
+      </div>
+
+      <div>
+        <label htmlFor="logo" className="mb-1 block text-sm font-medium text-slate-700">
+          Company logo (optional)
+        </label>
+        <input
+          id="logo"
+          name="logo"
+          type="file"
+          accept="image/png,image/jpeg,image/webp,image/svg+xml"
+          className="block w-full text-sm text-slate-500 file:mr-3 file:h-10 file:rounded-lg file:border-0 file:bg-slate-100 file:px-4 file:text-sm file:font-medium file:text-slate-700 hover:file:bg-slate-200"
+        />
+        {logoUrl && <p className="mt-1 text-xs text-slate-400">logo uploaded ✓</p>}
       </div>
 
       <div>

@@ -39,6 +39,7 @@ export async function signInAction(_: ActionResult | undefined, formData: FormDa
  * TODO(B4 Lokaksha): swap the /signup shell for the real visual; keep this action.
  */
 export async function signUpAction(_: ActionResult | undefined, formData: FormData): Promise<ActionResult> {
+  const logoUrl = typeof formData.get("logoUrl") === "string" ? (formData.get("logoUrl") as string) : undefined;
   const parsed = signupSchema.safeParse({
     companyName: formData.get("companyName"),
     companyCode: formData.get("companyCode"),
@@ -64,7 +65,7 @@ export async function signUpAction(_: ActionResult | undefined, formData: FormDa
   // 2. company
   const { data: company, error: companyError } = await admin
     .from("companies")
-    .insert({ name: parsed.data.companyName, code: parsed.data.companyCode })
+    .insert({ name: parsed.data.companyName, code: parsed.data.companyCode, ...(logoUrl ? { logo_url: logoUrl } : {}) })
     .select("id")
     .single();
   if (companyError) {

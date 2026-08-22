@@ -6,6 +6,7 @@ create table public.companies (
   id uuid primary key default gen_random_uuid(),
   name text not null,
   code text not null unique,
+  logo_url text,
   created_at timestamptz not null default now()
 );
 
@@ -132,3 +133,22 @@ create policy "admin review leave" on public.leave_requests
       and p.company_id = leave_requests.company_id
     )
   );
+
+-- ============ storage (logos bucket) ============
+-- Bucket 'logos' created via project (public, 1MB, png/jpeg/webp/svg only).
+-- Anyone may read public logos; any signed-in user may upload (scoped by path
+-- prefix in app code). Keep uploads out of anonymous hands.
+create policy "logos public read" on storage.objects
+  for select using (bucket_id = 'logos');
+
+create policy "logos authenticated upload" on storage.objects
+  for insert with check (
+    bucket_id = 'logos'
+    and auth.role() = 'authenticated'
+  );
+
+create policy "logos authenticated update" on storage.objects
+  for update using (bucket_id = 'logos' and auth.role() = 'authenticated');
+
+create policy "logos owner delete" on storage.objects
+  for delete using (bucket_id = 'logos' and auth.role() = 'authenticated');

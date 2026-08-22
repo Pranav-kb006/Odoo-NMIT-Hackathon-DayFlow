@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>TalentOS - Employee Profile (Admin View)</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&amp;family=Geist+Mono:wght@400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-error": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "outline": "#76777d",
+                        "on-secondary-fixed-variant": "#444650",
+                        "primary-fixed": "#dae2fd",
+                        "tertiary": "#000000",
+                        "outline-variant": "#c6c6cd",
+                        "secondary-container": "#dedfeb",
+                        "on-background": "#0b1c30",
+                        "on-tertiary-fixed-variant": "#574425",
+                        "surface-container-highest": "#d3e4fe",
+                        "primary-container": "#131b2e",
+                        "tertiary-fixed": "#fcdeb5",
+                        "surface-container-low": "#eff4ff",
+                        "background": "#f8f9ff",
+                        "on-secondary": "#ffffff",
+                        "on-tertiary-fixed": "#271901",
+                        "on-tertiary": "#ffffff",
+                        "surface-tint": "#565e74",
+                        "primary-fixed-dim": "#bec6e0",
+                        "on-primary": "#ffffff",
+                        "surface-container": "#e5eeff",
+                        "on-secondary-container": "#60626c",
+                        "on-surface": "#0b1c30",
+                        "inverse-primary": "#bec6e0",
+                        "surface-container-lowest": "#ffffff",
+                        "on-surface-variant": "#45464d",
+                        "on-primary-fixed": "#131b2e",
+                        "surface-bright": "#f8f9ff",
+                        "surface-variant": "#d3e4fe",
+                        "tertiary-container": "#271901",
+                        "on-primary-fixed-variant": "#3f465c",
+                        "surface": "#f8f9ff",
+                        "surface-dim": "#cbdbf5",
+                        "tertiary-fixed-dim": "#dec29a",
+                        "on-primary-container": "#7c839b",
+                        "on-secondary-fixed": "#191b24",
+                        "secondary-fixed": "#e1e2ed",
+                        "inverse-surface": "#213145",
+                        "secondary": "#5c5e68",
+                        "on-tertiary-container": "#98805d",
+                        "error-container": "#ffdad6",
+                        "primary": "#000000",
+                        "inverse-on-surface": "#eaf1ff",
+                        "secondary-fixed-dim": "#c4c6d1",
+                        "error": "#ba1a1a",
+                        "surface-container-high": "#dce9ff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "base": "4px",
+                        "margin": "32px",
+                        "xs": "4px",
+                        "sm": "8px",
+                        "gutter": "24px",
+                        "md": "16px",
+                        "xxl": "48px",
+                        "lg": "24px",
+                        "xl": "32px"
+                    },
+                    "fontFamily": {
+                        "body-lg": ["Geist"],
+                        "display": ["Geist"],
+                        "body-md": ["Geist"],
+                        "label-md": ["Geist"],
+                        "headline-md": ["Geist"],
+                        "mono-sm": ["Geist Mono"],
+                        "headline-lg": ["Geist"]
+                    },
+                    "fontSize": {
+                        "body-lg": ["16px", { "lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "400" }],
+                        "display": ["36px", { "lineHeight": "1.1", "letterSpacing": "-0.03em", "fontWeight": "600" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "letterSpacing": "-0.01em", "fontWeight": "400" }],
+                        "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.01em", "fontWeight": "500" }],
+                        "headline-md": ["20px", { "lineHeight": "28px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+                        "mono-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0", "fontWeight": "400" }],
+                        "headline-lg": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Geist', sans-serif; }
+    </style>
+</head>
+<body class="bg-background text-on-background antialiased h-screen flex overflow-hidden">
+<!-- SideNavBar -->
+<aside class="bg-primary dark:bg-primary-container font-body-md text-body-md fixed left-0 top-0 h-full w-[260px] bg-primary flex flex-col h-full py-lg z-20">
+<div class="px-gutter mb-xl flex items-center gap-sm">
+<div class="w-8 h-8 bg-white/20 rounded flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-white text-[20px]" data-icon="corporate_fare">corporate_fare</span>
+</div>
+<div>
+<h1 class="font-display text-headline-lg text-on-primary">TalentOS</h1>
+<p class="text-secondary-fixed-dim font-label-md text-label-md">HR Management</p>
+</div>
+</div>
+<nav class="flex-1 px-sm space-y-xs">
+<a class="flex items-center gap-md px-md py-sm rounded-DEFAULT text-secondary-fixed-dim hover:text-white hover:bg-secondary-container/5 transition-colors duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+                Dashboard
+            </a>
+<a class="flex items-center gap-md px-md py-sm rounded-DEFAULT text-white bg-secondary-container/10 border-r-4 border-surface-container-highest transition-colors duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined" data-icon="contacts" data-weight="fill" style="font-variation-settings: 'FILL' 1;">contacts</span>
+                Directory
+            </a>
+<a class="flex items-center gap-md px-md py-sm rounded-DEFAULT text-secondary-fixed-dim hover:text-white hover:bg-secondary-container/5 transition-colors duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined" data-icon="calendar_today">calendar_today</span>
+                Attendance
+            </a>
+<a class="flex items-center gap-md px-md py-sm rounded-DEFAULT text-secondary-fixed-dim hover:text-white hover:bg-secondary-container/5 transition-colors duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined" data-icon="event_busy">event_busy</span>
+                Time Off
+            </a>
+</nav>
+</aside>
+<!-- Main Content Wrapper -->
+<div class="flex-1 ml-[260px] flex flex-col h-screen overflow-hidden">
+<!-- TopNavBar -->
+<header class="bg-surface-lowest dark:bg-surface-container-lowest font-body-md text-body-md docked full-width top-0 border-b border-outline-variant flex justify-between items-center h-16 px-gutter shrink-0 z-10">
+<div class="flex items-center gap-gutter">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-secondary" data-icon="search">search</span>
+<input class="pl-10 pr-4 py-2 bg-surface rounded-lg border border-outline-variant focus:border-primary focus:ring-0 w-[300px] transition-colors" placeholder="Search employees, documents..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-md">
+<button class="w-10 h-10 rounded-full flex items-center justify-center text-secondary hover:text-primary hover:bg-surface-container-low transition-colors duration-150 relative">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-error rounded-full border border-white"></span>
+</button>
+<button class="w-10 h-10 rounded-full flex items-center justify-center text-secondary hover:text-primary hover:bg-surface-container-low transition-colors duration-150">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</button>
+<div class="w-px h-6 bg-outline-variant mx-sm"></div>
+<button class="flex items-center gap-sm">
+<img alt="User Profile" class="w-8 h-8 rounded-full object-cover border border-outline-variant" data-alt="A professional headshot of a corporate HR administrator, light mode aesthetic, clean background, modern office setting, well-lit." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBA35SiomJOnfVksVLUBbew9854UQV0h8v-1qIVftYyY73Spfl9KdwhZVKFF9RMrloBYSWoC9pnfIIJs8ItGti92FQvAwhh35cq0XJxKl0726VaYe8HQdUuCDYVILHgsdoBeps3tzEHRfisH9AnThkkThlg-wgyfBMmyQHJIfXkyVgXw1lwqiLC75exQI29-FMTtA12z-C9eXSeakXrbr_U4o8L9Y4ysZ0F9TZlOFO3ZhQnMdRHHE-E"/>
+<span class="material-symbols-outlined text-secondary" data-icon="keyboard_arrow_down">keyboard_arrow_down</span>
+</button>
+</div>
+</header>
+<!-- Main Scrollable Area -->
+<main class="flex-1 overflow-y-auto bg-background p-margin">
+<div class="max-w-[1200px] mx-auto space-y-margin">
+<!-- Breadcrumb -->
+<nav class="flex items-center gap-sm text-secondary font-label-md text-label-md">
+<a class="hover:text-primary transition-colors" href="#">Directory</a>
+<span class="material-symbols-outlined text-[16px]" data-icon="chevron_right">chevron_right</span>
+<a class="hover:text-primary transition-colors" href="#">Engineering</a>
+<span class="material-symbols-outlined text-[16px]" data-icon="chevron_right">chevron_right</span>
+<span class="text-on-surface">Alex Mercer</span>
+</nav>
+<!-- Profile Header Card -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-xl flex flex-col md:flex-row gap-xl items-start relative">
+<div class="absolute top-xl right-xl">
+<span class="px-sm py-xs bg-surface-container rounded font-label-md text-label-md text-on-surface uppercase tracking-wider">Active</span>
+</div>
+<div class="relative group cursor-pointer shrink-0">
+<img alt="Employee Avatar" class="w-32 h-32 rounded-full object-cover border-2 border-surface-container-highest" data-alt="A professional headshot of a software engineer, male, 30s, approachable expression, modern corporate attire, light gray background, high-key lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAmTAwPMUYCFdB8PBM-0iZFH2EPqO79m5Ke6YMsv7V43bwI6hzHDVvqMvbi-qUMjEOEkqi3AHViXMcCXLTWiy99KkaDb1eoc2AV3YXAhk6ZB5rv5dc8-tT1CpqpUAKw84RDEDymoLipByJ9Hh530W5vp2yJBESShZt07wYpVl8nNMOcPow3xFZepl9QGIhJ_05jKppMsN293Fac2tE1CpskbSdD5dUfrwbg4HaQeEsbo6yoavxyh7-Z"/>
+<div class="absolute inset-0 bg-primary/50 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined text-white" data-icon="edit">edit</span>
+</div>
+</div>
+<div class="flex-1 grid grid-cols-1 md:grid-cols-2 gap-xl">
+<div class="space-y-sm">
+<h2 class="font-headline-lg text-headline-lg text-on-surface">Alex Mercer</h2>
+<p class="text-secondary font-body-lg text-body-lg">Senior Full Stack Engineer</p>
+<div class="pt-sm space-y-xs">
+<div class="flex items-center gap-sm text-secondary font-body-md text-body-md">
+<span class="material-symbols-outlined text-[18px]" data-icon="mail">mail</span>
+<span>alex.mercer@talentos.com</span>
+</div>
+<div class="flex items-center gap-sm text-secondary font-body-md text-body-md">
+<span class="material-symbols-outlined text-[18px]" data-icon="call">call</span>
+<span>+1 (555) 123-4567</span>
+</div>
+<div class="flex items-center gap-sm text-secondary font-body-md text-body-md">
+<span class="material-symbols-outlined text-[18px]" data-icon="badge">badge</span>
+<span>EMP-2023-042</span>
+</div>
+</div>
+</div>
+<div class="space-y-sm md:border-l border-outline-variant md:pl-xl">
+<div class="grid grid-cols-[100px_1fr] gap-sm font-body-md text-body-md">
+<span class="text-secondary">Department:</span>
+<span class="text-on-surface font-medium">Engineering</span>
+<span class="text-secondary">Manager:</span>
+<span class="text-on-surface font-medium flex items-center gap-xs">
+<img alt="Manager Avatar" class="w-5 h-5 rounded-full" data-alt="Small avatar of a female engineering manager, professional." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDsFWyS27jaNxKZ2J9bWjbaEoJtKMJeRhhliuL0FJFA9vpe84KkjTx1NBjCVr5GDcIwlMLwZfP-ZhcA9hALZKoS8eoXGR7Xr5nzx_vrc-kqWLYwuJNfDZavbVgMInj9e7cv2OQ4FNZ5nqotAWT8zHoTuUXYXDIVn88rruDSxzc95N_2mijNVUdai1726JQIKl0FXHOpWQwEhbhOjNrUfVej9i51qqQ0jDZT-gyiNr5J0p7bF97NGjey"/>
+                                    Sarah Jenkins
+                                </span>
+<span class="text-secondary">Location:</span>
+<span class="text-on-surface font-medium">San Francisco, CA (Hybrid)</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Tab Navigation -->
+<div class="border-b border-outline-variant flex gap-lg">
+<a class="pb-sm font-label-md text-label-md uppercase tracking-wider text-secondary hover:text-primary transition-colors" href="#">Resume</a>
+<a class="pb-sm font-label-md text-label-md uppercase tracking-wider text-primary border-b-2 border-primary font-bold" href="#">Private Info</a>
+<a class="pb-sm font-label-md text-label-md uppercase tracking-wider text-secondary hover:text-primary transition-colors" href="#">Salary Info</a>
+</div>
+<!-- Private Info Content Canvas (Bento/Card Layout) -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-lg">
+<!-- Left Column: Core Personal Data -->
+<div class="lg:col-span-2 space-y-lg">
+<!-- Personal Details Card -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden">
+<div class="px-xl py-md border-b border-outline-variant bg-surface-bright flex justify-between items-center">
+<h3 class="font-headline-md text-headline-md text-on-surface">Personal Details</h3>
+<button class="w-8 h-8 flex items-center justify-center rounded text-secondary hover:bg-surface-container hover:text-primary transition-colors" title="Edit">
+<span class="material-symbols-outlined text-[18px]" data-icon="edit">edit</span>
+</button>
+</div>
+<div class="p-xl grid grid-cols-1 md:grid-cols-2 gap-y-xl gap-x-lg">
+<div class="space-y-xs">
+<label class="font-label-md text-label-md text-secondary uppercase">Date of Birth</label>
+<div class="font-body-lg text-body-lg text-on-surface flex items-center gap-sm">
+<span class="material-symbols-outlined text-secondary text-[20px]" data-icon="calendar_month">calendar_month</span>
+                                        October 12, 1990
+                                    </div>
+</div>
+<div class="space-y-xs">
+<label class="font-label-md text-label-md text-secondary uppercase">Gender</label>
+<div class="font-body-lg text-body-lg text-on-surface">Male</div>
+</div>
+<div class="space-y-xs">
+<label class="font-label-md text-label-md text-secondary uppercase">Marital Status</label>
+<div class="font-body-lg text-body-lg text-on-surface">Single</div>
+</div>
+<div class="space-y-xs">
+<label class="font-label-md text-label-md text-secondary uppercase">Nationality</label>
+<div class="font-body-lg text-body-lg text-on-surface">American</div>
+</div>
+<div class="space-y-xs md:col-span-2">
+<label class="font-label-md text-label-md text-secondary uppercase">Personal Email</label>
+<div class="font-body-lg text-body-lg text-on-surface">alex.m.personal@example.com</div>
+</div>
+</div>
+</div>
+<!-- Address Information Card -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden">
+<div class="px-xl py-md border-b border-outline-variant bg-surface-bright flex justify-between items-center">
+<h3 class="font-headline-md text-headline-md text-on-surface">Address Information</h3>
+<button class="w-8 h-8 flex items-center justify-center rounded text-secondary hover:bg-surface-container hover:text-primary transition-colors" title="Edit">
+<span class="material-symbols-outlined text-[18px]" data-icon="edit">edit</span>
+</button>
+</div>
+<div class="p-xl grid grid-cols-1 md:grid-cols-2 gap-y-xl gap-x-lg">
+<div class="space-y-xs md:col-span-2">
+<label class="font-label-md text-label-md text-secondary uppercase">Current Address</label>
+<div class="font-body-lg text-body-lg text-on-surface">
+                                        123 Tech Lane, Apt 4B<br/>
+                                        San Francisco, CA 94105<br/>
+                                        United States
+                                    </div>
+</div>
+<div class="space-y-xs md:col-span-2 pt-sm border-t border-outline-variant">
+<label class="font-label-md text-label-md text-secondary uppercase flex items-center gap-xs">
+                                        Permanent Address
+                                        <span class="px-xs py-[2px] bg-surface-container rounded-sm text-[10px]">Same as Current</span>
+</label>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Column: Financial & ID -->
+<div class="space-y-lg">
+<!-- Bank Details Card -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden">
+<div class="px-xl py-md border-b border-outline-variant bg-surface-bright flex justify-between items-center">
+<h3 class="font-headline-md text-headline-md text-on-surface">Bank Details</h3>
+<button class="w-8 h-8 flex items-center justify-center rounded text-secondary hover:bg-surface-container hover:text-primary transition-colors" title="Edit">
+<span class="material-symbols-outlined text-[18px]" data-icon="edit">edit</span>
+</button>
+</div>
+<div class="p-xl space-y-xl">
+<div class="space-y-xs">
+<label class="font-label-md text-label-md text-secondary uppercase">Bank Name</label>
+<div class="font-body-lg text-body-lg text-on-surface flex items-center gap-sm">
+<span class="material-symbols-outlined text-secondary text-[20px]" data-icon="account_balance">account_balance</span>
+                                        Chase Bank
+                                    </div>
+</div>
+<div class="space-y-xs">
+<label class="font-label-md text-label-md text-secondary uppercase">Account Name</label>
+<div class="font-body-lg text-body-lg text-on-surface">Alexander Mercer</div>
+</div>
+<div class="space-y-xs">
+<label class="font-label-md text-label-md text-secondary uppercase">Account Number</label>
+<div class="font-mono-sm text-mono-sm text-on-surface text-[14px]">•••• •••• 4567</div>
+</div>
+<div class="space-y-xs">
+<label class="font-label-md text-label-md text-secondary uppercase">Routing Number</label>
+<div class="font-mono-sm text-mono-sm text-on-surface text-[14px]">021000021</div>
+</div>
+</div>
+</div>
+<!-- Identity Documents Card -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden">
+<div class="px-xl py-md border-b border-outline-variant bg-surface-bright flex justify-between items-center">
+<h3 class="font-headline-md text-headline-md text-on-surface">Identity &amp; Visas</h3>
+<button class="text-primary font-label-md text-label-md hover:underline">Manage</button>
+</div>
+<div class="p-0">
+<div class="px-xl py-md border-b border-outline-variant last:border-b-0 hover:bg-surface-container-low transition-colors cursor-pointer flex justify-between items-center">
+<div>
+<div class="font-body-md text-body-md text-on-surface font-medium">SSN</div>
+<div class="font-mono-sm text-mono-sm text-secondary">•••-••-1234</div>
+</div>
+<span class="material-symbols-outlined text-secondary" data-icon="visibility">visibility</span>
+</div>
+<div class="px-xl py-md border-b border-outline-variant last:border-b-0 hover:bg-surface-container-low transition-colors cursor-pointer flex justify-between items-center">
+<div>
+<div class="font-body-md text-body-md text-on-surface font-medium">Passport</div>
+<div class="font-body-md text-body-md text-secondary">Exp: Oct 2028</div>
+</div>
+<span class="px-sm py-xs bg-emerald-50 text-emerald-700 rounded font-label-md text-label-md border border-emerald-200">Verified</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

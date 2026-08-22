@@ -279,7 +279,6 @@ export default function Landing() {
                 href="/signup"
                 className="group inline-flex items-center gap-2.5 rounded-2xl bg-gradient-to-r from-slate-900 to-slate-800 px-8 py-4 text-sm font-semibold text-white shadow-xl shadow-slate-900/20 transition-all duration-300 hover:shadow-2xl hover:shadow-slate-900/30 hover:scale-[1.02]"
               >
-                <Sparkles className="h-4 w-4 text-amber-300" />
                 Create your company
                 <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
               </a>
@@ -287,7 +286,6 @@ export default function Landing() {
                 href="/login"
                 className="group inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-white/80 backdrop-blur-sm px-8 py-4 text-sm font-semibold text-slate-700 transition-all duration-300 hover:border-slate-300 hover:bg-white hover:shadow-lg hover:scale-[1.02]"
               >
-                <MousePointerClick className="h-4 w-4 text-slate-400" />
                 Sign in
               </a>
             </div>

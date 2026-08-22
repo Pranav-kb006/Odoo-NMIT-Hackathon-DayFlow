@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import type { Employee } from "./types";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Download, Plus, RefreshCw, Upload } from "lucide-react";
@@ -13,7 +14,6 @@ import { serializeEmployeesCsv } from "@/lib/csv";
 import type {
   CsvEmployeeRow,
   CsvImportSummary,
-  Employee,
   EmployeeCreateResponse,
   EmployeeFormValues,
   EmployeeStats,
@@ -42,6 +42,8 @@ export function EmployeeDirectory({
   const router = useRouter();
 
   const [employees, setEmployees] = useState<Employee[]>(initialEmployees);
+  const [filteredEmployees, setFilteredEmployees] =
+    useState<Employee[]>(initialEmployees);
   const [stats, setStats] = useState<EmployeeStats>(initialStats);
 
   const [formOpen, setFormOpen] = useState(false);
@@ -187,7 +189,7 @@ export function EmployeeDirectory({
   }
 
   function handleExport() {
-    const csv = serializeEmployeesCsv(employees);
+    const csv = serializeEmployeesCsv(filteredEmployees ?? employees);
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
     const anchor = document.createElement("a");
@@ -233,11 +235,10 @@ export function EmployeeDirectory({
 
       <EmployeeTable
         employees={employees}
-        managers={managers}
         onAdd={openAddForm}
         onEdit={openEditForm}
         onImport={() => setCsvOpen(true)}
-        onRefresh={handleRefresh}
+        onFilteredChange={setFilteredEmployees}
       />
 
       <EmployeeFormModal

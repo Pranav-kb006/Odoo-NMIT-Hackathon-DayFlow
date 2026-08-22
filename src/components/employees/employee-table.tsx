@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import {
   Table,
@@ -20,11 +20,10 @@ import type { Employee } from "./types";
 
 type Props = {
   employees: Employee[];
-  managers: Employee[];
   onAdd: () => void;
   onEdit: (employee: Employee) => void;
   onImport: () => void;
-  onRefresh: () => void;
+  onFilteredChange?: (rows: Employee[]) => void;
   loading?: boolean;
 };
 
@@ -60,11 +59,10 @@ function deriveDepartments(employees: Employee[]): string[] {
 
 export function EmployeeTable({
   employees,
-  managers,
   onAdd,
   onEdit,
   onImport,
-  onRefresh,
+  onFilteredChange,
   loading = false,
 }: Props) {
   const [search, setSearch] = useState("");
@@ -96,8 +94,9 @@ export function EmployeeTable({
     });
   }, [employees, search, department, status]);
 
-  const hasFilters =
-    search.trim() !== "" || department !== "All" || status !== "All";
+  useEffect(() => {
+    onFilteredChange?.(filtered);
+  }, [filtered, onFilteredChange]);
 
   function resetFilters() {
     setSearch("");

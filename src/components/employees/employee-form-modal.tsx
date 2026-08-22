@@ -99,6 +99,11 @@ export function EmployeeFormModal({
     });
   }
 
+  function handleFieldChange(key: keyof EmployeeFormValues) {
+    return (e: React.ChangeEvent<HTMLInputElement>) =>
+      updateField(key, e.target.value);
+  }
+
   function validate(next: EmployeeFormValues): FieldErrors {
     const errors: FieldErrors = {};
     if (!next.first_name.trim()) {
@@ -195,7 +200,7 @@ export function EmployeeFormModal({
               id="first_name"
               className={inputBaseClass}
               value={values.first_name}
-              onChange={(e) => updateField("first_name", e.target.value)}
+              onChange={handleFieldChange("first_name")}
               disabled={submitting}
               aria-invalid={Boolean(fieldErrors.first_name)}
             />
@@ -217,7 +222,7 @@ export function EmployeeFormModal({
               id="last_name"
               className={inputBaseClass}
               value={values.last_name}
-              onChange={(e) => updateField("last_name", e.target.value)}
+              onChange={handleFieldChange("last_name")}
               disabled={submitting}
               aria-invalid={Boolean(fieldErrors.last_name)}
             />
@@ -240,7 +245,7 @@ export function EmployeeFormModal({
               type="email"
               className={inputBaseClass}
               value={values.work_email}
-              onChange={(e) => updateField("work_email", e.target.value)}
+              onChange={handleFieldChange("work_email")}
               disabled={submitting}
               aria-invalid={Boolean(fieldErrors.work_email)}
             />
@@ -263,7 +268,7 @@ export function EmployeeFormModal({
               type="email"
               className={inputBaseClass}
               value={values.personal_email}
-              onChange={(e) => updateField("personal_email", e.target.value)}
+              onChange={handleFieldChange("personal_email")}
               disabled={submitting}
               aria-invalid={Boolean(fieldErrors.personal_email)}
             />
@@ -286,7 +291,7 @@ export function EmployeeFormModal({
               type="tel"
               className={inputBaseClass}
               value={values.mobile}
-              onChange={(e) => updateField("mobile", e.target.value)}
+              onChange={handleFieldChange("mobile")}
               disabled={submitting}
             />
           </div>
@@ -303,7 +308,7 @@ export function EmployeeFormModal({
               type="date"
               className={inputBaseClass}
               value={values.date_of_joining}
-              onChange={(e) => updateField("date_of_joining", e.target.value)}
+              onChange={handleFieldChange("date_of_joining")}
               disabled={submitting}
               aria-invalid={Boolean(fieldErrors.date_of_joining)}
             />
@@ -325,7 +330,7 @@ export function EmployeeFormModal({
               id="department"
               className={inputBaseClass}
               value={values.department}
-              onChange={(e) => updateField("department", e.target.value)}
+              onChange={handleFieldChange("department")}
               disabled={submitting}
             />
           </div>
@@ -341,7 +346,7 @@ export function EmployeeFormModal({
               id="job_position"
               className={inputBaseClass}
               value={values.job_position}
-              onChange={(e) => updateField("job_position", e.target.value)}
+              onChange={handleFieldChange("job_position")}
               disabled={submitting}
             />
           </div>
@@ -380,7 +385,7 @@ export function EmployeeFormModal({
               id="location"
               className={inputBaseClass}
               value={values.location}
-              onChange={(e) => updateField("location", e.target.value)}
+              onChange={handleFieldChange("location")}
               disabled={submitting}
             />
           </div>

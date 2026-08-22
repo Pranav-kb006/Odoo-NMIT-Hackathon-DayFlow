@@ -149,7 +149,9 @@ export function EmployeeTable({
           <Input
             type="search"
             value={search}
-            onChange={(event) => setSearch(event.target.value)}
+            onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+              setSearch(event.target.value)
+            }
             placeholder="Search name, login, email, department…"
             className="pl-9"
             aria-label="Search employees"
@@ -210,7 +212,7 @@ export function EmployeeTable({
                         </span>
                         <div className="min-w-0">
                           <Link
-                            href={`/employees/${employee.id}`}
+                            href={`/dashboard/employees/${employee.id}`}
                             className="block truncate font-medium text-slate-900 hover:text-blue-600 hover:underline"
                           >
                             {getDisplayName(employee)}
@@ -257,7 +259,7 @@ export function EmployeeTable({
       <div className="space-y-3 md:hidden">
         {filtered.map((employee) => (
           <Card key={employee.id}>
-            <Link href={`/employees/${employee.id}`} className="block">
+            <Link href={`/dashboard/employees/${employee.id}`} className="block">
               <CardContent className="p-4">
                 <div className="flex items-center gap-3">
                   <span

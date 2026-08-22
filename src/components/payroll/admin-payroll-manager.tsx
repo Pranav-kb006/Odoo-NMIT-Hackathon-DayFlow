@@ -3,21 +3,36 @@
 import { useState, useMemo, useEffect } from "react";
 import {
   calculateSalaryBreakdown,
-  mapProfileToPayrollItem,
   type PayrollItem,
   type DBProfile,
 } from "@/lib/payroll";
 import { Modal, ModalHeader, ModalBody, ModalFooter } from "@/components/ui/modal";
 
 interface AdminPayrollManagerProps {
-  initialItems?: PayrollItem[];
+  companyId: string;
 }
 
-export function AdminPayrollManager({ initialItems = [] }: AdminPayrollManagerProps) {
-  const [payrollList, setPayrollList] = useState<PayrollItem[]>(initialItems);
-  const [loading, setLoading] = useState(initialItems.length === 0);
+const MONTH_NAMES = [
+  "January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December",
+];
+
+function recentMonths(n = 6) {
+  const out: { year: number; month: number; label: string }[] = [];
+  const now = new Date();
+  for (let i = 0; i < n; i++) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    out.push({ year: d.getFullYear(), month: d.getMonth() + 1, label: `${MONTH_NAMES[d.getMonth()]} ${d.getFullYear()}` });
+  }
+  return out;
+}
+
+export function AdminPayrollManager({ companyId }: AdminPayrollManagerProps) {
+  const months = useMemo(() => recentMonths(6), []);
+  const [payrollList, setPayrollList] = useState<PayrollItem[]>([]);
+  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedMonth, setSelectedMonth] = useState("October 2023");
+  const [selected, setSelected] = useState(months[0]);
   const [monthDropdownOpen, setMonthDropdownOpen] = useState(false);
   const [statusFilter, setStatusFilter] = useState<"all" | "paid" | "processing" | "pending">("all");
   const [filterDropdownOpen, setFilterDropdownOpen] = useState(false);
@@ -29,36 +44,58 @@ export function AdminPayrollManager({ initialItems = [] }: AdminPayrollManagerPr
   const [newWageInput, setNewWageInput] = useState("");
   const [isProcessingBatch, setIsProcessingBatch] = useState(false);
 
-  // Fetch real employee profiles from API to stay live when new employees are added in Directory
-  const fetchEmployees = async () => {
+  // Fetch REAL payroll: payslips for the month + latest salary per employee.
+  const loadPayroll = async (year: number, month: number) => {
+    setLoading(true);
     try {
-      setLoading(true);
-      const res = await fetch("/api/employees");
-      if (res.ok) {
-        const data = await res.json();
-        if (Array.isArray(data.employees)) {
-          const mapped = data.employees.map((p: DBProfile) => {
-            // Preserve status if existing in state
-            const existing = payrollList.find((item) => item.id === p.id);
-            return mapProfileToPayrollItem(
-              p,
-              existing?.monthlyWage,
-              existing?.status
-            );
-          });
-          setPayrollList(mapped);
-        }
-      }
+      const res = await fetch(`/api/payslips?year=${year}&month=${month}`);
+      if (!res.ok) throw new Error("Failed to load payroll");
+      const data = await res.json();
+      const slipMap: Record<string, (typeof data.payslips)[number]> = {};
+      for (const p of data.payslips ?? []) slipMap[p.profile_id] = p;
+      const emps: DBProfile[] = window.__payrollEmployees ?? [];
+      const items: (PayrollItem & { noSalary?: boolean })[] = emps.map((emp) => {
+        const slip = slipMap[emp.id];
+        const base = data.salaryMap?.[emp.id]?.base ?? 0;
+        const bd = calculateSalaryBreakdown(base || 1);
+        return {
+          id: emp.id,
+          empId: `EMP-${emp.id.slice(0, 4).toUpperCase()}`,
+          name: emp.full_name,
+          role: emp.designation || emp.department || "Employee",
+          avatarUrl: emp.avatar_url,
+          monthlyWage: slip ? Number(slip.base_salary) : base,
+          deductions: slip ? Number(slip.deductions) : bd.totalDeductions * (base > 0 ? 1 : 0),
+          netPay: slip ? Number(slip.net_pay) : base > 0 ? bd.netPay : 0,
+          status: slip ? "paid" : "pending",
+          noSalary: base <= 0 && !slip,
+        };
+      });
+      setPayrollList(items);
     } catch (err) {
-      console.error("Failed to fetch employees for payroll:", err);
+      console.error("Payroll load failed:", err);
     } finally {
       setLoading(false);
     }
   };
 
+  // Load the employee roster first, then payroll for the selected month.
   useEffect(() => {
-    fetchEmployees();
-  }, []);
+    (async () => {
+      try {
+        const res = await fetch("/api/employees");
+        if (res.ok) {
+          const data = await res.json();
+          window.__payrollEmployees = data.employees ?? [];
+        }
+      } catch {
+        /* ignore */
+      } finally {
+        await loadPayroll(selected.year, selected.month);
+      }
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selected]);
 
   // Metrics
   const totalPayroll = useMemo(() => {
@@ -96,37 +133,48 @@ export function AdminPayrollManager({ initialItems = [] }: AdminPayrollManagerPr
     }).format(amount);
   };
 
-  const handleGenerateAllPayslips = () => {
+  const handleGenerateAllPayslips = async () => {
     setIsProcessingBatch(true);
-    setTimeout(() => {
-      setPayrollList((prev) =>
-        prev.map((item) => ({ ...item, status: "paid" }))
-      );
-      setIsProcessingBatch(false);
+    try {
+      const res = await fetch("/api/payslips/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ year: selected.year, month: selected.month }),
+      });
+      if (!res.ok) {
+        const d = await res.json().catch(() => ({}));
+        throw new Error(d.error || "Generation failed");
+      }
+      await loadPayroll(selected.year, selected.month);
       setBatchModalOpen(false);
-    }, 1200);
+    } catch (err: unknown) {
+      console.error("Generate failed:", err);
+    } finally {
+      setIsProcessingBatch(false);
+    }
   };
 
-  const handleUpdateWage = (e: React.FormEvent) => {
+  const handleUpdateWage = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editWageItem) return;
     const wage = parseFloat(newWageInput);
     if (isNaN(wage) || wage <= 0) return;
 
-    const breakdown = calculateSalaryBreakdown(wage);
-    setPayrollList((prev) =>
-      prev.map((item) =>
-        item.id === editWageItem.id
-          ? {
-              ...item,
-              monthlyWage: wage,
-              deductions: breakdown.totalDeductions,
-              netPay: breakdown.netPay,
-            }
-          : item
-      )
-    );
-    setEditWageItem(null);
+    try {
+      const res = await fetch(`/api/employees/${editWageItem.id}/salary`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ baseSalary: wage }),
+      });
+      if (!res.ok) {
+        const d = await res.json().catch(() => ({}));
+        throw new Error(d.error || "Salary update failed");
+      }
+      await loadPayroll(selected.year, selected.month);
+      setEditWageItem(null);
+    } catch (err: unknown) {
+      console.error("Wage update failed:", err);
+    }
   };
 
   return (
@@ -157,7 +205,7 @@ export function AdminPayrollManager({ initialItems = [] }: AdminPayrollManagerPr
               className="flex items-center gap-sm bg-[#FFFFFF] border border-[#E2E8F0] px-md py-sm rounded text-body-md font-body-md text-on-background hover:border-[#CBD5E1] transition-colors focus:outline-none focus:border-[#0F172A]"
             >
               <span className="material-symbols-outlined text-[18px]">calendar_month</span>
-              <span>{selectedMonth}</span>
+              <span>{selected.label}</span>
               <span className="material-symbols-outlined text-[18px] ml-sm">expand_more</span>
             </button>
 
@@ -168,21 +216,21 @@ export function AdminPayrollManager({ initialItems = [] }: AdminPayrollManagerPr
                   onClick={() => setMonthDropdownOpen(false)}
                 />
                 <div className="absolute right-0 top-full mt-1 w-44 rounded border border-outline-variant bg-surface-container-lowest py-1 shadow-lg z-20">
-                  {["September 2023", "October 2023", "November 2023", "December 2023"].map(
+                  {months.map(
                     (m) => (
                       <button
-                        key={m}
+                        key={m.label}
                         onClick={() => {
-                          setSelectedMonth(m);
+                          setSelected(m);
                           setMonthDropdownOpen(false);
                         }}
                         className={`w-full px-4 py-2 text-left text-sm transition-colors ${
-                          selectedMonth === m
+                          selected.label === m.label
                             ? "bg-surface-container-low font-bold text-primary"
                             : "text-on-surface-variant hover:bg-surface-container-low"
                         }`}
                       >
-                        {m}
+                        {m.label}
                       </button>
                     )
                   )}
@@ -277,7 +325,7 @@ export function AdminPayrollManager({ initialItems = [] }: AdminPayrollManagerPr
           {/* Filter & Refresh */}
           <div className="flex items-center gap-sm w-full sm:w-auto">
             <button
-              onClick={fetchEmployees}
+              onClick={() => loadPayroll(selected.year, selected.month)}
               className="flex items-center gap-xs px-md py-2 border border-[#E2E8F0] rounded hover:bg-[#F8FAFB] transition-colors font-label-md text-label-md text-[#0F172A]"
               title="Refresh from Directory"
             >
@@ -404,11 +452,15 @@ export function AdminPayrollManager({ initialItems = [] }: AdminPayrollManagerPr
                     </td>
                     <td className="py-sm px-lg font-mono-sm text-mono-sm text-[#0F172A] text-right">
                       <div className="flex items-center justify-end gap-1">
-                        <span>{formatCurrency(item.monthlyWage)}</span>
+                        {item.noSalary ? (
+                          <span className="text-amber-600 text-xs">Set salary</span>
+                        ) : (
+                          <span>{formatCurrency(item.monthlyWage)}</span>
+                        )}
                         <button
                           onClick={() => {
                             setEditWageItem(item);
-                            setNewWageInput(item.monthlyWage.toString());
+                            setNewWageInput((item.monthlyWage || 0).toString());
                           }}
                           className="text-on-surface-variant hover:text-primary p-0.5 rounded transition-colors"
                           title="Edit Base Wage"
@@ -481,13 +533,13 @@ export function AdminPayrollManager({ initialItems = [] }: AdminPayrollManagerPr
       <Modal open={batchModalOpen} onClose={() => setBatchModalOpen(false)}>
         <ModalHeader
           title="Batch Process Payslips"
-          description={`Generate and finalize payslips for ${selectedMonth}`}
+          description={`Generate and finalize payslips for ${selected.label}`}
           onClose={() => setBatchModalOpen(false)}
         />
         <ModalBody className="space-y-4">
           <p className="text-sm text-on-surface-variant">
             You are about to generate payslips for all eligible employees for{" "}
-            <strong>{selectedMonth}</strong>.
+            <strong>{selected.label}</strong>.
           </p>
           <div className="rounded-lg bg-surface-container-low p-4 space-y-2 text-sm">
             <div className="flex justify-between">

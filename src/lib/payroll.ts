@@ -61,6 +61,8 @@ export type PayrollItem = {
   deductions: number;
   netPay: number;
   status: "paid" | "processing" | "pending";
+  /** True when no salary structure is configured for this employee yet. */
+  noSalary?: boolean;
 };
 
 export type DBProfile = {

@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Luminal HR - Sign Up</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&amp;family=Geist+Mono:wght@400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-secondary-fixed-variant": "#444650",
+                      "surface-container-highest": "#d3e4fe",
+                      "inverse-primary": "#bec6e0",
+                      "on-surface": "#0b1c30",
+                      "on-error": "#ffffff",
+                      "surface-variant": "#d3e4fe",
+                      "tertiary": "#000000",
+                      "surface-container": "#e5eeff",
+                      "surface-bright": "#f8f9ff",
+                      "secondary-container": "#dedfeb",
+                      "surface-tint": "#565e74",
+                      "tertiary-fixed-dim": "#dec29a",
+                      "surface-dim": "#cbdbf5",
+                      "surface-container-lowest": "#ffffff",
+                      "on-tertiary-fixed-variant": "#574425",
+                      "error-container": "#ffdad6",
+                      "inverse-on-surface": "#eaf1ff",
+                      "tertiary-fixed": "#fcdeb5",
+                      "outline-variant": "#c6c6cd",
+                      "primary-container": "#131b2e",
+                      "secondary-fixed-dim": "#c4c6d1",
+                      "primary-fixed": "#dae2fd",
+                      "on-primary": "#ffffff",
+                      "on-primary-fixed": "#131b2e",
+                      "on-tertiary": "#ffffff",
+                      "on-tertiary-fixed": "#271901",
+                      "surface-container-low": "#eff4ff",
+                      "on-background": "#0b1c30",
+                      "inverse-surface": "#213145",
+                      "surface-container-high": "#dce9ff",
+                      "secondary": "#5c5e68",
+                      "on-primary-container": "#7c839b",
+                      "outline": "#76777d",
+                      "secondary-fixed": "#e1e2ed",
+                      "on-surface-variant": "#45464d",
+                      "on-error-container": "#93000a",
+                      "primary": "#000000",
+                      "primary-fixed-dim": "#bec6e0",
+                      "on-secondary-fixed": "#191b24",
+                      "on-tertiary-container": "#98805d",
+                      "on-secondary": "#ffffff",
+                      "surface": "#f8f9ff",
+                      "on-secondary-container": "#60626c",
+                      "tertiary-container": "#271901",
+                      "on-primary-fixed-variant": "#3f465c",
+                      "error": "#ba1a1a",
+                      "background": "#f8f9ff"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "xxl": "48px",
+                      "base": "4px",
+                      "sm": "8px",
+                      "gutter": "24px",
+                      "margin": "32px",
+                      "xl": "32px",
+                      "md": "16px",
+                      "xs": "4px",
+                      "lg": "24px"
+              },
+              "fontFamily": {
+                      "display": [
+                              "Geist"
+                      ],
+                      "body-md": [
+                              "Geist"
+                      ],
+                      "headline-lg": [
+                              "Geist"
+                      ],
+                      "mono-sm": [
+                              "Geist Mono"
+                      ],
+                      "label-md": [
+                              "Geist"
+                      ],
+                      "body-lg": [
+                              "Geist"
+                      ],
+                      "headline-md": [
+                              "Geist"
+                      ]
+              },
+              "fontSize": {
+                      "display": [
+                              "36px",
+                              {
+                                      "lineHeight": "1.1",
+                                      "letterSpacing": "-0.03em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-md": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "letterSpacing": "-0.01em",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-lg": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "mono-sm": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "letterSpacing": "0",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "label-md": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "letterSpacing": "0.01em",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "body-lg": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "letterSpacing": "-0.01em",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-md": [
+                              "20px",
+                              {
+                                      "lineHeight": "28px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "600"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+      </script>
+</head>
+<body class="bg-background text-on-surface min-h-screen flex items-center justify-center p-gutter font-body-md">
+<!-- Transactional Screen: Navigation Suppressed -->
+<div class="w-full max-w-[480px] bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-xl shadow-sm flex flex-col gap-lg relative overflow-hidden">
+<!-- Minimal Graphic Element -->
+<div class="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-bl-full -mr-8 -mt-8 pointer-events-none"></div>
+<div class="text-center flex flex-col items-center gap-sm">
+<div class="w-12 h-12 bg-primary text-on-primary rounded-lg flex items-center justify-center mb-xs">
+<span class="material-symbols-outlined" style="font-size: 28px;">hub</span>
+</div>
+<h1 class="font-display text-display text-primary">Luminal HR</h1>
+<p class="font-body-md text-body-md text-on-surface-variant">Create a new organization account</p>
+</div>
+<form class="flex flex-col gap-md">
+<div class="flex flex-col gap-xs">
+<div class="flex items-center justify-between">
+<label class="font-label-md text-label-md text-on-surface" for="companyName">Company Name</label>
+<button class="text-primary hover:text-primary-fixed-dim transition-colors flex items-center gap-xs font-label-md text-label-md" title="Upload Company Logo" type="button">
+<span class="material-symbols-outlined text-[16px]">upload_file</span>
+<span>Upload Logo</span>
+</button>
+</div>
+<input class="w-full h-10 px-md bg-surface-container-lowest border border-outline-variant rounded focus:border-primary focus:ring-0 focus:outline-none transition-colors font-body-md text-body-md placeholder:text-outline/50" id="companyName" placeholder="Enter company name" type="text"/>
+</div>
+<div class="flex flex-col gap-xs">
+<label class="font-label-md text-label-md text-on-surface" for="fullName">Full Name</label>
+<input class="w-full h-10 px-md bg-surface-container-lowest border border-outline-variant rounded focus:border-primary focus:ring-0 focus:outline-none transition-colors font-body-md text-body-md placeholder:text-outline/50" id="fullName" placeholder="Enter your full name" type="text"/>
+</div>
+<div class="flex flex-col gap-xs">
+<label class="font-label-md text-label-md text-on-surface" for="email">Email Address</label>
+<input class="w-full h-10 px-md bg-surface-container-lowest border border-outline-variant rounded focus:border-primary focus:ring-0 focus:outline-none transition-colors font-body-md text-body-md placeholder:text-outline/50" id="email" placeholder="Enter professional email" type="email"/>
+</div>
+<div class="flex flex-col gap-xs">
+<label class="font-label-md text-label-md text-on-surface" for="phone">Phone Number</label>
+<input class="w-full h-10 px-md bg-surface-container-lowest border border-outline-variant rounded focus:border-primary focus:ring-0 focus:outline-none transition-colors font-body-md text-body-md placeholder:text-outline/50" id="phone" placeholder="Enter phone number" type="tel"/>
+</div>
+<div class="flex flex-col gap-xs relative">
+<label class="font-label-md text-label-md text-on-surface" for="password">Password</label>
+<div class="relative">
+<input class="w-full h-10 px-md pr-10 bg-surface-container-lowest border border-outline-variant rounded focus:border-primary focus:ring-0 focus:outline-none transition-colors font-body-md text-body-md placeholder:text-outline/50" id="password" placeholder="Create a password" type="password"/>
+<button class="absolute right-3 top-1/2 -translate-y-1/2 text-outline hover:text-on-surface transition-colors" onclick="togglePassword('password', 'visibility_icon_1')" type="button">
+<span class="material-symbols-outlined text-[20px]" id="visibility_icon_1">visibility_off</span>
+</button>
+</div>
+</div>
+<div class="flex flex-col gap-xs relative">
+<label class="font-label-md text-label-md text-on-surface" for="confirmPassword">Confirm Password</label>
+<div class="relative">
+<input class="w-full h-10 px-md pr-10 bg-surface-container-lowest border border-outline-variant rounded focus:border-primary focus:ring-0 focus:outline-none transition-colors font-body-md text-body-md placeholder:text-outline/50" id="confirmPassword" placeholder="Confirm your password" type="password"/>
+<button class="absolute right-3 top-1/2 -translate-y-1/2 text-outline hover:text-on-surface transition-colors" onclick="togglePassword('confirmPassword', 'visibility_icon_2')" type="button">
+<span class="material-symbols-outlined text-[20px]" id="visibility_icon_2">visibility_off</span>
+</button>
+</div>
+</div>
+<button class="w-full h-10 bg-primary text-on-primary rounded font-label-md text-label-md mt-sm hover:bg-primary/90 transition-colors flex items-center justify-center gap-xs" type="button">
+<span>Sign Up</span>
+<span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+</button>
+</form>
+<div class="text-center pt-md border-t border-outline-variant/30 mt-xs">
+<p class="font-body-md text-body-md text-on-surface-variant">
+                Already have an account? 
+                <a class="text-primary hover:underline font-label-md" href="#">Sign In</a>
+</p>
+</div>
+</div>
+<script>
+        function togglePassword(inputId, iconId) {
+            const input = document.getElementById(inputId);
+            const icon = document.getElementById(iconId);
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.textContent = 'visibility';
+            } else {
+                input.type = 'password';
+                icon.textContent = 'visibility_off';
+            }
+        }
+    </script>
+</body></html>

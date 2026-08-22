@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Time Off Management - Admin</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&amp;family=Geist+Mono:wght@400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary-container": "#131b2e",
+                        "tertiary-container": "#271901",
+                        "surface-container-low": "#eff4ff",
+                        "inverse-primary": "#bec6e0",
+                        "on-error-container": "#93000a",
+                        "on-secondary-fixed": "#191b24",
+                        "on-background": "#0b1c30",
+                        "tertiary-fixed": "#fcdeb5",
+                        "on-error": "#ffffff",
+                        "background": "#f8f9ff",
+                        "outline-variant": "#c6c6cd",
+                        "on-tertiary-fixed-variant": "#574425",
+                        "on-tertiary": "#ffffff",
+                        "surface": "#f8f9ff",
+                        "surface-tint": "#565e74",
+                        "error-container": "#ffdad6",
+                        "surface-dim": "#cbdbf5",
+                        "secondary-container": "#dedfeb",
+                        "secondary-fixed-dim": "#c4c6d1",
+                        "on-tertiary-container": "#98805d",
+                        "inverse-on-surface": "#eaf1ff",
+                        "tertiary": "#000000",
+                        "outline": "#76777d",
+                        "secondary": "#5c5e68",
+                        "primary-fixed-dim": "#bec6e0",
+                        "on-secondary-container": "#60626c",
+                        "on-primary": "#ffffff",
+                        "on-surface": "#0b1c30",
+                        "surface-variant": "#d3e4fe",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container-high": "#dce9ff",
+                        "surface-bright": "#f8f9ff",
+                        "on-primary-fixed": "#131b2e",
+                        "primary-fixed": "#dae2fd",
+                        "on-primary-fixed-variant": "#3f465c",
+                        "surface-container-highest": "#d3e4fe",
+                        "on-primary-container": "#7c839b",
+                        "error": "#ba1a1a",
+                        "primary": "#000000",
+                        "on-secondary-fixed-variant": "#444650",
+                        "secondary-fixed": "#e1e2ed",
+                        "on-tertiary-fixed": "#271901",
+                        "tertiary-fixed-dim": "#dec29a",
+                        "on-surface-variant": "#45464d",
+                        "surface-container": "#e5eeff",
+                        "inverse-surface": "#213145",
+                        "on-secondary": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter": "24px",
+                        "xs": "4px",
+                        "margin": "32px",
+                        "md": "16px",
+                        "base": "4px",
+                        "xl": "32px",
+                        "xxl": "48px",
+                        "lg": "24px",
+                        "sm": "8px"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Geist"],
+                        "body-lg": ["Geist"],
+                        "headline-lg": ["Geist"],
+                        "label-md": ["Geist"],
+                        "mono-sm": ["Geist Mono"],
+                        "headline-md": ["Geist"],
+                        "display": ["Geist"]
+                    },
+                    "fontSize": {
+                        "body-md": ["14px", { "lineHeight": "20px", "letterSpacing": "-0.01em", "fontWeight": "400" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "400" }],
+                        "headline-lg": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+                        "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.01em", "fontWeight": "500" }],
+                        "mono-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0", "fontWeight": "400" }],
+                        "headline-md": ["20px", { "lineHeight": "28px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+                        "display": ["36px", { "lineHeight": "1.1", "letterSpacing": "-0.03em", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { background-color: #F8FAFB; }
+    </style>
+</head>
+<body class="font-body-md text-on-surface antialiased flex h-screen overflow-hidden">
+<!-- SideNavBar -->
+<nav class="bg-primary-container dark:bg-primary-container text-on-primary-container dark:text-primary-fixed font-body-md text-body-md fixed left-0 top-0 h-full w-[260px] no-border shadow-sm flex flex-col h-screen py-xl px-md fixed left-0 top-0 z-40 hidden md:flex">
+<div class="mb-xxl px-md">
+<h1 class="font-headline-lg text-headline-lg text-white">Corporate HQ</h1>
+<p class="text-on-primary-container/70 mt-xs">HR Division</p>
+</div>
+<ul class="flex flex-col gap-sm flex-grow">
+<li>
+<a class="text-on-primary-container/70 font-body-md hover:bg-white/5 hover:text-white transition-all flex items-center gap-md px-md py-sm transition-transform duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+                    Dashboard
+                </a>
+</li>
+<li>
+<a class="text-on-primary-container/70 font-body-md hover:bg-white/5 hover:text-white transition-all flex items-center gap-md px-md py-sm transition-transform duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="groups">groups</span>
+                    Directory
+                </a>
+</li>
+<li>
+<a class="text-on-primary-container/70 font-body-md hover:bg-white/5 hover:text-white transition-all flex items-center gap-md px-md py-sm transition-transform duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="calendar_today">calendar_today</span>
+                    Attendance
+                </a>
+</li>
+<li>
+<a class="bg-white/10 text-white font-bold rounded-lg flex items-center gap-md px-md py-sm transition-transform duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="event_busy">event_busy</span>
+                    Time Off
+                </a>
+</li>
+</ul>
+<div class="mt-auto border-t border-white/10 pt-md">
+<ul class="flex flex-col gap-sm">
+<li>
+<a class="text-on-primary-container/70 font-body-md hover:bg-white/5 hover:text-white transition-all flex items-center gap-md px-md py-sm transition-transform duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+                        Support
+                    </a>
+</li>
+<li>
+<a class="text-on-primary-container/70 font-body-md hover:bg-white/5 hover:text-white transition-all flex items-center gap-md px-md py-sm transition-transform duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="logout">logout</span>
+                        Sign Out
+                    </a>
+</li>
+</ul>
+</div>
+</nav>
+<!-- Main Content Canvas -->
+<main class="flex-1 flex flex-col md:ml-[260px] h-screen bg-background">
+<!-- TopNavBar (Mobile only for Nav, but acts as header here) -->
+<header class="bg-surface dark:bg-surface-container-low text-on-surface dark:text-inverse-on-surface font-body-md text-body-md docked full-width top-0 border-b border-outline-variant dark:border-outline flat no shadows flex justify-between items-center w-full px-margin py-sm sticky top-0 z-50">
+<div class="flex items-center gap-md">
+<button class="md:hidden p-sm hover:bg-surface-variant rounded-full text-secondary transition-colors">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<div class="font-headline-md text-headline-md font-bold text-primary dark:text-inverse-primary hidden md:block">HRMS Executive</div>
+</div>
+<div class="flex items-center gap-lg w-full max-w-md mx-md hidden md:flex">
+<div class="relative w-full">
+<span class="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-outline">search</span>
+<input class="w-full pl-xl pr-sm py-sm bg-surface-container-lowest border border-outline-variant rounded focus:border-primary focus:ring-0 text-body-md transition-colors placeholder:text-outline h-[36px]" placeholder="Search employees..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-sm">
+<button class="p-sm text-secondary hover:text-primary dark:hover:text-primary-fixed transition-colors cursor-pointer active:opacity-80 rounded-full hover:bg-surface-variant flex items-center justify-center">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="p-sm text-secondary hover:text-primary dark:hover:text-primary-fixed transition-colors cursor-pointer active:opacity-80 rounded-full hover:bg-surface-variant flex items-center justify-center">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</button>
+<div class="w-[32px] h-[32px] rounded-full bg-surface-variant overflow-hidden ml-sm border border-outline-variant cursor-pointer">
+<img alt="Executive User Profile" class="w-full h-full object-cover" data-alt="Professional headshot of a corporate executive in a modern office setting. Sharp focus, clean lighting, high resolution, minimalist background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA1xMMe7pNZsTBfiH7WS1vUhrycFt98hIjEYPSaKfW-mgNG1y2ptg3YozhVW-ikP9I_Tus5ciTYbd_XEDeC4J0leFHPxDUfpoCSqrT6YAj_lgslzT1uVJlC7Zzgv-92wNwZnD5SYYM0o35AGVfpqY4_tdb31UgOI-cIOF4iWiOrnkwv0Mu8naDJ4XmMFVOjlta9fZafpUeMNkqdxXaAGJRCxNGh4mMcJkPl89PkdZSX9U0woV0rxLp7"/>
+</div>
+</div>
+</header>
+<div class="flex-1 overflow-auto p-margin">
+<!-- Balance Summary Strip -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-gutter mb-xl">
+<div class="bg-surface-container-lowest border border-outline-variant rounded p-lg flex flex-col justify-center">
+<span class="font-label-md text-label-md text-secondary uppercase tracking-wider mb-xs">Paid Time Off Pool</span>
+<div class="flex items-baseline gap-sm">
+<span class="font-display text-display text-primary">24</span>
+<span class="font-body-md text-body-md text-secondary">Days Available (Avg)</span>
+</div>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant rounded p-lg flex flex-col justify-center">
+<span class="font-label-md text-label-md text-secondary uppercase tracking-wider mb-xs">Sick Time Off Pool</span>
+<div class="flex items-baseline gap-sm">
+<span class="font-display text-display text-primary">07</span>
+<span class="font-body-md text-body-md text-secondary">Days Available (Avg)</span>
+</div>
+</div>
+</div>
+<!-- Main Data Section -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded flex flex-col h-full min-h-[500px]">
+<!-- Table Header Actions -->
+<div class="flex justify-between items-center p-md border-b border-surface-variant">
+<div class="flex gap-sm">
+<button class="bg-primary text-on-primary font-label-md text-label-md px-md py-sm rounded hover:opacity-90 transition-opacity flex items-center gap-xs">
+<span class="material-symbols-outlined text-[16px]">add</span>
+                            NEW REQUEST
+                        </button>
+</div>
+<div class="flex gap-md text-secondary font-label-md text-label-md">
+<button class="hover:text-primary transition-colors uppercase border-b-2 border-primary pb-1 text-primary">Pending (12)</button>
+<button class="hover:text-primary transition-colors uppercase pb-1 border-b-2 border-transparent">Approved</button>
+<button class="hover:text-primary transition-colors uppercase pb-1 border-b-2 border-transparent">Rejected</button>
+</div>
+</div>
+<!-- Data Table -->
+<div class="overflow-x-auto flex-1">
+<table class="w-full text-left border-collapse">
+<thead class="bg-surface text-secondary font-label-md text-label-md uppercase tracking-wider border-b border-outline-variant sticky top-0 z-10">
+<tr>
+<th class="p-md font-medium w-[250px]">Employee Name</th>
+<th class="p-md font-medium w-[150px]">Start Date</th>
+<th class="p-md font-medium w-[150px]">End Date</th>
+<th class="p-md font-medium w-[150px]">Time Off Type</th>
+<th class="p-md font-medium text-right w-[180px]">Action</th>
+</tr>
+</thead>
+<tbody class="font-body-md text-body-md text-on-surface divide-y divide-surface-variant">
+<!-- Row 1 -->
+<tr class="hover:bg-surface-bright transition-colors group">
+<td class="p-md flex items-center gap-sm">
+<div class="w-8 h-8 rounded-full bg-surface-variant flex items-center justify-center text-secondary font-medium text-xs">SJ</div>
+                                    Sarah Jenkins
+                                </td>
+<td class="p-md text-secondary">28/10/2025</td>
+<td class="p-md text-secondary">28/10/2025</td>
+<td class="p-md">
+<span class="inline-flex items-center px-2 py-1 rounded bg-surface-variant text-primary font-mono-sm text-mono-sm border border-outline-variant/30">
+                                        Paid Time Off
+                                    </span>
+</td>
+<td class="p-md text-right">
+<div class="flex justify-end gap-sm opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="w-8 h-8 rounded border border-[#22c55e] text-[#22c55e] hover:bg-[#22c55e]/10 flex items-center justify-center transition-colors" title="Approve">
+<span class="material-symbols-outlined text-[18px]">check</span>
+</button>
+<button class="w-8 h-8 rounded border border-error text-error hover:bg-error-container/30 flex items-center justify-center transition-colors" title="Reject">
+<span class="material-symbols-outlined text-[18px]">close</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-surface-bright transition-colors group">
+<td class="p-md flex items-center gap-sm">
+<div class="w-8 h-8 rounded-full bg-surface-variant flex items-center justify-center text-secondary font-medium text-xs">MR</div>
+                                    Michael Ross
+                                </td>
+<td class="p-md text-secondary">01/11/2025</td>
+<td class="p-md text-secondary">05/11/2025</td>
+<td class="p-md">
+<span class="inline-flex items-center px-2 py-1 rounded bg-error-container/20 text-error font-mono-sm text-mono-sm border border-error/20">
+                                        Sick Leave
+                                    </span>
+</td>
+<td class="p-md text-right">
+<div class="flex justify-end gap-sm opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="w-8 h-8 rounded border border-[#22c55e] text-[#22c55e] hover:bg-[#22c55e]/10 flex items-center justify-center transition-colors" title="Approve">
+<span class="material-symbols-outlined text-[18px]">check</span>
+</button>
+<button class="w-8 h-8 rounded border border-error text-error hover:bg-error-container/30 flex items-center justify-center transition-colors" title="Reject">
+<span class="material-symbols-outlined text-[18px]">close</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-surface-bright transition-colors group">
+<td class="p-md flex items-center gap-sm">
+<div class="w-8 h-8 rounded-full bg-surface-variant flex items-center justify-center text-secondary font-medium text-xs">DP</div>
+                                    David Palmer
+                                </td>
+<td class="p-md text-secondary">15/12/2025</td>
+<td class="p-md text-secondary">30/12/2025</td>
+<td class="p-md">
+<span class="inline-flex items-center px-2 py-1 rounded bg-surface-variant text-primary font-mono-sm text-mono-sm border border-outline-variant/30">
+                                        Paid Time Off
+                                    </span>
+</td>
+<td class="p-md text-right">
+<div class="flex justify-end gap-sm opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="w-8 h-8 rounded border border-[#22c55e] text-[#22c55e] hover:bg-[#22c55e]/10 flex items-center justify-center transition-colors" title="Approve">
+<span class="material-symbols-outlined text-[18px]">check</span>
+</button>
+<button class="w-8 h-8 rounded border border-error text-error hover:bg-error-container/30 flex items-center justify-center transition-colors" title="Reject">
+<span class="material-symbols-outlined text-[18px]">close</span>
+</button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</main>
+</body></html>

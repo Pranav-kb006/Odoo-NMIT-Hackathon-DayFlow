@@ -6,6 +6,7 @@ create table public.companies (
   id uuid primary key default gen_random_uuid(),
   name text not null,
   code text not null unique,
+  logo_url text,
   created_at timestamptz not null default now()
 );
 
@@ -67,9 +68,18 @@ create policy "read own company" on public.companies
   );
 
 -- profiles: read everyone in your company; update only yourself (admins via service role/seed)
+-- NOTE: the company-scope read uses a SECURITY DEFINER helper to avoid the
+-- infinite-recursion trap (a policy selecting profiles that itself selects
+-- profiles re-enters RLS forever, SQLSTATE 42P17).
+create or replace function public.get_my_company_id()
+returns uuid language sql stable security definer set search_path = public as $$
+  select company_id from public.profiles where id = auth.uid();
+$$;
+grant execute on function public.get_my_company_id() to authenticated, anon;
+
 create policy "read company profiles" on public.profiles
   for select using (
-    company_id = (select company_id from public.profiles where id = auth.uid())
+    company_id = public.get_my_company_id()
   );
 create policy "update own profile" on public.profiles
   for update using (id = auth.uid());
@@ -123,3 +133,22 @@ create policy "admin review leave" on public.leave_requests
       and p.company_id = leave_requests.company_id
     )
   );
+
+-- ============ storage (logos bucket) ============
+-- Bucket 'logos' created via project (public, 1MB, png/jpeg/webp/svg only).
+-- Anyone may read public logos; any signed-in user may upload (scoped by path
+-- prefix in app code). Keep uploads out of anonymous hands.
+create policy "logos public read" on storage.objects
+  for select using (bucket_id = 'logos');
+
+create policy "logos authenticated upload" on storage.objects
+  for insert with check (
+    bucket_id = 'logos'
+    and auth.role() = 'authenticated'
+  );
+
+create policy "logos authenticated update" on storage.objects
+  for update using (bucket_id = 'logos' and auth.role() = 'authenticated');
+
+create policy "logos owner delete" on storage.objects
+  for delete using (bucket_id = 'logos' and auth.role() = 'authenticated');

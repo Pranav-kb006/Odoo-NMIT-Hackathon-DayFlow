@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
-import { Calendar, AlertCircle, CheckCircle2, Send, AlertTriangle } from "lucide-react";
+import { useRef, useState } from "react";
+import { Calendar, AlertCircle, CheckCircle2, Send, AlertTriangle, FileText, X } from "lucide-react";
 import { workingDaysBetween } from "@/lib/utils";
 import { showToast } from "@/components/ui/Toast";
+import { uploadLeaveDocument } from "@/lib/storage";
 
 interface LeaveApplyFormProps {
   onSuccess?: () => void;
@@ -13,9 +14,12 @@ export function LeaveApplyForm({ onSuccess }: LeaveApplyFormProps) {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [reason, setReason] = useState("");
+  const [file, setFile] = useState<File | null>(null);
+  const [fileError, setFileError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Compute working days count
   const daysCount =
@@ -45,8 +49,19 @@ export function LeaveApplyForm({ onSuccess }: LeaveApplyFormProps) {
       return;
     }
 
+    if (!file) {
+      setFileError("Please attach a supporting document (PDF, JPG, or PNG, max 5MB).");
+      return;
+    }
+
     setLoading(true);
+    setError(null);
     try {
+      const upload = await uploadLeaveDocument(file);
+      if (!upload.ok) {
+        throw new Error(upload.error);
+      }
+
       const res = await fetch("/api/leave-requests", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -54,6 +69,7 @@ export function LeaveApplyForm({ onSuccess }: LeaveApplyFormProps) {
           startDate,
           endDate,
           reason: reason.trim(),
+          attachmentUrl: upload.url,
         }),
       });
 
@@ -67,6 +83,9 @@ export function LeaveApplyForm({ onSuccess }: LeaveApplyFormProps) {
       setStartDate("");
       setEndDate("");
       setReason("");
+      setFile(null);
+      setFileError(null);
+      if (fileInputRef.current) fileInputRef.current.value = "";
       onSuccess?.();
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "An error occurred";
@@ -161,6 +180,47 @@ export function LeaveApplyForm({ onSuccess }: LeaveApplyFormProps) {
             className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-800 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
           />
           <span className="text-[11px] text-slate-400">Minimum 10 characters</span>
+        </div>
+
+        <div>
+          <label className="block text-xs font-medium text-slate-700 mb-1">
+            Supporting Document <span className="text-red-600">*</span>
+          </label>
+          {file ? (
+            <div className="flex items-center gap-3 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2.5">
+              <FileText className="h-4 w-4 text-blue-600 shrink-0" />
+              <span className="min-w-0 flex-1 truncate text-sm text-slate-700">{file.name}</span>
+              <span className="text-[11px] text-slate-400">{(file.size / 1024).toFixed(1)} KB</span>
+              <button
+                type="button"
+                onClick={() => {
+                  setFile(null);
+                  setFileError(null);
+                  if (fileInputRef.current) fileInputRef.current.value = "";
+                }}
+                className="text-slate-400 hover:text-red-600"
+                aria-label="Remove document"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+          ) : (
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".pdf,.jpg,.jpeg,.png"
+              onChange={(e) => {
+                setFile(e.target.files?.[0] ?? null);
+                setFileError(null);
+              }}
+              required
+              className="block w-full text-sm text-slate-600 file:mr-3 file:rounded-lg file:border-0 file:bg-blue-50 file:px-3 file:py-2 file:text-sm file:font-medium file:text-blue-700 hover:file:bg-blue-100"
+            />
+          )}
+          {fileError && <p className="mt-1 text-xs text-red-600">{fileError}</p>}
+          <p className="text-[11px] text-slate-400 mt-1">
+            Proof document — PDF, JPG, or PNG, up to 5MB. Required.
+          </p>
         </div>
 
         <div className="pt-2">

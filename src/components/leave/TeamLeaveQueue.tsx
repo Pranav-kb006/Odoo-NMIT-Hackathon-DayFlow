@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { LeaveRequestWithProfile } from "@/lib/types";
 import { workingDaysBetween } from "@/lib/utils";
-import { Check, X, Calendar, Clock, AlertCircle } from "lucide-react";
+import { Check, X, Calendar, Clock, AlertCircle, FileText } from "lucide-react";
 import { showToast } from "@/components/ui/Toast";
 
 interface TeamLeaveQueueProps {
@@ -109,6 +109,7 @@ export function TeamLeaveQueue({
               <th className="px-6 py-3.5">Duration</th>
               <th className="px-6 py-3.5">Days</th>
               <th className="px-6 py-3.5">Reason</th>
+              <th className="px-6 py-3.5">Attachment</th>
               <th className="px-6 py-3.5">Applied On</th>
               <th className="px-6 py-3.5 text-right">Action / Status</th>
             </tr>
@@ -116,13 +117,13 @@ export function TeamLeaveQueue({
           <tbody className="divide-y divide-slate-100 text-slate-700">
             {loading ? (
               <tr>
-                <td colSpan={6} className="py-8 text-center text-slate-400">
+                <td colSpan={7} className="py-8 text-center text-slate-400">
                   Loading leave queue...
                 </td>
               </tr>
             ) : filteredRequests.length === 0 ? (
               <tr>
-                <td colSpan={6} className="py-8 text-center text-slate-400">
+                <td colSpan={7} className="py-8 text-center text-slate-400">
                   No {filter !== "all" ? filter : ""} leave requests found.
                 </td>
               </tr>
@@ -160,6 +161,21 @@ export function TeamLeaveQueue({
                     </td>
                     <td className="px-6 py-4 max-w-xs truncate text-slate-600" title={req.reason}>
                       {req.reason}
+                    </td>
+                    <td className="px-6 py-4">
+                      {req.attachment_url ? (
+                        <a
+                          href={req.attachment_url}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-flex items-center gap-1 text-xs font-medium text-blue-600 hover:text-blue-800 hover:underline"
+                        >
+                          <FileText className="h-3.5 w-3.5" />
+                          View
+                        </a>
+                      ) : (
+                        <span className="text-xs text-slate-400">—</span>
+                      )}
                     </td>
                     <td className="px-6 py-4 text-xs text-slate-400">
                       {new Date(req.created_at).toLocaleDateString(undefined, {

@@ -366,7 +366,6 @@ export function CsvImportDialog({ open, onClose, onImport }: Props) {
               variant="secondary"
               size="sm"
               onClick={handleChooseAnother}
-              disabled={phase === "importing"}
             >
               Choose another file
             </Button>

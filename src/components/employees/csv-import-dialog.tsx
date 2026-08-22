@@ -215,10 +215,10 @@ export function CsvImportDialog({ open, onClose, onImport }: Props) {
         {phase === "preview" && parseResult && (
           <div className="space-y-4">
             <div className="flex flex-wrap items-center gap-2">
-              <Badge variant={validCount > 0 ? "default" : "secondary"}>
+              <Badge variant={validCount > 0 ? "info" : "neutral"}>
                 {validCount} valid
               </Badge>
-              <Badge variant={invalidCount > 0 ? "destructive" : "secondary"}>
+              <Badge variant={invalidCount > 0 ? "danger" : "neutral"}>
                 {invalidCount} error{invalidCount === 1 ? "" : "s"}
               </Badge>
               <span className="text-xs text-slate-500">
@@ -293,12 +293,12 @@ export function CsvImportDialog({ open, onClose, onImport }: Props) {
         {phase === "done" && importSummary && (
           <div className="space-y-4">
             <div className="flex flex-wrap items-center gap-2">
-              <Badge variant="default">
+              <Badge variant="info">
                 {importSummary.created.length} created
               </Badge>
               <Badge
                 variant={
-                  importSummary.failures.length > 0 ? "destructive" : "secondary"
+                  importSummary.failures.length > 0 ? "danger" : "neutral"
                 }
               >
                 {importSummary.failures.length} failed

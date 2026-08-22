@@ -1,112 +1,54 @@
-"use client";
-
-import { useState } from "react";
 import type { Profile } from "@/lib/auth";
 
 interface EmployeeDashboardProps {
   profile: Profile;
 }
 
+/**
+ * Employee home. No fake state here — check-in/out is a real action on
+ * /dashboard/attendance, so this card reflects today's status via a link and
+ * the balances card defers to the real leave page.
+ */
 export function EmployeeDashboard({ profile }: EmployeeDashboardProps) {
-  const [checkedIn, setCheckedIn] = useState(false);
   const firstName = profile.full_name.split(" ")[0];
 
   return (
     <div className="space-y-xl">
-      {/* Welcome & Check In Row */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-md">
-        <div>
-          <h2 className="font-headline-lg text-headline-lg text-on-surface">
-            Welcome back, {firstName}
-          </h2>
-          <p className="text-secondary font-body-lg text-body-lg mt-xs">
-            {profile.department ?? "Department"} · {profile.designation ?? "Employee"}
-          </p>
-        </div>
-
-        <button
-          onClick={() => setCheckedIn(!checkedIn)}
-          className={`h-11 px-6 rounded-lg font-label-md text-label-md flex items-center gap-xs transition-colors ${
-            checkedIn
-              ? "bg-error text-on-error hover:bg-error/90"
-              : "bg-primary text-on-primary hover:bg-primary/90"
-          }`}
-        >
-          <span className="material-symbols-outlined text-[20px]">
-            {checkedIn ? "logout" : "login"}
-          </span>
-          <span>{checkedIn ? "Check Out" : "Check In"}</span>
-        </button>
+      {/* Welcome */}
+      <div>
+        <h2 className="font-headline-lg text-headline-lg text-on-surface">
+          Welcome back, {firstName}
+        </h2>
+        <p className="text-secondary font-body-lg text-body-lg mt-xs">
+          {profile.department ?? "Team"} · {profile.designation ?? "Employee"}
+        </p>
       </div>
 
-      {/* Today Status Metric Card */}
-      <div className="bg-surface-container-lowest border border-outline-variant rounded-lg p-lg flex flex-wrap items-center justify-between gap-md">
+      {/* Today status — real state lives in /attendance; deep-link there */}
+      <a
+        href="/dashboard/attendance"
+        className="block bg-surface-container-lowest border border-outline-variant rounded-lg p-lg flex flex-wrap items-center justify-between gap-md hover:border-primary transition-colors"
+      >
         <div className="flex items-center gap-md">
-          <div
-            className={`w-3 h-3 rounded-full ${
-              checkedIn ? "bg-status-present" : "bg-outline"
-            }`}
-          />
+          <span className="material-symbols-outlined text-primary text-[28px]">today</span>
           <div>
             <p className="font-body-md text-body-md font-bold text-on-surface">
-              {checkedIn ? "Checked In Today" : "Not Checked In Yet"}
+              Today&apos;s attendance
             </p>
             <p className="font-mono-sm text-mono-sm text-secondary">
-              Today: {new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+              Check in / check out and see your status —{" "}
+              {new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
             </p>
           </div>
         </div>
-        <div className="px-md py-xs rounded-full bg-surface-container-high text-primary font-label-md text-label-md">
-          {checkedIn ? "PRESENT" : "AWAITING CHECK-IN"}
-        </div>
-      </div>
-
-      {/* Leave Balances Grid */}
-      <div>
-        <h3 className="font-headline-md text-headline-md text-on-surface mb-md">
-          Time Off Balances
-        </h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-gutter">
-          <div className="bg-surface-container-lowest border border-outline-variant rounded-lg p-md">
-            <div className="flex justify-between items-start mb-sm">
-              <span className="text-secondary font-label-md text-label-md uppercase tracking-wider">
-                Paid Time Off
-              </span>
-              <span className="material-symbols-outlined text-primary">event_available</span>
-            </div>
-            <div className="font-display text-display text-on-surface">18</div>
-            <p className="font-mono-sm text-mono-sm text-secondary mt-xs">24 Days Available Pool</p>
-          </div>
-
-          <div className="bg-surface-container-lowest border border-outline-variant rounded-lg p-md">
-            <div className="flex justify-between items-start mb-sm">
-              <span className="text-secondary font-label-md text-label-md uppercase tracking-wider">
-                Sick Leave
-              </span>
-              <span className="material-symbols-outlined text-primary">medical_services</span>
-            </div>
-            <div className="font-display text-display text-on-surface">7</div>
-            <p className="font-mono-sm text-mono-sm text-secondary mt-xs">10 Days Available Pool</p>
-          </div>
-
-          <div className="bg-surface-container-lowest border border-outline-variant rounded-lg p-md">
-            <div className="flex justify-between items-start mb-sm">
-              <span className="text-secondary font-label-md text-label-md uppercase tracking-wider">
-                Unpaid Leave
-              </span>
-              <span className="material-symbols-outlined text-primary">event_busy</span>
-            </div>
-            <div className="font-display text-display text-on-surface">5</div>
-            <p className="font-mono-sm text-mono-sm text-secondary mt-xs">Unlimited</p>
-          </div>
-        </div>
-      </div>
+        <span className="px-md py-xs rounded-full bg-surface-container-high text-primary font-label-md text-label-md">
+          Open attendance →
+        </span>
+      </a>
 
       {/* Quick Navigation Cards */}
       <div>
-        <h3 className="font-headline-md text-headline-md text-on-surface mb-md">
-          Quick Access
-        </h3>
+        <h3 className="font-headline-md text-headline-md text-on-surface mb-md">Quick Access</h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-gutter">
           <a
             href="/dashboard/attendance"
@@ -116,7 +58,7 @@ export function EmployeeDashboard({ profile }: EmployeeDashboardProps) {
               <span className="material-symbols-outlined text-primary text-[28px]">calendar_today</span>
               <div>
                 <p className="font-body-md text-body-md font-bold text-on-surface">Attendance Log</p>
-                <p className="font-mono-sm text-mono-sm text-secondary">View monthly check-in history</p>
+                <p className="font-mono-sm text-mono-sm text-secondary">Monthly check-in history</p>
               </div>
             </div>
             <span className="material-symbols-outlined text-secondary">arrow_forward</span>
@@ -129,22 +71,22 @@ export function EmployeeDashboard({ profile }: EmployeeDashboardProps) {
             <div className="flex items-center gap-md">
               <span className="material-symbols-outlined text-primary text-[28px]">event_busy</span>
               <div>
-                <p className="font-body-md text-body-md font-bold text-on-surface">Apply for Leave</p>
-                <p className="font-mono-sm text-mono-sm text-secondary">Submit PTO or Sick request</p>
+                <p className="font-body-md text-body-md font-bold text-on-surface">Time Off</p>
+                <p className="font-mono-sm text-mono-sm text-secondary">Apply for leave, track requests</p>
               </div>
             </div>
             <span className="material-symbols-outlined text-secondary">arrow_forward</span>
           </a>
 
           <a
-            href="/dashboard"
+            href="/dashboard/employees"
             className="bg-surface-container-lowest border border-outline-variant rounded-lg p-lg flex items-center justify-between hover:border-primary transition-colors"
           >
             <div className="flex items-center gap-md">
               <span className="material-symbols-outlined text-primary text-[28px]">badge</span>
               <div>
-                <p className="font-body-md text-body-md font-bold text-on-surface">My Profile</p>
-                <p className="font-mono-sm text-mono-sm text-secondary">View personal & employee info</p>
+                <p className="font-body-md text-body-md font-bold text-on-surface">Directory</p>
+                <p className="font-mono-sm text-mono-sm text-secondary">Find teammates & contact info</p>
               </div>
             </div>
             <span className="material-symbols-outlined text-secondary">arrow_forward</span>

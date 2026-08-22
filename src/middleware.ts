@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import type { CookieOptions } from "@supabase/ssr";
 
-const PUBLIC_PREFIXES = ["/login", "/signup"];
+const PUBLIC_PREFIXES = ["/login", "/signup", "/forgot-password", "/update-password", "/auth"];
 const LANDING_PATH = "/"; // always server-rendered, no redirect
 
 /**

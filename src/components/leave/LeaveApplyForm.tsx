@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { Calendar, AlertCircle, CheckCircle2, Send } from "lucide-react";
+import { Calendar, AlertCircle, CheckCircle2, Send, AlertTriangle } from "lucide-react";
 import { workingDaysBetween } from "@/lib/utils";
+import { showToast } from "@/components/ui/Toast";
 
 interface LeaveApplyFormProps {
   onSuccess?: () => void;
@@ -21,6 +22,8 @@ export function LeaveApplyForm({ onSuccess }: LeaveApplyFormProps) {
     startDate && endDate && endDate >= startDate
       ? workingDaysBetween(startDate, endDate)
       : 0;
+
+  const isWeekendOnly = Boolean(startDate && endDate && endDate >= startDate && daysCount === 0);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -60,12 +63,15 @@ export function LeaveApplyForm({ onSuccess }: LeaveApplyFormProps) {
       }
 
       setSuccess(true);
+      showToast("Leave Request Submitted", `Applied for ${daysCount} working ${daysCount === 1 ? "day" : "days"}.`, "success");
       setStartDate("");
       setEndDate("");
       setReason("");
       onSuccess?.();
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "An error occurred");
+      const msg = err instanceof Error ? err.message : "An error occurred";
+      setError(msg);
+      showToast("Submission Failed", msg, "error");
     } finally {
       setLoading(false);
     }
@@ -126,11 +132,19 @@ export function LeaveApplyForm({ onSuccess }: LeaveApplyFormProps) {
         </div>
 
         {startDate && endDate && (
-          <div className="flex items-center gap-2 rounded-lg bg-blue-50/70 px-3 py-2 text-xs font-medium text-blue-800">
-            <Calendar className="h-4 w-4 text-blue-600" />
-            <span>
-              Total Working Days: <strong>{daysCount}</strong> {daysCount === 1 ? "day" : "days"} (Mon–Fri)
-            </span>
+          <div>
+            <div className="flex items-center gap-2 rounded-lg bg-blue-50/70 px-3 py-2 text-xs font-medium text-blue-800">
+              <Calendar className="h-4 w-4 text-blue-600" />
+              <span>
+                Total Working Days: <strong>{daysCount}</strong> {daysCount === 1 ? "day" : "days"} (Mon–Fri)
+              </span>
+            </div>
+            {isWeekendOnly && (
+              <div className="mt-2 flex items-center gap-2 rounded-lg bg-amber-50 px-3 py-2 text-xs font-medium text-amber-800 border border-amber-200">
+                <AlertTriangle className="h-4 w-4 text-amber-600 shrink-0" />
+                <span>The selected date range falls entirely on weekends (0 working days).</span>
+              </div>
+            )}
           </div>
         )}
 

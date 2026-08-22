@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 
 import { getCurrentProfile } from "@/lib/auth";
 import { signOutAction } from "@/app/actions/auth";
+import { ToastContainer } from "@/components/ui/Toast";
 
 const NAV_ITEMS = [
   { href: "/dashboard", label: "Dashboard" },
@@ -59,6 +60,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
         <main className="px-6 py-6">{children}</main>
       </div>
+      <ToastContainer />
     </div>
   );
 }

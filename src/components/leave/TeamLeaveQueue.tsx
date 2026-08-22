@@ -4,6 +4,7 @@ import { useState } from "react";
 import { LeaveRequestWithProfile } from "@/lib/types";
 import { workingDaysBetween } from "@/lib/utils";
 import { Check, X, Calendar, Clock, AlertCircle } from "lucide-react";
+import { showToast } from "@/components/ui/Toast";
 
 interface TeamLeaveQueueProps {
   requests: LeaveRequestWithProfile[];
@@ -38,9 +39,16 @@ export function TeamLeaveQueue({
       if (!res.ok) {
         throw new Error(data.error || "Failed to update review status");
       }
+      showToast(
+        status === "approved" ? "Leave Request Approved" : "Leave Request Rejected",
+        `Updated request status to ${status}.`,
+        status === "approved" ? "success" : "info"
+      );
       onReviewed?.();
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Error processing review");
+      const msg = err instanceof Error ? err.message : "Error processing review";
+      setError(msg);
+      showToast("Review Action Failed", msg, "error");
     } finally {
       setActionLoadingId(null);
     }

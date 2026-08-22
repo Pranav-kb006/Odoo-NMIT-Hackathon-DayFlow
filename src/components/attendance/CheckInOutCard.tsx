@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Clock, LogIn, LogOut, CheckCircle2, AlertCircle } from "lucide-react";
 import { AttendanceRow } from "@/lib/types";
+import { showToast } from "@/components/ui/Toast";
 
 interface CheckInOutCardProps {
   initialAttendance?: AttendanceRow | null;
@@ -81,9 +82,12 @@ export function CheckInOutCard({
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to check in");
       setAttendance(data.attendance);
+      showToast("Checked In Successfully", "Your shift timer has started.", "success");
       onStatusChange?.(data.attendance);
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Error checking in");
+      const msg = err instanceof Error ? err.message : "Error checking in";
+      setError(msg);
+      showToast("Check-in Failed", msg, "error");
     } finally {
       setLoading(false);
     }
@@ -97,9 +101,12 @@ export function CheckInOutCard({
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to check out");
       setAttendance(data.attendance);
+      showToast("Checked Out Successfully", "Your work duration for today has been logged.", "success");
       onStatusChange?.(data.attendance);
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Error checking out");
+      const msg = err instanceof Error ? err.message : "Error checking out";
+      setError(msg);
+      showToast("Check-out Failed", msg, "error");
     } finally {
       setLoading(false);
     }

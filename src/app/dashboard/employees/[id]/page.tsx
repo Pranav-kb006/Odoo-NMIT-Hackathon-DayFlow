@@ -39,21 +39,6 @@ type DocumentRow = {
   uploaded_at: string;
 };
 
-type AttendanceRow = {
-  work_date: string;
-  check_in: string | null;
-  check_out: string | null;
-};
-
-type LeaveRow = {
-  id: string;
-  start_date: string;
-  end_date: string;
-  reason: string;
-  status: string;
-  created_at: string;
-};
-
 function splitName(full: string): { first: string; last: string } {
   const parts = full.trim().split(/\s+/);
   if (parts.length === 1) return { first: parts[0], last: "" };
@@ -114,45 +99,48 @@ export default async function EmployeeProfilePage({
   const canViewPrivateInfo = me.role === "admin" || me.id === id;
 
   try {
-    const { data: empRow, error: empError } = await db
-      .from("profiles")
-      .select("*")
-      .eq("id", id)
-      .eq("company_id", callerCompanyId)
-      .single();
+    const [{ data: empRow, error: empError }, { data: companyRow }] =
+      await Promise.all([
+        db
+          .from("profiles")
+          .select("*")
+          .eq("id", id)
+          .eq("company_id", callerCompanyId)
+          .single(),
+        db
+          .from("companies")
+          .select("name")
+          .eq("id", callerCompanyId)
+          .single(),
+      ]);
 
     if (empError || !empRow) return notFound();
 
     const employee = mapRow(empRow as ProfileRow);
 
-    // NOTE: user_private_info / user_documents tables don't exist yet —
-    // those queries removed rather than 500-ing the page. Re-add when the
-    // schema lands (PRD §48 private info + documents tabs).
+    let privateInfo: PrivateInfoRow | null = null;
+    if (canViewPrivateInfo) {
+      const { data: pi } = await db
+        .from("user_private_info")
+        .select("*")
+        .eq("user_id", id)
+        .maybeSingle();
+      privateInfo = (pi as PrivateInfoRow) ?? null;
+    }
 
-    const { data: attendance } = await db
-      .from("attendance")
-      .select("work_date, check_in, check_out")
+    const { data: docs } = await db
+      .from("user_documents")
+      .select("id, doc_type, file_url, file_size_bytes, uploaded_at")
       .eq("user_id", id)
-      .order("work_date", { ascending: false })
-      .limit(50);
-
-    const { data: leaves } = await db
-      .from("leave_requests")
-      .select("id, start_date, end_date, reason, status, created_at")
-      .eq("user_id", id)
-      .order("start_date", { ascending: false })
-      .limit(50);
-
-    const fullName = `${employee.first_name} ${employee.last_name}`.trim();
+      .eq("company_id", callerCompanyId);
 
     return (
       <main className="p-2 sm:p-4">
         <EmployeeDetail
           employee={employee}
-          privateInfo={null}
-          documents={[]}
-          attendance={(attendance as AttendanceRow[]) ?? []}
-          leaveRequests={(leaves as LeaveRow[]) ?? []}
+          companyName={companyRow?.name || "—"}
+          privateInfo={privateInfo}
+          documents={(docs as DocumentRow[]) ?? []}
           canViewPrivateInfo={canViewPrivateInfo}
         />
       </main>

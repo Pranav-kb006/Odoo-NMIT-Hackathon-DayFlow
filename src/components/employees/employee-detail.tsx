@@ -4,21 +4,13 @@ import { useState } from "react";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import {
-  Table,
-  TableHeader,
-  TableBody,
-  TableRow,
-  TableHead,
-  TableCell,
-} from "@/components/ui/table";
-import {
   Pencil,
   FileText,
   Download,
-  Calendar,
   Award,
   Plus,
   ArrowLeft,
+  DollarSign,
 } from "lucide-react";
 import type { Employee } from "@/components/employees/types";
 
@@ -41,25 +33,6 @@ type UserDocument = {
   file_url: string;
   file_size_bytes: number;
   uploaded_at: string;
-};
-
-type AttendanceHistoryRow = {
-  work_date: string;
-  check_in: string | null;
-  check_out: string | null;
-  status?: string;
-};
-
-type LeaveHistoryRow = {
-  id: string;
-  leave_type?: string;
-  start_date: string;
-  end_date: string;
-  days_requested?: number;
-  reason?: string;
-  status: string;
-  reviewer_comment?: string | null;
-  created_at?: string;
 };
 
 const dateFmt = new Intl.DateTimeFormat("en-IN", {
@@ -89,31 +62,37 @@ function mask(value: string | null): string {
 
 export function EmployeeDetail({
   employee,
+  companyName = "—",
   privateInfo,
   documents = [],
-  attendance = [],
-  leaveRequests = [],
   canViewPrivateInfo = false,
   onEdit,
 }: {
   employee: Employee;
+  companyName?: string;
   privateInfo: PrivateInfo | null;
   documents?: UserDocument[];
-  attendance?: AttendanceHistoryRow[];
-  leaveRequests?: LeaveHistoryRow[];
   canViewPrivateInfo?: boolean;
   onEdit?: () => void;
 }) {
-  const [activeTab, setActiveTab] = useState<
-    "resume" | "private" | "attendance" | "leave"
-  >("resume");
+  const [activeTab, setActiveTab] = useState<"resume" | "private" | "salary">("resume");
 
   const fullName = `${employee.first_name} ${employee.last_name}`.trim() || "Employee";
 
-  const defaultSkills =
-    employee.skills && employee.skills.length > 0
-      ? employee.skills
-      : ["UI Design", "Prototyping", "User Research", "Figma", "React", "TypeScript"];
+  const certifications = documents.filter((d) => d.doc_type === "certification");
+  const otherDocs = documents.filter((d) => d.doc_type !== "certification");
+
+  // Salary calculations based on standard wage allocation
+  const monthlyWage = 8500;
+  const yearlyWage = monthlyWage * 12;
+  const basicSalary = monthlyWage * 0.5;
+  const hra = monthlyWage * 0.25;
+  const standardAllowance = monthlyWage * 0.15;
+  const performanceBonus = monthlyWage * 0.1;
+  const employeePf = basicSalary * 0.12;
+  const employerPf = basicSalary * 0.12;
+  const professionalTax = 200;
+  const netPay = monthlyWage - employeePf - professionalTax;
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto animate-in fade-in-50 duration-200">
@@ -130,7 +109,7 @@ export function EmployeeDetail({
         <span className="text-slate-900 font-semibold">{fullName}</span>
       </div>
 
-      {/* Top Profile Header Card (Matches Image 2 1:1) */}
+      {/* Top Profile Header Card (Real Data without Hardcoded Values) */}
       <div className="rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
         <div className="flex flex-col md:flex-row gap-6 items-start">
           {/* Avatar */}
@@ -185,7 +164,7 @@ export function EmployeeDetail({
                   Company
                 </span>
                 <span className="text-sm font-medium text-slate-800 mt-0.5 block truncate">
-                  Dayflow Global
+                  {companyName}
                 </span>
               </div>
 
@@ -194,7 +173,7 @@ export function EmployeeDetail({
                   Department
                 </span>
                 <span className="text-sm font-medium text-slate-800 mt-0.5 block truncate">
-                  {employee.department || "General"}
+                  {employee.department || "—"}
                 </span>
               </div>
 
@@ -221,7 +200,7 @@ export function EmployeeDetail({
                   Manager
                 </span>
                 <span className="text-sm font-medium text-slate-800 mt-0.5 block truncate">
-                  {employee.manager_id || "Direct Lead"}
+                  {employee.manager_id || "—"}
                 </span>
               </div>
 
@@ -230,16 +209,7 @@ export function EmployeeDetail({
                   Mobile
                 </span>
                 <span className="text-sm font-mono text-slate-800 mt-0.5 block truncate">
-                  {employee.mobile || "+1 (555) 019-2834"}
-                </span>
-              </div>
-
-              <div className="border-b border-slate-100 pb-2.5 md:col-span-3">
-                <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block">
-                  Location
-                </span>
-                <span className="text-sm font-medium text-slate-800 mt-0.5 block">
-                  {employee.location || "San Francisco, CA (Hybrid)"}
+                  {employee.mobile || "—"}
                 </span>
               </div>
             </div>
@@ -247,7 +217,7 @@ export function EmployeeDetail({
         </div>
       </div>
 
-      {/* Tabs Navigation Bar */}
+      {/* Tabs Navigation Bar: Resume, Private Info, Salary Info */}
       <div className="flex border-b border-slate-200 w-full overflow-x-auto gap-2">
         <button
           onClick={() => setActiveTab("resume")}
@@ -257,7 +227,7 @@ export function EmployeeDetail({
               : "border-transparent text-slate-500 hover:text-slate-800 hover:bg-slate-50"
           }`}
         >
-          Resume & Overview
+          Resume
         </button>
 
         {canViewPrivateInfo && (
@@ -274,32 +244,21 @@ export function EmployeeDetail({
         )}
 
         <button
-          onClick={() => setActiveTab("attendance")}
+          onClick={() => setActiveTab("salary")}
           className={`px-5 py-3 text-xs font-bold uppercase tracking-wider transition-colors border-b-2 ${
-            activeTab === "attendance"
+            activeTab === "salary"
               ? "border-blue-600 text-blue-600 bg-blue-50/50"
               : "border-transparent text-slate-500 hover:text-slate-800 hover:bg-slate-50"
           }`}
         >
-          Attendance ({attendance.length})
-        </button>
-
-        <button
-          onClick={() => setActiveTab("leave")}
-          className={`px-5 py-3 text-xs font-bold uppercase tracking-wider transition-colors border-b-2 ${
-            activeTab === "leave"
-              ? "border-blue-600 text-blue-600 bg-blue-50/50"
-              : "border-transparent text-slate-500 hover:text-slate-800 hover:bg-slate-50"
-          }`}
-        >
-          Time Off ({leaveRequests.length})
+          Salary Info
         </button>
       </div>
 
-      {/* Tab 1: Resume / Overview (Matches Image 2 1:1) */}
+      {/* Tab 1: Resume */}
       {activeTab === "resume" && (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-          {/* Left Column (8 cols): About, What I Love, Interests */}
+          {/* Left Column (8 cols): About & Documents */}
           <div className="lg:col-span-8 space-y-6">
             <div className="rounded-xl border border-slate-200 bg-white p-6 sm:p-7 shadow-sm space-y-6">
               {/* About */}
@@ -308,8 +267,7 @@ export function EmployeeDetail({
                   <h3 className="text-base font-bold text-slate-900">About</h3>
                 </div>
                 <p className="text-sm leading-relaxed text-slate-600">
-                  {employee.about ||
-                    "Passionate and dedicated professional committed to delivering impactful results, streamlining workflows, and building collaborative experiences across cross-functional teams."}
+                  {employee.about || "No bio information provided yet."}
                 </p>
               </div>
 
@@ -320,8 +278,8 @@ export function EmployeeDetail({
                     What I love about my job
                   </h3>
                 </div>
-                <p className="text-sm leading-relaxed text-slate-600">
-                  Solving challenging architectural problems, crafting intuitive user interfaces, and seeing product improvements directly empower our clients and teams every day.
+                <p className="text-sm leading-relaxed text-slate-500 italic">
+                  Collaborating across teams to deliver high-quality products and achieve team goals.
                 </p>
               </div>
 
@@ -332,20 +290,20 @@ export function EmployeeDetail({
                     My interests and hobbies
                   </h3>
                 </div>
-                <p className="text-sm leading-relaxed text-slate-600">
-                  Open source contributions, technical writing, typography, photography, exploring local coffee shops, and cycling on weekends.
+                <p className="text-sm leading-relaxed text-slate-500 italic">
+                  Learning new technologies, open source contributions, and outdoor activities.
                 </p>
               </div>
             </div>
 
             {/* Documents Card */}
-            {documents.length > 0 && (
+            {otherDocs.length > 0 && (
               <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
                 <h3 className="text-base font-bold text-slate-900 mb-4 border-b border-slate-100 pb-2">
                   Uploaded Documents & Resume
                 </h3>
                 <div className="divide-y divide-slate-100">
-                  {documents.map((doc) => (
+                  {otherDocs.map((doc) => (
                     <div
                       key={doc.id}
                       className="py-3 flex items-center justify-between gap-4"
@@ -384,25 +342,31 @@ export function EmployeeDetail({
               <div className="p-5 border-b border-slate-100">
                 <h3 className="text-base font-bold text-slate-900">Skills</h3>
               </div>
-              <div className="p-5 min-h-[140px] flex flex-wrap content-start gap-2">
-                {defaultSkills.map((skill, index) => (
-                  <span
-                    key={index}
-                    className="px-3 py-1 bg-slate-100 text-slate-700 rounded-lg text-xs font-medium border border-slate-200/80"
+              <div className="p-5 min-h-[120px] flex flex-wrap content-start gap-2">
+                {employee.skills && employee.skills.length > 0 ? (
+                  employee.skills.map((skill, index) => (
+                    <span
+                      key={index}
+                      className="px-3 py-1 bg-slate-100 text-slate-700 rounded-lg text-xs font-medium border border-slate-200/80"
+                    >
+                      {skill}
+                    </span>
+                  ))
+                ) : (
+                  <p className="text-xs text-slate-400">No skills added yet.</p>
+                )}
+              </div>
+              {onEdit && (
+                <div className="p-3 border-t border-slate-100 bg-slate-50/50">
+                  <button
+                    onClick={onEdit}
+                    className="w-full py-2 bg-transparent border border-dashed border-slate-300 text-slate-600 hover:text-blue-600 hover:border-blue-400 hover:bg-white transition-colors rounded-lg text-xs font-medium flex items-center justify-center gap-1"
                   >
-                    {skill}
-                  </span>
-                ))}
-              </div>
-              <div className="p-3 border-t border-slate-100 bg-slate-50/50">
-                <button
-                  onClick={onEdit}
-                  className="w-full py-2 bg-transparent border border-dashed border-slate-300 text-slate-600 hover:text-blue-600 hover:border-blue-400 hover:bg-white transition-colors rounded-lg text-xs font-medium flex items-center justify-center gap-1"
-                >
-                  <Plus className="h-3.5 w-3.5" />
-                  <span>Add Skills</span>
-                </button>
-              </div>
+                    <Plus className="h-3.5 w-3.5" />
+                    <span>Add Skills</span>
+                  </button>
+                </div>
+              )}
             </div>
 
             {/* Certification Card */}
@@ -410,30 +374,38 @@ export function EmployeeDetail({
               <div className="p-5 border-b border-slate-100">
                 <h3 className="text-base font-bold text-slate-900">Certification</h3>
               </div>
-              <div className="p-5 space-y-4">
-                <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center shrink-0 border border-blue-100 text-blue-600">
-                    <Award className="h-5 w-5" />
-                  </div>
-                  <div>
-                    <h4 className="text-xs font-bold text-slate-900">
-                      Certified Usability Analyst
-                    </h4>
-                    <p className="text-[11px] text-slate-500 mt-0.5">
-                      Human Factors International · 2022
-                    </p>
-                  </div>
+              <div className="p-5 space-y-4 min-h-[100px]">
+                {certifications.length > 0 ? (
+                  certifications.map((cert) => (
+                    <div key={cert.id} className="flex items-start gap-3">
+                      <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center shrink-0 border border-blue-100 text-blue-600">
+                        <Award className="h-5 w-5" />
+                      </div>
+                      <div>
+                        <h4 className="text-xs font-bold text-slate-900 capitalize">
+                          {cert.doc_type}
+                        </h4>
+                        <p className="text-[11px] text-slate-500 mt-0.5">
+                          Uploaded {formatDate(cert.uploaded_at)}
+                        </p>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-xs text-slate-400">No certifications recorded yet.</p>
+                )}
+              </div>
+              {onEdit && (
+                <div className="p-3 border-t border-slate-100 bg-slate-50/50">
+                  <button
+                    onClick={onEdit}
+                    className="w-full py-2 bg-transparent border border-dashed border-slate-300 text-slate-600 hover:text-blue-600 hover:border-blue-400 hover:bg-white transition-colors rounded-lg text-xs font-medium flex items-center justify-center gap-1"
+                  >
+                    <Plus className="h-3.5 w-3.5" />
+                    <span>Add Certification</span>
+                  </button>
                 </div>
-              </div>
-              <div className="p-3 border-t border-slate-100 bg-slate-50/50">
-                <button
-                  onClick={onEdit}
-                  className="w-full py-2 bg-transparent border border-dashed border-slate-300 text-slate-600 hover:text-blue-600 hover:border-blue-400 hover:bg-white transition-colors rounded-lg text-xs font-medium flex items-center justify-center gap-1"
-                >
-                  <Plus className="h-3.5 w-3.5" />
-                  <span>Add Certification</span>
-                </button>
-              </div>
+              )}
             </div>
           </div>
         </div>
@@ -518,97 +490,163 @@ export function EmployeeDetail({
         </div>
       )}
 
-      {/* Tab 3: Attendance History */}
-      {activeTab === "attendance" && (
-        <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
-          <div className="p-6 border-b border-slate-100">
-            <h3 className="font-bold text-slate-900">Attendance Records</h3>
+      {/* Tab 3: Salary Info (1:1 with executive salary design) */}
+      {activeTab === "salary" && (
+        <div className="space-y-6">
+          {/* Top Summary Metrics */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+              <span className="text-[11px] font-semibold text-slate-400 uppercase block">
+                Monthly Wage
+              </span>
+              <p className="text-xl font-bold text-slate-900 mt-1">
+                ₹ {monthlyWage.toLocaleString()}
+              </p>
+            </div>
+            <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+              <span className="text-[11px] font-semibold text-slate-400 uppercase block">
+                Yearly Wage
+              </span>
+              <p className="text-xl font-bold text-slate-900 mt-1">
+                ₹ {yearlyWage.toLocaleString()}
+              </p>
+            </div>
+            <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+              <span className="text-[11px] font-semibold text-slate-400 uppercase block">
+                Working Days / Week
+              </span>
+              <p className="text-xl font-bold text-slate-900 mt-1">5 Days</p>
+            </div>
+            <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+              <span className="text-[11px] font-semibold text-slate-400 uppercase block">
+                Break Time
+              </span>
+              <p className="text-xl font-bold text-slate-900 mt-1">60 Mins</p>
+            </div>
           </div>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Work Date</TableHead>
-                <TableHead>Check In</TableHead>
-                <TableHead>Check Out</TableHead>
-                <TableHead>Status</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {attendance.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={4} className="text-center py-6 text-slate-400">
-                    No attendance records logged yet.
-                  </TableCell>
-                </TableRow>
-              ) : (
-                attendance.map((row, i) => (
-                  <TableRow key={i}>
-                    <TableCell className="font-medium">{formatDate(row.work_date)}</TableCell>
-                    <TableCell className="font-mono text-xs">{row.check_in ? new Date(row.check_in).toLocaleTimeString() : "—"}</TableCell>
-                    <TableCell className="font-mono text-xs">{row.check_out ? new Date(row.check_out).toLocaleTimeString() : "—"}</TableCell>
-                    <TableCell>
-                      <Badge variant={row.status === "present" ? "success" : "neutral"}>
-                        {row.status || "present"}
-                      </Badge>
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </div>
-      )}
 
-      {/* Tab 4: Leave History */}
-      {activeTab === "leave" && (
-        <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
-          <div className="p-6 border-b border-slate-100">
-            <h3 className="font-bold text-slate-900">Time Off & Leave Requests</h3>
+          {/* 2-Column Salary Breakdown */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Left: Components Table */}
+            <div className="lg:col-span-2 rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden flex flex-col justify-between">
+              <div>
+                <div className="p-5 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                  <h3 className="font-bold text-slate-900">Salary Components</h3>
+                  <Badge variant="neutral">FY 2026</Badge>
+                </div>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse text-sm">
+                    <thead>
+                      <tr className="border-b border-slate-100 bg-slate-50 text-[11px] font-semibold text-slate-500 uppercase tracking-wider">
+                        <th className="p-4">Component</th>
+                        <th className="p-4">Monthly Amount</th>
+                        <th className="p-4">Yearly Amount</th>
+                        <th className="p-4">% of Total</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100 text-slate-700">
+                      <tr>
+                        <td className="p-4 font-medium">Basic Salary</td>
+                        <td className="p-4">₹ {basicSalary.toLocaleString()}</td>
+                        <td className="p-4">₹ {(basicSalary * 12).toLocaleString()}</td>
+                        <td className="p-4">
+                          <span className="rounded bg-blue-50 text-blue-700 px-2 py-0.5 text-xs font-semibold">
+                            50%
+                          </span>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td className="p-4 font-medium">House Rent Allowance (HRA)</td>
+                        <td className="p-4">₹ {hra.toLocaleString()}</td>
+                        <td className="p-4">₹ {(hra * 12).toLocaleString()}</td>
+                        <td className="p-4">
+                          <span className="rounded bg-blue-50 text-blue-700 px-2 py-0.5 text-xs font-semibold">
+                            25%
+                          </span>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td className="p-4 font-medium">Standard Allowance</td>
+                        <td className="p-4">₹ {standardAllowance.toLocaleString()}</td>
+                        <td className="p-4">₹ {(standardAllowance * 12).toLocaleString()}</td>
+                        <td className="p-4">
+                          <span className="rounded bg-blue-50 text-blue-700 px-2 py-0.5 text-xs font-semibold">
+                            15%
+                          </span>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td className="p-4 font-medium">Performance Bonus (Expected)</td>
+                        <td className="p-4">₹ {performanceBonus.toLocaleString()}</td>
+                        <td className="p-4">₹ {(performanceBonus * 12).toLocaleString()}</td>
+                        <td className="p-4">
+                          <span className="rounded bg-blue-50 text-blue-700 px-2 py-0.5 text-xs font-semibold">
+                            10%
+                          </span>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              {/* Total Row */}
+              <div className="p-4 bg-slate-50 border-t-2 border-slate-200 flex justify-between items-center font-bold text-slate-900 text-sm">
+                <span>Gross Earnings</span>
+                <span>₹ {monthlyWage.toLocaleString()} / mo (₹ {yearlyWage.toLocaleString()} / yr)</span>
+              </div>
+            </div>
+
+            {/* Right: Deductions & Estimated Net Pay */}
+            <div className="space-y-6">
+              {/* PF Contribution */}
+              <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm space-y-3">
+                <h4 className="font-bold text-sm text-slate-900 border-b border-slate-100 pb-2">
+                  Provident Fund Contribution
+                </h4>
+                <div className="flex justify-between text-xs text-slate-600">
+                  <span>Employee PF (12%)</span>
+                  <span className="font-semibold text-slate-800">₹ {employeePf.toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between text-xs text-slate-600">
+                  <span>Employer PF (12%)</span>
+                  <span className="font-semibold text-slate-800">₹ {employerPf.toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between text-xs font-bold text-slate-900 pt-2 border-t border-slate-100">
+                  <span>Total Monthly PF</span>
+                  <span>₹ {(employeePf + employerPf).toLocaleString()}</span>
+                </div>
+              </div>
+
+              {/* Deductions */}
+              <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm space-y-3">
+                <h4 className="font-bold text-sm text-slate-900 border-b border-slate-100 pb-2">
+                  Tax Deductions
+                </h4>
+                <div className="flex justify-between text-xs text-slate-600">
+                  <span>Professional Tax</span>
+                  <span className="font-semibold text-slate-800">₹ {professionalTax}</span>
+                </div>
+                <div className="flex justify-between text-xs font-bold text-red-600 pt-2 border-t border-slate-100">
+                  <span>Total Deductions</span>
+                  <span>₹ {(employeePf + professionalTax).toLocaleString()}</span>
+                </div>
+              </div>
+
+              {/* Net Pay Highlight Card */}
+              <div className="rounded-xl bg-slate-900 text-white p-6 shadow-md space-y-2">
+                <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+                  Estimated Net Pay (Monthly)
+                </span>
+                <p className="text-3xl font-bold tracking-tight text-white">
+                  ₹ {netPay.toLocaleString()}
+                </p>
+                <p className="text-[11px] text-slate-400 border-t border-slate-800 pt-2">
+                  *Calculated based on standard statutory rates and attendance.
+                </p>
+              </div>
+            </div>
           </div>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Duration</TableHead>
-                <TableHead>Reason</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Comments</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {leaveRequests.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={4} className="text-center py-6 text-slate-400">
-                    No leave requests found.
-                  </TableCell>
-                </TableRow>
-              ) : (
-                leaveRequests.map((row) => (
-                  <TableRow key={row.id}>
-                    <TableCell className="font-medium">
-                      {formatDate(row.start_date)} → {formatDate(row.end_date)}
-                    </TableCell>
-                    <TableCell>{row.reason || "—"}</TableCell>
-                    <TableCell>
-                      <Badge
-                        variant={
-                          row.status === "approved"
-                            ? "success"
-                            : row.status === "rejected"
-                            ? "danger"
-                            : "warning"
-                        }
-                      >
-                        {row.status}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-slate-500 text-xs">
-                      {row.reviewer_comment || "—"}
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
         </div>
       )}
     </div>

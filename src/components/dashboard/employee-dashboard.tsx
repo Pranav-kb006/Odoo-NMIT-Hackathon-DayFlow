@@ -1,4 +1,5 @@
 import type { Profile } from "@/lib/auth";
+import { EmployeePayslips } from "@/components/dashboard/employee-payslips";
 
 interface EmployeeDashboardProps {
   profile: Profile;
@@ -93,6 +94,9 @@ export function EmployeeDashboard({ profile }: EmployeeDashboardProps) {
           </a>
         </div>
       </div>
+
+      {/* Payslips — last 12 months, read from the payslips table (RLS scopes to own rows) */}
+      <EmployeePayslips profileId={profile.id} />
     </div>
   );
 }

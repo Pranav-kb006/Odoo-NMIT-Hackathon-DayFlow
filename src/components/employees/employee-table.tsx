@@ -45,8 +45,8 @@ function getDisplayName(employee: Employee): string {
   return `${employee.first_name} ${employee.last_name}`.trim() || "—";
 }
 
-function getStatusVariant(status?: "active" | "inactive"): "success" | "slate" {
-  return status === "active" ? "success" : "slate";
+function getStatusVariant(status?: "active" | "inactive"): "success" | "neutral" {
+  return status === "active" ? "success" : "neutral";
 }
 
 function deriveDepartments(employees: Employee[]): string[] {
@@ -111,7 +111,7 @@ export function EmployeeTable({
   if (employees.length === 0) {
     return (
       <EmptyState
-        icon={Users}
+        icon={<Users className="h-8 w-8" />}
         title="No employees yet"
         description="Add your first team member manually or import a batch from CSV."
         action={
@@ -129,7 +129,7 @@ export function EmployeeTable({
   if (filtered.length === 0) {
     return (
       <EmptyState
-        icon={Search}
+        icon={<Search className="h-8 w-8" />}
         title="No matching employees"
         description="Try a different search term or clear the filters to see everyone."
         action={

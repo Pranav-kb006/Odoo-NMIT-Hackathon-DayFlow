@@ -82,37 +82,37 @@ function mask(value: string | null): string {
   return `**** ${value.slice(-4)}`;
 }
 
-function statusBadge(status: string): "success" | "slate" {
-  return status === "active" ? "success" : "slate";
+function statusBadge(status: string): "success" | "neutral" {
+  return status === "active" ? "success" : "neutral";
 }
 
 function attendanceStatusVariant(
   status: string,
-): "success" | "destructive" | "warning" | "slate" {
+): "success" | "danger" | "warning" | "neutral" {
   switch (status) {
     case "present":
       return "success";
     case "absent":
-      return "destructive";
+      return "danger";
     case "half_day":
       return "warning";
     default:
-      return "slate";
+      return "neutral";
   }
 }
 
 function leaveStatusVariant(
   status: string,
-): "success" | "destructive" | "warning" | "slate" {
+): "success" | "danger" | "warning" | "neutral" {
   switch (status) {
     case "approved":
       return "success";
     case "rejected":
-      return "destructive";
+      return "danger";
     case "pending":
       return "warning";
     default:
-      return "slate";
+      return "neutral";
   }
 }
 

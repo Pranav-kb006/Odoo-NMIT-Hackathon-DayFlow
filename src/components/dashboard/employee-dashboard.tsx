@@ -1,271 +1,154 @@
 "use client";
 
 import { useState } from "react";
-import {
-  User,
-  CalendarDays,
-  Clock,
-  LogOut,
-  CheckCircle2,
-  XCircle,
-  ArrowRight,
-} from "lucide-react";
-import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Avatar } from "@/components/ui/avatar";
 import type { Profile } from "@/lib/auth";
 
 interface EmployeeDashboardProps {
   profile: Profile;
 }
 
-/* ─── Quick Access Card ─── */
-function QuickCard({
-  icon: Icon,
-  title,
-  description,
-  href,
-  color,
-}: {
-  icon: React.ElementType;
-  title: string;
-  description: string;
-  href: string;
-  color: string;
-}) {
-  return (
-    <a
-      href={href}
-      className="group block rounded-xl border border-slate-200 bg-white p-5 transition-all duration-200 hover:border-slate-300 hover:shadow-lg hover:shadow-slate-100"
-    >
-      <div
-        className={`mb-3 inline-flex h-10 w-10 items-center justify-center rounded-xl ${color}`}
-      >
-        <Icon className="h-5 w-5" />
-      </div>
-      <h3 className="text-sm font-semibold text-slate-900">{title}</h3>
-      <p className="mt-0.5 text-xs text-slate-500">{description}</p>
-      <div className="mt-3 flex items-center gap-1 text-xs font-medium text-accent opacity-0 transition-opacity duration-200 group-hover:opacity-100">
-        Open <ArrowRight className="h-3 w-3" />
-      </div>
-    </a>
-  );
-}
-
 export function EmployeeDashboard({ profile }: EmployeeDashboardProps) {
   const [checkedIn, setCheckedIn] = useState(false);
-
-  const now = new Date();
-  const greeting =
-    now.getHours() < 12
-      ? "Good morning"
-      : now.getHours() < 17
-      ? "Good afternoon"
-      : "Good evening";
+  const firstName = profile.full_name.split(" ")[0];
 
   return (
-    <div className="space-y-6 animate-fade-in">
-      {/* Greeting + Check-in */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-center gap-4">
-          <Avatar
-            name={profile.full_name}
-            src={profile.avatar_url}
-            size="xl"
-            status={checkedIn ? "present" : "absent"}
-          />
-          <div>
-            <h1 className="text-display text-slate-900">
-              {greeting}, {profile.full_name.split(" ")[0]}
-            </h1>
-            <p className="mt-1 text-secondary">
-              {profile.department ?? "No department"} ·{" "}
-              {profile.designation ?? "Employee"}
-            </p>
-          </div>
+    <div className="space-y-xl">
+      {/* Welcome & Check In Row */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-md">
+        <div>
+          <h2 className="font-headline-lg text-headline-lg text-on-surface">
+            Welcome back, {firstName}
+          </h2>
+          <p className="text-secondary font-body-lg text-body-lg mt-xs">
+            {profile.department ?? "Department"} · {profile.designation ?? "Employee"}
+          </p>
         </div>
 
         <button
           onClick={() => setCheckedIn(!checkedIn)}
-          className={`inline-flex items-center gap-2 rounded-xl px-6 py-3 text-sm font-semibold shadow-sm transition-all duration-200 ${
+          className={`h-11 px-6 rounded-lg font-label-md text-label-md flex items-center gap-xs transition-colors ${
             checkedIn
-              ? "bg-red-50 text-red-700 border border-red-200 hover:bg-red-100"
-              : "bg-green-600 text-white hover:bg-green-700 shadow-green-600/25"
+              ? "bg-error text-on-error hover:bg-error/90"
+              : "bg-primary text-on-primary hover:bg-primary/90"
           }`}
         >
-          {checkedIn ? (
-            <>
-              <XCircle className="h-4 w-4" />
-              Check Out
-            </>
-          ) : (
-            <>
-              <CheckCircle2 className="h-4 w-4" />
-              Check In
-            </>
-          )}
+          <span className="material-symbols-outlined text-[20px]">
+            {checkedIn ? "logout" : "login"}
+          </span>
+          <span>{checkedIn ? "Check Out" : "Check In"}</span>
         </button>
       </div>
 
-      {/* Status card */}
-      <Card className="p-5">
-        <div className="flex flex-wrap items-center gap-6">
-          <div className="flex items-center gap-2">
-            <span
-              className={`h-3 w-3 rounded-full ${
-                checkedIn ? "bg-green-500" : "bg-slate-300"
-              }`}
-            />
-            <span className="text-sm font-medium text-slate-700">
-              {checkedIn ? "Currently checked in" : "Not checked in"}
-            </span>
+      {/* Today Status Metric Card */}
+      <div className="bg-surface-container-lowest border border-outline-variant rounded-lg p-lg flex flex-wrap items-center justify-between gap-md">
+        <div className="flex items-center gap-md">
+          <div
+            className={`w-3 h-3 rounded-full ${
+              checkedIn ? "bg-status-present" : "bg-outline"
+            }`}
+          />
+          <div>
+            <p className="font-body-md text-body-md font-bold text-on-surface">
+              {checkedIn ? "Checked In Today" : "Not Checked In Yet"}
+            </p>
+            <p className="font-mono-sm text-mono-sm text-secondary">
+              Today: {new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+            </p>
           </div>
-          <div className="text-sm text-slate-500">
-            Today:{" "}
-            {now.toLocaleDateString("en-IN", {
-              weekday: "long",
-              year: "numeric",
-              month: "long",
-              day: "numeric",
-            })}
-          </div>
-          <Badge variant={checkedIn ? "success" : "neutral"}>
-            {checkedIn ? "Present" : "Awaiting check-in"}
-          </Badge>
         </div>
-      </Card>
-
-      {/* Quick Access */}
-      <div>
-        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-slate-400">
-          Quick Access
-        </h2>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <QuickCard
-            icon={User}
-            title="My Profile"
-            description="View and update your personal information"
-            href="/dashboard"
-            color="bg-blue-50 text-blue-600"
-          />
-          <QuickCard
-            icon={CalendarDays}
-            title="Attendance"
-            description="View your monthly attendance log"
-            href="/dashboard/attendance"
-            color="bg-green-50 text-green-600"
-          />
-          <QuickCard
-            icon={Clock}
-            title="Leave Requests"
-            description="Apply for time off or check balances"
-            href="/dashboard/leave"
-            color="bg-amber-50 text-amber-600"
-          />
-          <QuickCard
-            icon={LogOut}
-            title="Sign Out"
-            description="End your current session"
-            href="/login"
-            color="bg-slate-100 text-slate-600"
-          />
+        <div className="px-md py-xs rounded-full bg-surface-container-high text-primary font-label-md text-label-md">
+          {checkedIn ? "PRESENT" : "AWAITING CHECK-IN"}
         </div>
       </div>
 
-      {/* Recent Activity */}
-      <Card>
-        <div className="border-b border-slate-100 px-5 py-4">
-          <h2 className="text-lg font-semibold tracking-tight text-slate-900">
-            Recent Activity
-          </h2>
+      {/* Leave Balances Grid */}
+      <div>
+        <h3 className="font-headline-md text-headline-md text-on-surface mb-md">
+          Time Off Balances
+        </h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-gutter">
+          <div className="bg-surface-container-lowest border border-outline-variant rounded-lg p-md">
+            <div className="flex justify-between items-start mb-sm">
+              <span className="text-secondary font-label-md text-label-md uppercase tracking-wider">
+                Paid Time Off
+              </span>
+              <span className="material-symbols-outlined text-primary">event_available</span>
+            </div>
+            <div className="font-display text-display text-on-surface">18</div>
+            <p className="font-mono-sm text-mono-sm text-secondary mt-xs">24 Days Available Pool</p>
+          </div>
+
+          <div className="bg-surface-container-lowest border border-outline-variant rounded-lg p-md">
+            <div className="flex justify-between items-start mb-sm">
+              <span className="text-secondary font-label-md text-label-md uppercase tracking-wider">
+                Sick Leave
+              </span>
+              <span className="material-symbols-outlined text-primary">medical_services</span>
+            </div>
+            <div className="font-display text-display text-on-surface">7</div>
+            <p className="font-mono-sm text-mono-sm text-secondary mt-xs">10 Days Available Pool</p>
+          </div>
+
+          <div className="bg-surface-container-lowest border border-outline-variant rounded-lg p-md">
+            <div className="flex justify-between items-start mb-sm">
+              <span className="text-secondary font-label-md text-label-md uppercase tracking-wider">
+                Unpaid Leave
+              </span>
+              <span className="material-symbols-outlined text-primary">event_busy</span>
+            </div>
+            <div className="font-display text-display text-on-surface">5</div>
+            <p className="font-mono-sm text-mono-sm text-secondary mt-xs">Unlimited</p>
+          </div>
         </div>
-        <div className="divide-y divide-slate-50 px-5">
-          {[
-            {
-              text: "You checked in at 9:05 AM",
-              time: "Today",
-              icon: CheckCircle2,
-              color: "bg-green-50 text-green-600",
-            },
-            {
-              text: "Leave request approved — Oct 15-16",
-              time: "Yesterday",
-              icon: CalendarDays,
-              color: "bg-blue-50 text-blue-600",
-            },
-            {
-              text: "Profile updated — phone number changed",
-              time: "3 days ago",
-              icon: User,
-              color: "bg-slate-100 text-slate-600",
-            },
-          ].map((item, i) => (
-            <div key={i} className="flex items-start gap-3 py-3">
-              <div
-                className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${item.color}`}
-              >
-                <item.icon className="h-4 w-4" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm text-slate-700">{item.text}</p>
-                <p className="mt-0.5 text-xs text-slate-400">{item.time}</p>
+      </div>
+
+      {/* Quick Navigation Cards */}
+      <div>
+        <h3 className="font-headline-md text-headline-md text-on-surface mb-md">
+          Quick Access
+        </h3>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-gutter">
+          <a
+            href="/dashboard/attendance"
+            className="bg-surface-container-lowest border border-outline-variant rounded-lg p-lg flex items-center justify-between hover:border-primary transition-colors"
+          >
+            <div className="flex items-center gap-md">
+              <span className="material-symbols-outlined text-primary text-[28px]">calendar_today</span>
+              <div>
+                <p className="font-body-md text-body-md font-bold text-on-surface">Attendance Log</p>
+                <p className="font-mono-sm text-mono-sm text-secondary">View monthly check-in history</p>
               </div>
             </div>
-          ))}
-        </div>
-      </Card>
+            <span className="material-symbols-outlined text-secondary">arrow_forward</span>
+          </a>
 
-      {/* Leave Balance Summary */}
-      <div>
-        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-slate-400">
-          Leave Balance
-        </h2>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-          {[
-            {
-              type: "Paid Time Off",
-              available: 18,
-              total: 24,
-              color: "text-blue-600",
-              bg: "bg-blue-600",
-            },
-            {
-              type: "Sick Leave",
-              available: 7,
-              total: 10,
-              color: "text-amber-600",
-              bg: "bg-amber-600",
-            },
-            {
-              type: "Unpaid Leave",
-              available: 5,
-              total: 5,
-              color: "text-slate-600",
-              bg: "bg-slate-600",
-            },
-          ].map((leave) => (
-            <Card key={leave.type} className="p-5">
-              <p className="text-xs font-medium uppercase tracking-wider text-slate-500">
-                {leave.type}
-              </p>
-              <div className="mt-2 flex items-baseline gap-1">
-                <span className={`text-stat ${leave.color}`}>
-                  {leave.available}
-                </span>
-                <span className="text-sm text-slate-400">
-                  / {leave.total} days
-                </span>
+          <a
+            href="/dashboard/leave"
+            className="bg-surface-container-lowest border border-outline-variant rounded-lg p-lg flex items-center justify-between hover:border-primary transition-colors"
+          >
+            <div className="flex items-center gap-md">
+              <span className="material-symbols-outlined text-primary text-[28px]">event_busy</span>
+              <div>
+                <p className="font-body-md text-body-md font-bold text-on-surface">Apply for Leave</p>
+                <p className="font-mono-sm text-mono-sm text-secondary">Submit PTO or Sick request</p>
               </div>
-              <div className="mt-3 h-1.5 rounded-full bg-slate-100">
-                <div
-                  className={`h-1.5 rounded-full ${leave.bg} transition-all duration-500`}
-                  style={{
-                    width: `${(leave.available / leave.total) * 100}%`,
-                  }}
-                />
+            </div>
+            <span className="material-symbols-outlined text-secondary">arrow_forward</span>
+          </a>
+
+          <a
+            href="/dashboard"
+            className="bg-surface-container-lowest border border-outline-variant rounded-lg p-lg flex items-center justify-between hover:border-primary transition-colors"
+          >
+            <div className="flex items-center gap-md">
+              <span className="material-symbols-outlined text-primary text-[28px]">badge</span>
+              <div>
+                <p className="font-body-md text-body-md font-bold text-on-surface">My Profile</p>
+                <p className="font-mono-sm text-mono-sm text-secondary">View personal & employee info</p>
               </div>
-            </Card>
-          ))}
+            </div>
+            <span className="material-symbols-outlined text-secondary">arrow_forward</span>
+          </a>
         </div>
       </div>
     </div>

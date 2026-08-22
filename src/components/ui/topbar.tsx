@@ -1,10 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { cn } from "@/lib/utils";
 import { Avatar } from "@/components/ui/avatar";
 import { signOutAction } from "@/app/actions/auth";
-import { Bell, Settings, Search, ChevronDown } from "lucide-react";
 import type { Profile } from "@/lib/auth";
 
 interface TopbarProps {
@@ -15,35 +13,32 @@ export function Topbar({ profile }: TopbarProps) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-20 flex h-topbar items-center justify-between border-b border-slate-200 bg-white px-6">
-      {/* Search */}
-      <div className="hidden items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-400 transition-colors hover:border-slate-300 sm:flex sm:w-72 lg:w-96">
-        <Search className="h-4 w-4 shrink-0" />
-        <span>Search employees, documents...</span>
+    <header className="md:ml-[260px] flex justify-between items-center h-16 px-gutter bg-surface-container-lowest text-primary font-body-md text-body-md border-b border-outline-variant fixed top-0 right-0 left-0 z-10">
+      <div className="flex items-center gap-lg pl-12 md:pl-0">
+        <h2 className="font-headline-md text-headline-md text-primary">Dashboard</h2>
       </div>
-      <div className="sm:hidden" />
 
-      {/* Right side */}
-      <div className="flex items-center gap-2">
-        {/* Notification bell */}
-        <button className="relative rounded-lg p-2 text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700">
-          <Bell className="h-5 w-5" />
-          <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-danger ring-2 ring-white" />
-        </button>
+      <div className="flex items-center gap-md">
+        <div className="flex items-center gap-sm">
+          <button
+            className="p-xs text-secondary hover:text-primary hover:bg-surface-container-low transition-colors rounded-full"
+            title="Notifications"
+          >
+            <span className="material-symbols-outlined">notifications</span>
+          </button>
+          <button
+            className="p-xs text-secondary hover:text-primary hover:bg-surface-container-low transition-colors rounded-full"
+            title="Settings"
+          >
+            <span className="material-symbols-outlined">settings</span>
+          </button>
+        </div>
 
-        {/* Settings */}
-        <button className="rounded-lg p-2 text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700">
-          <Settings className="h-5 w-5" />
-        </button>
-
-        {/* Separator */}
-        <div className="mx-1 h-6 w-px bg-slate-200" />
-
-        {/* User menu */}
+        {/* User profile avatar dropdown */}
         <div className="relative">
           <button
             onClick={() => setDropdownOpen(!dropdownOpen)}
-            className="flex items-center gap-2.5 rounded-lg px-2 py-1.5 transition-colors hover:bg-slate-50"
+            className="flex items-center gap-sm p-xs rounded-full hover:bg-surface-container-low transition-colors"
           >
             <Avatar
               name={profile.full_name}
@@ -51,44 +46,27 @@ export function Topbar({ profile }: TopbarProps) {
               size="sm"
               status="present"
             />
-            <div className="hidden text-left md:block">
-              <div className="text-sm font-medium leading-tight text-slate-800">
-                {profile.full_name}
-              </div>
-              <div className="text-[11px] capitalize leading-tight text-slate-400">
-                {profile.role}
-              </div>
-            </div>
-            <ChevronDown className="hidden h-4 w-4 text-slate-400 md:block" />
           </button>
 
-          {/* Dropdown */}
           {dropdownOpen && (
             <>
               <div
                 className="fixed inset-0 z-10"
                 onClick={() => setDropdownOpen(false)}
               />
-              <div className="absolute right-0 top-full z-20 mt-1 w-48 rounded-xl border border-slate-200 bg-white py-1 shadow-lg animate-scale-in">
-                <a
-                  href="/dashboard"
-                  className="block px-4 py-2 text-sm text-slate-700 transition-colors hover:bg-slate-50"
-                >
-                  My Profile
-                </a>
-                <a
-                  href="/dashboard/attendance"
-                  className="block px-4 py-2 text-sm text-slate-700 transition-colors hover:bg-slate-50"
-                >
-                  My Attendance
-                </a>
-                <div className="my-1 border-t border-slate-100" />
-                <form action={signOutAction}>
+              <div className="absolute right-0 top-full z-20 mt-2 w-48 rounded-lg border border-outline-variant bg-surface-container-lowest py-2 shadow-lg">
+                <div className="px-4 py-2 border-b border-outline-variant/30">
+                  <p className="font-label-md text-label-md font-bold text-on-surface">
+                    {profile.full_name}
+                  </p>
+                  <p className="font-mono-sm text-mono-sm text-secondary capitalize">
+                    {profile.role}
+                  </p>
+                </div>
+                <form action={signOutAction} className="mt-1">
                   <button
                     type="submit"
-                    className={cn(
-                      "w-full px-4 py-2 text-left text-sm text-red-600 transition-colors hover:bg-red-50"
-                    )}
+                    className="w-full px-4 py-2 text-left font-body-md text-body-md text-error hover:bg-error-container/30 transition-colors"
                   >
                     Sign out
                   </button>

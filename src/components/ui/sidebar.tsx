@@ -5,16 +5,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import type { Role } from "@/lib/types";
-import {
-  LayoutDashboard,
-  Users,
-  CalendarDays,
-  Clock,
-  FileCheck,
-  LogOut,
-  Menu,
-  X,
-} from "lucide-react";
 import { signOutAction } from "@/app/actions/auth";
 
 interface SidebarProps {
@@ -22,11 +12,11 @@ interface SidebarProps {
 }
 
 const NAV_ITEMS = [
-  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/dashboard/employees", label: "Directory", icon: Users, adminOnly: true },
-  { href: "/dashboard/attendance", label: "Attendance", icon: CalendarDays },
-  { href: "/dashboard/leave", label: "Time Off", icon: Clock },
-  { href: "/dashboard/approvals", label: "Approvals", icon: FileCheck, adminOnly: true },
+  { href: "/dashboard", label: "Dashboard", icon: "dashboard" },
+  { href: "/dashboard/employees", label: "Directory", icon: "contacts", adminOnly: true },
+  { href: "/dashboard/attendance", label: "Attendance", icon: "calendar_today" },
+  { href: "/dashboard/leave", label: "Time Off", icon: "event_busy" },
+  { href: "/dashboard/approvals", label: "Approvals", icon: "assignment_turned_in", adminOnly: true },
 ];
 
 export function Sidebar({ role }: SidebarProps) {
@@ -39,23 +29,12 @@ export function Sidebar({ role }: SidebarProps) {
 
   const navContent = (
     <>
-      {/* Logo area */}
-      <div className="flex h-topbar items-center gap-3 border-b border-slate-700/50 px-5">
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-accent text-white">
-          <LayoutDashboard className="h-4 w-4" />
-        </div>
-        <div>
-          <span className="text-base font-semibold tracking-tight text-white">
-            Dayflow
-          </span>
-          <p className="text-[10px] font-medium uppercase tracking-wider text-slate-400">
-            HR Management
-          </p>
-        </div>
+      <div className="px-lg mb-xl">
+        <h1 className="font-display text-display text-on-primary font-bold">Dayflow</h1>
+        <p className="text-on-primary/60 font-body-md text-body-md mt-xs">HR Management</p>
       </div>
 
-      {/* Nav links */}
-      <nav className="flex-1 space-y-1 p-3">
+      <nav className="flex-1 flex flex-col gap-xs px-sm">
         {filteredNav.map((item) => {
           const isActive =
             item.href === "/dashboard"
@@ -68,30 +47,26 @@ export function Sidebar({ role }: SidebarProps) {
               href={item.href}
               onClick={() => setMobileOpen(false)}
               className={cn(
-                "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-150",
+                "flex items-center gap-md px-md py-sm rounded-lg font-body-md text-body-md transition-colors duration-200 ease-in-out",
                 isActive
-                  ? "bg-accent/10 text-white"
-                  : "text-slate-400 hover:bg-slate-800 hover:text-slate-200"
+                  ? "text-white bg-secondary-container/10 border-r-4 border-surface-container-highest"
+                  : "text-secondary-fixed-dim hover:text-white hover:bg-secondary-container/5"
               )}
             >
-              <item.icon className="h-[18px] w-[18px]" />
+              <span className="material-symbols-outlined">{item.icon}</span>
               {item.label}
-              {isActive && (
-                <span className="ml-auto h-1.5 w-1.5 rounded-full bg-accent" />
-              )}
             </Link>
           );
         })}
       </nav>
 
-      {/* Bottom sign out */}
-      <div className="border-t border-slate-700/50 p-3">
+      <div className="px-sm pt-md border-t border-white/10 mt-auto">
         <form action={signOutAction}>
           <button
             type="submit"
-            className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-400 transition-colors hover:bg-slate-800 hover:text-slate-200"
+            className="flex items-center gap-md w-full px-md py-sm rounded-lg text-secondary-fixed-dim hover:text-white hover:bg-secondary-container/5 transition-colors duration-200 font-body-md text-body-md"
           >
-            <LogOut className="h-[18px] w-[18px]" />
+            <span className="material-symbols-outlined">logout</span>
             Sign Out
           </button>
         </form>
@@ -101,35 +76,33 @@ export function Sidebar({ role }: SidebarProps) {
 
   return (
     <>
-      {/* Desktop sidebar */}
-      <aside className="fixed inset-y-0 left-0 z-30 hidden w-sidebar flex-col bg-slate-900 md:flex">
+      {/* Desktop Sidebar */}
+      <aside className="fixed left-0 top-0 h-full w-[260px] bg-primary text-on-primary font-body-md text-body-md hidden md:flex flex-col py-lg z-20">
         {navContent}
       </aside>
 
-      {/* Mobile hamburger button */}
+      {/* Mobile Hamburger Toggle */}
       <button
         onClick={() => setMobileOpen(true)}
-        className="fixed left-4 top-4 z-40 flex h-10 w-10 items-center justify-center rounded-lg bg-slate-900 text-white shadow-lg md:hidden"
+        className="fixed left-4 top-3 z-40 flex h-10 w-10 items-center justify-center rounded-lg bg-primary text-on-primary shadow-md md:hidden"
         aria-label="Open menu"
       >
-        <Menu className="h-5 w-5" />
+        <span className="material-symbols-outlined">menu</span>
       </button>
 
-      {/* Mobile overlay */}
+      {/* Mobile Overlay Sidebar */}
       {mobileOpen && (
         <div className="fixed inset-0 z-40 md:hidden">
           <div
-            className="absolute inset-0 bg-slate-900/50 backdrop-blur-sm animate-overlay-fade"
+            className="absolute inset-0 bg-primary/50 backdrop-blur-sm"
             onClick={() => setMobileOpen(false)}
           />
-          <aside className="relative z-10 flex h-full w-sidebar flex-col bg-slate-900 animate-slide-in-left">
-            {/* Close button */}
+          <aside className="relative z-10 flex h-full w-[260px] flex-col bg-primary py-lg text-on-primary shadow-xl">
             <button
               onClick={() => setMobileOpen(false)}
-              className="absolute right-3 top-4 rounded-lg p-1.5 text-slate-400 hover:text-white"
-              aria-label="Close menu"
+              className="absolute right-3 top-3 text-secondary-fixed-dim hover:text-white p-1"
             >
-              <X className="h-5 w-5" />
+              <span className="material-symbols-outlined">close</span>
             </button>
             {navContent}
           </aside>

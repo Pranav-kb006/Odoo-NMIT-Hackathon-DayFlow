@@ -18,6 +18,18 @@ export const employeeCsvHeaders = [
   "location",
 ] as const;
 
+export const exportEmployeeHeaders = [
+  "login_id",
+  "first_name",
+  "last_name",
+  "work_email",
+  "department",
+  "job_position",
+  "date_of_joining",
+  "location",
+  "mobile",
+] as const;
+
 const IMPORT_KEYS = employeeCsvHeaders;
 const IMPORT_KEY_SET = new Set<string>(IMPORT_KEYS);
 
@@ -254,10 +266,10 @@ function escapeCsvValue(value: string): string {
 
 export function serializeEmployeesCsv(rows: ExportEmployee[]): string {
   const lines: string[] = [];
-  lines.push(employeeCsvHeaders.join(","));
+  lines.push(exportEmployeeHeaders.join(","));
 
   for (const row of rows) {
-    const cells = employeeCsvHeaders.map((header) => {
+    const cells = exportEmployeeHeaders.map((header) => {
       const value = (row as Record<string, unknown>)[header];
       return escapeCsvValue(value == null ? "" : String(value));
     });

@@ -1,84 +1,21 @@
 "use client";
 
-import { useState, useMemo } from "react";
-import { calculateSalaryBreakdown, type PayrollItem } from "@/lib/payroll";
+import { useState, useMemo, useEffect } from "react";
+import {
+  calculateSalaryBreakdown,
+  mapProfileToPayrollItem,
+  type PayrollItem,
+  type DBProfile,
+} from "@/lib/payroll";
 import { Modal, ModalHeader, ModalBody, ModalFooter } from "@/components/ui/modal";
 
-const INITIAL_PAYROLL_DATA: PayrollItem[] = [
-  {
-    id: "1",
-    name: "Sarah Jenkins",
-    role: "Senior Engineer",
-    empId: "EMP-0492",
-    monthlyWage: 8500,
-    deductions: 1250,
-    netPay: 7250,
-    status: "paid",
-    avatarUrl:
-      "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80",
-  },
-  {
-    id: "2",
-    name: "Marcus Thorne",
-    role: "Product Manager",
-    empId: "EMP-0184",
-    monthlyWage: 9200,
-    deductions: 1400,
-    netPay: 7800,
-    status: "paid",
-    avatarUrl:
-      "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&auto=format&fit=crop&q=80",
-  },
-  {
-    id: "3",
-    name: "Alicia Lin",
-    role: "UX Designer",
-    empId: "EMP-0511",
-    monthlyWage: 7800,
-    deductions: 1100,
-    netPay: 6700,
-    status: "processing",
-    avatarUrl: null,
-  },
-  {
-    id: "4",
-    name: "David Chen",
-    role: "Marketing Lead",
-    empId: "EMP-0329",
-    monthlyWage: 8100,
-    deductions: 1150,
-    netPay: 6950,
-    status: "pending",
-    avatarUrl:
-      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80",
-  },
-  {
-    id: "5",
-    name: "Elena Silva",
-    role: "Backend Developer",
-    empId: "EMP-0612",
-    monthlyWage: 8800,
-    deductions: 1300,
-    netPay: 7500,
-    status: "paid",
-    avatarUrl:
-      "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
-  },
-  {
-    id: "6",
-    name: "Alex Mercer",
-    role: "Full Stack Engineer",
-    empId: "EMP-0243",
-    monthlyWage: 9500,
-    deductions: 1450,
-    netPay: 8050,
-    status: "pending",
-    avatarUrl: null,
-  },
-];
+interface AdminPayrollManagerProps {
+  initialItems?: PayrollItem[];
+}
 
-export function AdminPayrollManager() {
-  const [payrollList, setPayrollList] = useState<PayrollItem[]>(INITIAL_PAYROLL_DATA);
+export function AdminPayrollManager({ initialItems = [] }: AdminPayrollManagerProps) {
+  const [payrollList, setPayrollList] = useState<PayrollItem[]>(initialItems);
+  const [loading, setLoading] = useState(initialItems.length === 0);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedMonth, setSelectedMonth] = useState("October 2023");
   const [monthDropdownOpen, setMonthDropdownOpen] = useState(false);
@@ -88,7 +25,40 @@ export function AdminPayrollManager() {
   // Modals
   const [batchModalOpen, setBatchModalOpen] = useState(false);
   const [detailModalItem, setDetailModalItem] = useState<PayrollItem | null>(null);
+  const [editWageItem, setEditWageItem] = useState<PayrollItem | null>(null);
+  const [newWageInput, setNewWageInput] = useState("");
   const [isProcessingBatch, setIsProcessingBatch] = useState(false);
+
+  // Fetch real employee profiles from API to stay live when new employees are added in Directory
+  const fetchEmployees = async () => {
+    try {
+      setLoading(true);
+      const res = await fetch("/api/employees");
+      if (res.ok) {
+        const data = await res.json();
+        if (Array.isArray(data.employees)) {
+          const mapped = data.employees.map((p: DBProfile) => {
+            // Preserve status if existing in state
+            const existing = payrollList.find((item) => item.id === p.id);
+            return mapProfileToPayrollItem(
+              p,
+              existing?.monthlyWage,
+              existing?.status
+            );
+          });
+          setPayrollList(mapped);
+        }
+      }
+    } catch (err) {
+      console.error("Failed to fetch employees for payroll:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchEmployees();
+  }, []);
 
   // Metrics
   const totalPayroll = useMemo(() => {
@@ -137,6 +107,28 @@ export function AdminPayrollManager() {
     }, 1200);
   };
 
+  const handleUpdateWage = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editWageItem) return;
+    const wage = parseFloat(newWageInput);
+    if (isNaN(wage) || wage <= 0) return;
+
+    const breakdown = calculateSalaryBreakdown(wage);
+    setPayrollList((prev) =>
+      prev.map((item) =>
+        item.id === editWageItem.id
+          ? {
+              ...item,
+              monthlyWage: wage,
+              deductions: breakdown.totalDeductions,
+              netPay: breakdown.netPay,
+            }
+          : item
+      )
+    );
+    setEditWageItem(null);
+  };
+
   return (
     <div className="space-y-xl animate-fade-in">
       {/* ─── Page Header ─── */}
@@ -144,11 +136,20 @@ export function AdminPayrollManager() {
         <div>
           <h2 className="font-display text-display text-on-background">Payroll Management</h2>
           <p className="font-body-md text-body-md text-on-surface-variant mt-xs">
-            Manage and process employee salaries
+            Manage and process employee salaries directly linked to Directory
           </p>
         </div>
 
         <div className="flex items-center gap-md w-full md:w-auto">
+          {/* Add Employee link */}
+          <a
+            href="/dashboard/employees"
+            className="flex items-center gap-xs px-md py-sm rounded border border-[#E2E8F0] bg-white font-label-md text-label-md text-on-background hover:bg-surface-container-low transition-colors"
+          >
+            <span className="material-symbols-outlined text-[18px]">person_add</span>
+            <span>Add Employee</span>
+          </a>
+
           {/* Month Selector Dropdown */}
           <div className="relative">
             <button
@@ -201,7 +202,7 @@ export function AdminPayrollManager() {
         </div>
       </div>
 
-      {/* ─── Summary Metric Cards Grid (3 cards matching UI design) ─── */}
+      {/* ─── Summary Metric Cards Grid ─── */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-gutter">
         {/* Total Payroll */}
         <div className="bg-[#FFFFFF] border border-[#E2E8F0] p-lg rounded-lg">
@@ -234,7 +235,9 @@ export function AdminPayrollManager() {
           <div className="w-full bg-surface-container mt-md h-1.5 rounded-full overflow-hidden">
             <div
               className="bg-[#0F172A] h-full rounded-full transition-all duration-500"
-              style={{ width: `${(paidCount / payrollList.length) * 100}%` }}
+              style={{
+                width: `${payrollList.length > 0 ? (paidCount / payrollList.length) * 100 : 0}%`,
+              }}
             />
           </div>
         </div>
@@ -271,42 +274,53 @@ export function AdminPayrollManager() {
             />
           </div>
 
-          {/* Filter Dropdown */}
-          <div className="relative w-full sm:w-auto">
+          {/* Filter & Refresh */}
+          <div className="flex items-center gap-sm w-full sm:w-auto">
             <button
-              onClick={() => setFilterDropdownOpen(!filterDropdownOpen)}
-              className="flex items-center gap-sm px-md py-2 border border-[#E2E8F0] rounded hover:bg-[#F8FAFB] transition-colors font-label-md text-label-md text-[#0F172A] whitespace-nowrap w-full sm:w-auto justify-center"
+              onClick={fetchEmployees}
+              className="flex items-center gap-xs px-md py-2 border border-[#E2E8F0] rounded hover:bg-[#F8FAFB] transition-colors font-label-md text-label-md text-[#0F172A]"
+              title="Refresh from Directory"
             >
-              <span className="material-symbols-outlined text-[18px]">filter_list</span>
-              <span>Filter: {statusFilter.toUpperCase()}</span>
+              <span className="material-symbols-outlined text-[18px]">refresh</span>
+              <span>Sync Directory</span>
             </button>
 
-            {filterDropdownOpen && (
-              <>
-                <div
-                  className="fixed inset-0 z-10"
-                  onClick={() => setFilterDropdownOpen(false)}
-                />
-                <div className="absolute right-0 top-full mt-1 w-40 rounded border border-outline-variant bg-surface-container-lowest py-1 shadow-lg z-20">
-                  {(["all", "paid", "processing", "pending"] as const).map((st) => (
-                    <button
-                      key={st}
-                      onClick={() => {
-                        setStatusFilter(st);
-                        setFilterDropdownOpen(false);
-                      }}
-                      className={`w-full px-4 py-2 text-left text-xs uppercase font-medium transition-colors ${
-                        statusFilter === st
-                          ? "bg-surface-container-low text-primary font-bold"
-                          : "text-on-surface-variant hover:bg-surface-container-low"
-                      }`}
-                    >
-                      {st}
-                    </button>
-                  ))}
-                </div>
-              </>
-            )}
+            <div className="relative flex-1 sm:flex-none">
+              <button
+                onClick={() => setFilterDropdownOpen(!filterDropdownOpen)}
+                className="flex items-center gap-sm px-md py-2 border border-[#E2E8F0] rounded hover:bg-[#F8FAFB] transition-colors font-label-md text-label-md text-[#0F172A] whitespace-nowrap w-full justify-center"
+              >
+                <span className="material-symbols-outlined text-[18px]">filter_list</span>
+                <span>Filter: {statusFilter.toUpperCase()}</span>
+              </button>
+
+              {filterDropdownOpen && (
+                <>
+                  <div
+                    className="fixed inset-0 z-10"
+                    onClick={() => setFilterDropdownOpen(false)}
+                  />
+                  <div className="absolute right-0 top-full mt-1 w-40 rounded border border-outline-variant bg-surface-container-lowest py-1 shadow-lg z-20">
+                    {(["all", "paid", "processing", "pending"] as const).map((st) => (
+                      <button
+                        key={st}
+                        onClick={() => {
+                          setStatusFilter(st);
+                          setFilterDropdownOpen(false);
+                        }}
+                        className={`w-full px-4 py-2 text-left text-xs uppercase font-medium transition-colors ${
+                          statusFilter === st
+                            ? "bg-surface-container-low text-primary font-bold"
+                            : "text-on-surface-variant hover:bg-surface-container-low"
+                        }`}
+                      >
+                        {st}
+                      </button>
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
           </div>
         </div>
 
@@ -339,10 +353,16 @@ export function AdminPayrollManager() {
               </tr>
             </thead>
             <tbody className="divide-y divide-[#F1F5F9]">
-              {filteredList.length === 0 ? (
+              {loading ? (
                 <tr>
                   <td colSpan={7} className="py-xl text-center text-on-surface-variant">
-                    No payroll records found matching your search.
+                    Loading payroll records from Directory...
+                  </td>
+                </tr>
+              ) : filteredList.length === 0 ? (
+                <tr>
+                  <td colSpan={7} className="py-xl text-center text-on-surface-variant">
+                    No employees found in Directory matching your search.
                   </td>
                 </tr>
               ) : (
@@ -383,7 +403,19 @@ export function AdminPayrollManager() {
                       {item.empId}
                     </td>
                     <td className="py-sm px-lg font-mono-sm text-mono-sm text-[#0F172A] text-right">
-                      {formatCurrency(item.monthlyWage)}
+                      <div className="flex items-center justify-end gap-1">
+                        <span>{formatCurrency(item.monthlyWage)}</span>
+                        <button
+                          onClick={() => {
+                            setEditWageItem(item);
+                            setNewWageInput(item.monthlyWage.toString());
+                          }}
+                          className="text-on-surface-variant hover:text-primary p-0.5 rounded transition-colors"
+                          title="Edit Base Wage"
+                        >
+                          <span className="material-symbols-outlined text-[16px]">edit</span>
+                        </button>
+                      </div>
                     </td>
                     <td className="py-sm px-lg font-mono-sm text-mono-sm text-error text-right">
                       -{formatCurrency(item.deductions)}
@@ -582,6 +614,53 @@ export function AdminPayrollManager() {
               Close
             </button>
           </ModalFooter>
+        </Modal>
+      )}
+
+      {/* ─── MODAL 3: Edit Employee Base Wage ─── */}
+      {editWageItem && (
+        <Modal open={!!editWageItem} onClose={() => setEditWageItem(null)}>
+          <ModalHeader
+            title={`Edit Base Salary — ${editWageItem.name}`}
+            description={`${editWageItem.empId} · ${editWageItem.role}`}
+            onClose={() => setEditWageItem(null)}
+          />
+          <form onSubmit={handleUpdateWage}>
+            <ModalBody className="space-y-4">
+              <div>
+                <label className="block text-xs font-medium uppercase tracking-wider text-secondary mb-1">
+                  Monthly Wage (Gross USD / ₹)
+                </label>
+                <input
+                  type="number"
+                  step="100"
+                  min="500"
+                  required
+                  value={newWageInput}
+                  onChange={(e) => setNewWageInput(e.target.value)}
+                  className="w-full px-3 py-2 border border-[#E2E8F0] rounded focus:border-[#0F172A] focus:ring-0 text-sm"
+                />
+              </div>
+              <p className="text-xs text-on-surface-variant">
+                Updating the monthly wage will automatically recalculate Basic (50%), HRA, Allowances, PF, Professional Tax, and Net Pay according to PRD §5.6.
+              </p>
+            </ModalBody>
+            <ModalFooter>
+              <button
+                type="button"
+                onClick={() => setEditWageItem(null)}
+                className="px-4 py-2 text-sm font-medium text-secondary hover:text-primary transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="px-5 py-2 text-sm font-medium bg-[#0F172A] text-white rounded hover:bg-opacity-90 transition-opacity"
+              >
+                Update Salary
+              </button>
+            </ModalFooter>
+          </form>
         </Modal>
       )}
     </div>

@@ -105,13 +105,12 @@ export function CsvImportDialog({ open, onClose, onImport }: Props) {
     setImportError(null);
     setProgress({ done: 0, total: validRows.length });
 
-    // NOTE: `source_row` is intentionally included in the rows passed to
-    // `onImport` for server-side traceability of failures; the parent is
-    // responsible for stripping `source_row` before any data reaches
-    // `POST /api/employees`. This dialog never invents credentials — the
-    // temporary passwords below come only from the server response.
+    // `source_row` is a client-only field for result reporting; it must
+    // never cross the API boundary. Strip it defensively here so the
+    // contract holds regardless of parent behavior.
+    const apiRows = validRows.map(({ source_row, ...rest }) => rest);
     try {
-      const summary = await onImport(validRows);
+      const summary = await onImport(apiRows as CsvEmployeeRow[]);
       setImportSummary(summary);
       setProgress({ done: validRows.length, total: validRows.length });
       setPhase("done");

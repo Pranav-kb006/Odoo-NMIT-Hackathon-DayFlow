@@ -39,7 +39,7 @@ export async function signInAction(_: ActionResult | undefined, formData: FormDa
  * TODO(B4 Lokaksha): swap the /signup shell for the real visual; keep this action.
  */
 export async function signUpAction(_: ActionResult | undefined, formData: FormData): Promise<ActionResult> {
-  const logoUrl = typeof formData.get("logoUrl") === "string" ? (formData.get("logoUrl") as string) : undefined;
+  const logoFile = formData.get("logo");
   const parsed = signupSchema.safeParse({
     companyName: formData.get("companyName"),
     companyCode: formData.get("companyCode"),
@@ -52,6 +52,24 @@ export async function signUpAction(_: ActionResult | undefined, formData: FormDa
   }
 
   const admin = createAdminClient();
+
+  // Upload logo server-side (service role bypasses storage RLS). The browser
+  // can't upload because the user isn't authenticated until signup completes,
+  // and the `logos` bucket only allows authenticated uploads.
+  let logoUrl: string | undefined;
+  if (logoFile instanceof File && logoFile.size > 0) {
+    const ext = logoFile.name.split(".").pop()?.toLowerCase() || "png";
+    const safeName = logoFile.name.replace(/[^a-zA-Z0-9._-]/g, "_").slice(0, 60);
+    const path = `company-${Date.now()}-${safeName}.${ext}`;
+    const { error: upErr } = await admin.storage
+      .from("logos")
+      .upload(path, logoFile, { cacheControl: "3600", upsert: false, contentType: logoFile.type || "image/png" });
+    if (upErr) {
+      return { error: `Logo upload failed: ${upErr.message}` };
+    }
+    const { data } = admin.storage.from("logos").getPublicUrl(path);
+    logoUrl = data.publicUrl;
+  }
 
   // 1. auth user (confirmed so the demo team can log in instantly)
   const { data: created, error: createError } = await admin.auth.admin.createUser({

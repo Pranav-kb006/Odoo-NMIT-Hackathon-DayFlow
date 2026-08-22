@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Employee Profile - Admin View</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&amp;family=Geist+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-error": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "outline": "#76777d",
+                        "on-secondary-fixed-variant": "#444650",
+                        "primary-fixed": "#dae2fd",
+                        "tertiary": "#000000",
+                        "outline-variant": "#c6c6cd",
+                        "secondary-container": "#dedfeb",
+                        "on-background": "#0b1c30",
+                        "on-tertiary-fixed-variant": "#574425",
+                        "surface-container-highest": "#d3e4fe",
+                        "primary-container": "#131b2e",
+                        "tertiary-fixed": "#fcdeb5",
+                        "surface-container-low": "#eff4ff",
+                        "background": "#f8f9ff",
+                        "on-secondary": "#ffffff",
+                        "on-tertiary-fixed": "#271901",
+                        "on-tertiary": "#ffffff",
+                        "surface-tint": "#565e74",
+                        "primary-fixed-dim": "#bec6e0",
+                        "on-primary": "#ffffff",
+                        "surface-container": "#e5eeff",
+                        "on-secondary-container": "#60626c",
+                        "on-surface": "#0b1c30",
+                        "inverse-primary": "#bec6e0",
+                        "surface-container-lowest": "#ffffff",
+                        "on-surface-variant": "#45464d",
+                        "on-primary-fixed": "#131b2e",
+                        "surface-bright": "#f8f9ff",
+                        "surface-variant": "#d3e4fe",
+                        "tertiary-container": "#271901",
+                        "on-primary-fixed-variant": "#3f465c",
+                        "surface": "#f8f9ff",
+                        "surface-dim": "#cbdbf5",
+                        "tertiary-fixed-dim": "#dec29a",
+                        "on-primary-container": "#7c839b",
+                        "on-secondary-fixed": "#191b24",
+                        "secondary-fixed": "#e1e2ed",
+                        "inverse-surface": "#213145",
+                        "secondary": "#5c5e68",
+                        "on-tertiary-container": "#98805d",
+                        "error-container": "#ffdad6",
+                        "primary": "#000000",
+                        "inverse-on-surface": "#eaf1ff",
+                        "secondary-fixed-dim": "#c4c6d1",
+                        "error": "#ba1a1a",
+                        "surface-container-high": "#dce9ff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "base": "4px",
+                        "margin": "32px",
+                        "xs": "4px",
+                        "sm": "8px",
+                        "gutter": "24px",
+                        "md": "16px",
+                        "xxl": "48px",
+                        "lg": "24px",
+                        "xl": "32px"
+                    },
+                    "fontFamily": {
+                        "body-lg": ["Geist"],
+                        "display": ["Geist"],
+                        "body-md": ["Geist"],
+                        "label-md": ["Geist"],
+                        "headline-md": ["Geist"],
+                        "mono-sm": ["Geist Mono"],
+                        "headline-lg": ["Geist"]
+                    },
+                    "fontSize": {
+                        "body-lg": ["16px", { "lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "400" }],
+                        "display": ["36px", { "lineHeight": "1.1", "letterSpacing": "-0.03em", "fontWeight": "600" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "letterSpacing": "-0.01em", "fontWeight": "400" }],
+                        "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.01em", "fontWeight": "500" }],
+                        "headline-md": ["20px", { "lineHeight": "28px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+                        "mono-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0", "fontWeight": "400" }],
+                        "headline-lg": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { background-color: #F8FAFB; }
+    </style>
+</head>
+<body class="flex h-screen overflow-hidden font-body-md text-on-surface">
+<!-- SideNavBar -->
+<nav class="hidden md:flex flex-col bg-primary dark:bg-primary-container text-on-primary dark:text-on-primary-fixed fixed left-0 top-0 h-full w-[260px] py-lg z-50">
+<div class="px-gutter mb-xl flex items-center gap-sm">
+<span class="font-display text-headline-lg text-on-primary tracking-tight">TalentOS</span>
+</div>
+<div class="flex flex-col gap-xs flex-1">
+<a class="flex items-center gap-md px-gutter py-md text-secondary-fixed-dim hover:text-white hover:bg-secondary-container/5 transition-colors duration-200 ease-in-out font-body-md text-body-md" href="#">
+<span class="material-symbols-outlined" data-weight="regular">dashboard</span>
+<span>Dashboard</span>
+</a>
+<a class="flex items-center gap-md px-gutter py-md text-white bg-secondary-container/10 border-r-4 border-surface-container-highest transition-colors duration-200 ease-in-out font-body-md text-body-md" href="#">
+<span class="material-symbols-outlined" data-weight="fill" style="font-variation-settings: 'FILL' 1;">contacts</span>
+<span>Directory</span>
+</a>
+<a class="flex items-center gap-md px-gutter py-md text-secondary-fixed-dim hover:text-white hover:bg-secondary-container/5 transition-colors duration-200 ease-in-out font-body-md text-body-md" href="#">
+<span class="material-symbols-outlined" data-weight="regular">calendar_today</span>
+<span>Attendance</span>
+</a>
+<a class="flex items-center gap-md px-gutter py-md text-secondary-fixed-dim hover:text-white hover:bg-secondary-container/5 transition-colors duration-200 ease-in-out font-body-md text-body-md" href="#">
+<span class="material-symbols-outlined" data-weight="regular">event_busy</span>
+<span>Time Off</span>
+</a>
+</div>
+</nav>
+<!-- Main Content -->
+<main class="flex-1 ml-0 md:ml-[260px] flex flex-col h-full overflow-y-auto bg-background">
+<!-- TopNavBar Header Area -->
+<header class="bg-surface-lowest dark:bg-surface-container-lowest border-b border-outline-variant flex justify-between items-center h-16 px-gutter sticky top-0 z-40">
+<div class="flex items-center gap-sm md:hidden">
+<span class="font-headline-md text-headline-md text-primary">TalentOS</span>
+</div>
+<div class="hidden md:flex items-center">
+<span class="font-headline-md text-headline-md text-primary">Employee Profile</span>
+</div>
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-secondary hover:text-primary cursor-pointer duration-150">notifications</span>
+<span class="material-symbols-outlined text-secondary hover:text-primary cursor-pointer duration-150">settings</span>
+<div class="w-8 h-8 rounded-full bg-primary-fixed-dim overflow-hidden ml-sm cursor-pointer border border-outline-variant">
+<img alt="User Profile" class="w-full h-full object-cover" data-alt="A small, professional headshot of an HR administrator, bright lighting, neutral background, corporate minimalist style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBzYtjfi-CUPLTbVx-03rWzovjG4cicJRT9g7VC-VhtT2qHa50JCjt5_iA4qG3njZ5L4W1CkJjGB2WZCuVOea06U7vE_sKpo5_3ysSeaKECLw4SHQgKKAH0uTdJTDaUMV9n0kc7Z7EjIdtuwj3w856BP4CcW9CRDB-yl6KPHEa0sPD4cABPp1zcyHVT2ezzNry7J-57lKBQaeCedR1BhaGuEavpgVeNwUKpRJ33G3SNn0Wgky4QgVTI"/>
+</div>
+</div>
+</header>
+<!-- Content Canvas -->
+<div class="p-margin max-w-[1440px] mx-auto w-full flex flex-col gap-margin">
+<!-- Profile Header -->
+<section class="bg-surface border border-outline-variant rounded p-xl flex flex-col md:flex-row gap-xl items-start">
+<div class="relative group cursor-pointer shrink-0">
+<div class="w-[120px] h-[120px] rounded-full overflow-hidden border border-outline-variant bg-surface-container-low">
+<img alt="Marcus Chen Profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBS8iWKALhWQs8mkNKGopca7raXR9sE1mosu6dNBGN0vyrBFVKk9v0lV_4hjTA8xjNGgBgcGpTDUxdeHgTWW9yw8zUaAnB01OxyZOgQ0MJw8nyEwn4qsvVe2Xt46fzPfqbKMnQ3PkUlMgUQAIx_i2UuwzZiYNLa85x0JIHk1XalhQyoLOBTA-SA4-BJrBsdtsl2yEf4J2ZE4D7Huzx_I8GcMJuTGRIVdOeR9KHfPYxCam-snGXxx1KGkID2pCdAQV75uw"/>
+</div>
+<div class="absolute inset-0 bg-primary/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center">
+<span class="material-symbols-outlined text-white">edit</span>
+</div>
+</div>
+<div class="flex-1 w-full flex flex-col gap-lg">
+<div class="flex justify-between items-start w-full">
+<h1 class="font-display text-display text-on-surface">Marcus Chen</h1>
+<button class="px-md py-sm bg-surface border border-outline-variant text-on-surface hover:bg-surface-container-low transition-colors rounded font-label-md text-label-md flex items-center gap-xs">
+<span class="material-symbols-outlined text-[16px]">edit</span> Edit Profile
+                        </button>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-y-md gap-x-xl w-full">
+<div class="flex flex-col border-b border-outline-variant/50 pb-sm">
+<span class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider mb-xs">Company</span>
+<span class="font-body-md text-body-md text-on-surface">Acme Corp Global</span>
+</div>
+<div class="flex flex-col border-b border-outline-variant/50 pb-sm">
+<span class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider mb-xs">Department</span>
+<span class="font-body-md text-body-md text-on-surface">Product Design</span>
+</div>
+<div class="flex flex-col border-b border-outline-variant/50 pb-sm">
+<span class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider mb-xs">Login ID</span>
+<span class="font-mono-sm text-mono-sm text-on-surface">MC-84920</span>
+</div>
+<div class="flex flex-col border-b border-outline-variant/50 pb-sm">
+<span class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider mb-xs">Email</span>
+<span class="font-body-md text-body-md text-on-surface">m.chen@acmecorp.com</span>
+</div>
+<div class="flex flex-col border-b border-outline-variant/50 pb-sm">
+<span class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider mb-xs">Manager</span>
+<span class="font-body-md text-body-md text-on-surface text-primary cursor-pointer hover:underline">Sarah Jenkins</span>
+</div>
+<div class="flex flex-col border-b border-outline-variant/50 pb-sm">
+<span class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider mb-xs">Mobile</span>
+<span class="font-mono-sm text-mono-sm text-on-surface">+1 (555) 019-2834</span>
+</div>
+<div class="flex flex-col border-b border-outline-variant/50 pb-sm lg:col-span-3">
+<span class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider mb-xs">Location</span>
+<span class="font-body-md text-body-md text-on-surface">San Francisco, CA (Hybrid)</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Tabs -->
+<div class="flex border-b border-outline-variant w-full overflow-x-auto no-scrollbar">
+<button class="px-lg py-md border-b-2 border-primary text-primary font-label-md text-label-md uppercase tracking-wider bg-surface-container-low/50">Resume</button>
+<button class="px-lg py-md border-b-2 border-transparent text-secondary hover:text-primary hover:bg-surface-container-low transition-colors font-label-md text-label-md uppercase tracking-wider">Private Info</button>
+<button class="px-lg py-md border-b-2 border-transparent text-secondary hover:text-primary hover:bg-surface-container-low transition-colors font-label-md text-label-md uppercase tracking-wider">Salary Info</button>
+</div>
+<!-- Tab Content Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-margin items-start">
+<!-- Left Column (Wider) -->
+<div class="lg:col-span-8 flex flex-col gap-margin">
+<section class="bg-surface border border-outline-variant rounded p-xl flex flex-col gap-xl relative group">
+<div class="flex items-center justify-between border-b border-outline-variant/50 pb-sm mb-sm">
+<h2 class="font-headline-md text-headline-md text-on-surface">About</h2>
+<button class="opacity-0 group-hover:opacity-100 transition-opacity text-secondary hover:text-primary p-xs rounded hover:bg-surface-container-low">
+<span class="material-symbols-outlined text-[20px]">edit</span>
+</button>
+</div>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-[800px]">
+                            Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.
+                        </p>
+<div class="flex items-center justify-between border-b border-outline-variant/50 pb-sm mb-sm mt-md">
+<h3 class="font-headline-md text-[18px] font-medium text-on-surface">What I love about my job</h3>
+<button class="opacity-0 group-hover:opacity-100 transition-opacity text-secondary hover:text-primary p-xs rounded hover:bg-surface-container-low">
+<span class="material-symbols-outlined text-[20px]">edit</span>
+</button>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-[800px]">
+                             Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.
+                        </p>
+<div class="flex items-center justify-between border-b border-outline-variant/50 pb-sm mb-sm mt-md">
+<h3 class="font-headline-md text-[18px] font-medium text-on-surface">My interests and hobbies</h3>
+<button class="opacity-0 group-hover:opacity-100 transition-opacity text-secondary hover:text-primary p-xs rounded hover:bg-surface-container-low">
+<span class="material-symbols-outlined text-[20px]">edit</span>
+</button>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-[800px]">
+                             Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.
+                        </p>
+</section>
+</div>
+<!-- Right Column (Narrower) -->
+<div class="lg:col-span-4 flex flex-col gap-margin">
+<!-- Skills Card -->
+<section class="bg-surface border border-outline-variant rounded flex flex-col">
+<div class="p-lg border-b border-outline-variant/50">
+<h2 class="font-headline-md text-[18px] text-on-surface">Skills</h2>
+</div>
+<div class="p-lg flex-1 min-h-[150px] flex flex-wrap content-start gap-sm">
+<span class="px-sm py-xs bg-surface-container-low border border-outline-variant rounded font-label-md text-label-md text-on-surface">UI Design</span>
+<span class="px-sm py-xs bg-surface-container-low border border-outline-variant rounded font-label-md text-label-md text-on-surface">Prototyping</span>
+<span class="px-sm py-xs bg-surface-container-low border border-outline-variant rounded font-label-md text-label-md text-on-surface">User Research</span>
+<span class="px-sm py-xs bg-surface-container-low border border-outline-variant rounded font-label-md text-label-md text-on-surface">Figma</span>
+</div>
+<div class="p-md border-t border-outline-variant/50">
+<button class="w-full py-sm bg-transparent border border-dashed border-outline-variant text-secondary hover:text-primary hover:border-primary hover:bg-surface-container-lowest transition-colors rounded font-label-md text-label-md flex items-center justify-center gap-xs">
+<span class="material-symbols-outlined text-[16px]">add</span> Add Skills
+                            </button>
+</div>
+</section>
+<!-- Certification Card -->
+<section class="bg-surface border border-outline-variant rounded flex flex-col">
+<div class="p-lg border-b border-outline-variant/50">
+<h2 class="font-headline-md text-[18px] text-on-surface">Certification</h2>
+</div>
+<div class="p-lg flex-1 min-h-[150px] flex flex-col gap-md">
+<div class="flex items-start gap-md">
+<div class="w-10 h-10 bg-surface-container-low rounded flex items-center justify-center shrink-0 border border-outline-variant">
+<span class="material-symbols-outlined text-secondary">workspace_premium</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-on-surface font-semibold">Certified Usability Analyst</span>
+<span class="font-body-md text-[12px] text-on-surface-variant">Human Factors International • 2022</span>
+</div>
+</div>
+</div>
+<div class="p-md border-t border-outline-variant/50">
+<button class="w-full py-sm bg-transparent border border-dashed border-outline-variant text-secondary hover:text-primary hover:border-primary hover:bg-surface-container-lowest transition-colors rounded font-label-md text-label-md flex items-center justify-center gap-xs">
+<span class="material-symbols-outlined text-[16px]">add</span> Add Certification
+                            </button>
+</div>
+</section>
+</div>
+</div>
+</div>
+</main>
+</body></html>

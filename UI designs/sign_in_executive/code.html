@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Luminal HR - Sign In</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&amp;family=Geist+Mono:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        /* Material Symbols Configuration */
+        .material-symbols-outlined {
+            font-family: 'Material Symbols Outlined';
+            font-weight: normal;
+            font-style: normal;
+            font-size: 24px;
+            line-height: 1;
+            letter-spacing: normal;
+            text-transform: none;
+            display: inline-block;
+            white-space: nowrap;
+            word-wrap: normal;
+            direction: ltr;
+            -webkit-font-feature-settings: 'liga';
+            -webkit-font-smoothing: antialiased;
+        }
+        /* Hide scrollbar for cleaner look if needed */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 4px; }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary-fixed-variant": "#444650",
+                        "surface-container-highest": "#d3e4fe",
+                        "inverse-primary": "#bec6e0",
+                        "on-surface": "#0b1c30",
+                        "on-error": "#ffffff",
+                        "surface-variant": "#d3e4fe",
+                        "tertiary": "#000000",
+                        "surface-container": "#e5eeff",
+                        "surface-bright": "#f8f9ff",
+                        "secondary-container": "#dedfeb",
+                        "surface-tint": "#565e74",
+                        "tertiary-fixed-dim": "#dec29a",
+                        "surface-dim": "#cbdbf5",
+                        "surface-container-lowest": "#ffffff",
+                        "on-tertiary-fixed-variant": "#574425",
+                        "error-container": "#ffdad6",
+                        "inverse-on-surface": "#eaf1ff",
+                        "tertiary-fixed": "#fcdeb5",
+                        "outline-variant": "#c6c6cd",
+                        "primary-container": "#131b2e",
+                        "secondary-fixed-dim": "#c4c6d1",
+                        "primary-fixed": "#dae2fd",
+                        "on-primary": "#ffffff",
+                        "on-primary-fixed": "#131b2e",
+                        "on-tertiary": "#ffffff",
+                        "on-tertiary-fixed": "#271901",
+                        "surface-container-low": "#eff4ff",
+                        "on-background": "#0b1c30",
+                        "inverse-surface": "#213145",
+                        "surface-container-high": "#dce9ff",
+                        "secondary": "#5c5e68",
+                        "on-primary-container": "#7c839b",
+                        "outline": "#76777d",
+                        "secondary-fixed": "#e1e2ed",
+                        "on-surface-variant": "#45464d",
+                        "on-error-container": "#93000a",
+                        "primary": "#000000",
+                        "primary-fixed-dim": "#bec6e0",
+                        "on-secondary-fixed": "#191b24",
+                        "on-tertiary-container": "#98805d",
+                        "on-secondary": "#ffffff",
+                        "surface": "#f8f9ff",
+                        "on-secondary-container": "#60626c",
+                        "tertiary-container": "#271901",
+                        "on-primary-fixed-variant": "#3f465c",
+                        "error": "#ba1a1a",
+                        "background": "#f8f9ff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "xxl": "48px",
+                        "base": "4px",
+                        "sm": "8px",
+                        "gutter": "24px",
+                        "margin": "32px",
+                        "xl": "32px",
+                        "md": "16px",
+                        "xs": "4px",
+                        "lg": "24px"
+                    },
+                    "fontFamily": {
+                        "display": ["Geist"],
+                        "body-md": ["Geist"],
+                        "headline-lg": ["Geist"],
+                        "mono-sm": ["Geist Mono"],
+                        "label-md": ["Geist"],
+                        "body-lg": ["Geist"],
+                        "headline-md": ["Geist"]
+                    },
+                    "fontSize": {
+                        "display": ["36px", { "lineHeight": "1.1", "letterSpacing": "-0.03em", "fontWeight": "600" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "letterSpacing": "-0.01em", "fontWeight": "400" }],
+                        "headline-lg": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+                        "mono-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0", "fontWeight": "400" }],
+                        "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.01em", "fontWeight": "500" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "400" }],
+                        "headline-md": ["20px", { "lineHeight": "28px", "letterSpacing": "-0.02em", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-surface min-h-screen flex items-center justify-center p-4">
+<!-- Top Navigation Anchor (Simplified for transactional intent) -->
+<header class="fixed top-0 w-full z-50 bg-surface/80 dark:bg-surface-dim/80 backdrop-blur-xl shadow-sm">
+<div class="flex justify-center items-center px-container-margin py-md w-full max-w-full mx-auto">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary font-bold text-[28px]" style="font-variation-settings: 'FILL' 1;">hub</span>
+<h1 class="font-display text-headline-lg font-bold text-primary tracking-tight">Luminal HR</h1>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="w-full max-w-[440px] mt-[80px]">
+<!-- Sign In Card -->
+<div class="bg-surface-container-lowest border border-secondary-fixed rounded-xl p-xl shadow-[0px_4px_20px_rgba(0,0,0,0.02)] flex flex-col items-center">
+<div class="mb-xl text-center">
+<h2 class="font-headline-md text-headline-md text-on-surface mb-2">Welcome Back</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Sign in to access your HR dashboard.</p>
+</div>
+<form action="#" class="w-full flex flex-col gap-lg" method="POST">
+<!-- Login ID / Email -->
+<div class="flex flex-col gap-xs">
+<label class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider" for="loginId">Login Id/Email</label>
+<div class="relative">
+<input class="w-full bg-surface-container-lowest border border-secondary-fixed rounded-lg px-md py-3 font-body-md text-body-md text-on-surface placeholder:text-outline-variant focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors" id="loginId" name="loginId" placeholder="e.g. OIJODO20220001" type="text"/>
+</div>
+<p class="font-mono-sm text-mono-sm text-outline mt-1 hidden" id="idFormatHint">Format: [Org][Name][Year][Serial]</p>
+</div>
+<!-- Password -->
+<div class="flex flex-col gap-xs">
+<div class="flex justify-between items-center">
+<label class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider" for="password">Password</label>
+<a class="font-label-md text-label-md text-primary hover:underline" href="#">Forgot password?</a>
+</div>
+<div class="relative">
+<input class="w-full bg-surface-container-lowest border border-secondary-fixed rounded-lg px-md py-3 pr-12 font-body-md text-body-md text-on-surface placeholder:text-outline-variant focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors" id="password" name="password" placeholder="Enter your password" type="password"/>
+<button class="absolute right-3 top-1/2 -translate-y-1/2 text-outline hover:text-on-surface transition-colors" id="togglePassword" type="button">
+<span class="material-symbols-outlined text-[20px]" id="visibilityIcon">visibility_off</span>
+</button>
+</div>
+</div>
+<!-- Actions -->
+<div class="mt-md flex flex-col gap-md">
+<button class="w-full bg-primary text-on-primary font-label-md text-label-md rounded-lg py-3 px-6 hover:bg-on-surface transition-colors flex items-center justify-center gap-2" type="submit">
+                        SIGN IN
+                        <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+</button>
+</div>
+</form>
+<div class="mt-xl text-center border-t border-secondary-fixed w-full pt-lg">
+<p class="font-body-md text-body-md text-on-surface-variant">
+                    Don't have an account? 
+                    <a class="text-primary font-bold hover:underline ml-1" href="#">Contact HR</a>
+</p>
+</div>
+<!-- Optional illustration or decorative element -->
+<div class="mt-lg w-full h-[120px] rounded-lg overflow-hidden border border-secondary-fixed opacity-50 pointer-events-none hidden md:block">
+<div class="bg-cover bg-center w-full h-full grayscale opacity-20" data-alt="A subtle, high-key abstract architectural background. Light mode aesthetic with sharp geometric shadows across pristine white surfaces. A minimal representation of a modern, efficient corporate environment in soft grey tones." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDq0-n1P6LbICt9YB_-alAu5q6YRsE4cJ2WBUx3ERW1cNBspcSM7WNzCYY8wJMEnAvvixeYSzs3KD21P_pElcoPCEwJqtZXEuzAJ3HLF98pBuwDdc6GnZIoEdCCm0-tkVFWrh_vXPY_FN_BZQPMuW2bXiahRP-BPCD0U2sp1f_l7qziGj4ZbGsKLdLREszHwiaMGbdTaocokKvArZ1pNO856jY3vVKYF8H7BYCZTJHh2xQn52mQr4JY')"></div>
+</div>
+</div>
+</main>
+<script>
+        // Simple password toggle interaction
+        const toggleBtn = document.getElementById('togglePassword');
+        const passwordInput = document.getElementById('password');
+        const visibilityIcon = document.getElementById('visibilityIcon');
+
+        if(toggleBtn && passwordInput && visibilityIcon) {
+            toggleBtn.addEventListener('click', () => {
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
+                visibilityIcon.textContent = type === 'password' ? 'visibility_off' : 'visibility';
+            });
+        }
+        
+        // Show hint on input focus
+        const loginInput = document.getElementById('loginId');
+        const hint = document.getElementById('idFormatHint');
+        if(loginInput && hint) {
+            loginInput.addEventListener('focus', () => hint.classList.remove('hidden'));
+            loginInput.addEventListener('blur', () => {
+                if(!loginInput.value) hint.classList.add('hidden');
+            });
+        }
+    </script>
+</body></html>

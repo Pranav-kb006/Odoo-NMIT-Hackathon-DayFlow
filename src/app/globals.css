@@ -2,11 +2,178 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ─── Design Tokens ─── */
 :root {
   --accent: #3b82f6;
   --accent-dark: #2563eb;
+  --accent-50: #eff6ff;
+  --accent-700: #1d4ed8;
+
+  --success: #16a34a;
+  --warning: #d97706;
+  --danger: #dc2626;
+
+  --present: #22c55e;
+  --on-leave: #f59e0b;
+  --absent: #eab308;
+  --pending: #94a3b8;
+  --approved: #22c55e;
+  --rejected: #ef4444;
+
+  --sidebar-width: 240px;
+  --topbar-height: 56px;
+
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
 }
 
+/* ─── Material Symbols Icon font ─── */
+.material-symbols-outlined {
+  font-family: 'Material Symbols Outlined';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -webkit-font-feature-settings: 'liga';
+  -webkit-font-smoothing: antialiased;
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+/* ─── Base ─── */
 body {
-  @apply bg-slate-50 text-slate-900 antialiased;
+  @apply bg-surface text-on-surface font-body-md antialiased;
+}
+
+/* ─── Skeleton Pulse ─── */
+@keyframes skeleton-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.skeleton {
+  @apply rounded-lg bg-slate-200;
+  animation: skeleton-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* ─── Fade-in Animation ─── */
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s ease-out forwards;
+}
+
+/* ─── Slide-in from left (sidebar mobile) ─── */
+@keyframes slide-in-left {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+
+.animate-slide-in-left {
+  animation: slide-in-left 0.25s ease-out forwards;
+}
+
+/* ─── Overlay fade ─── */
+@keyframes overlay-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.animate-overlay-fade {
+  animation: overlay-fade 0.2s ease-out forwards;
+}
+
+/* ─── Scale-in (modals) ─── */
+@keyframes scale-in {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.animate-scale-in {
+  animation: scale-in 0.2s ease-out forwards;
+}
+
+/* ─── Gradient background animation ─── */
+@keyframes gradient-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+.animate-gradient {
+  background-size: 200% 200%;
+  animation: gradient-shift 8s ease infinite;
+}
+
+/* ─── Float animation ─── */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-12px); }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.animate-float-delayed {
+  animation: float 6s ease-in-out 2s infinite;
+}
+
+.animate-float-slow {
+  animation: float 8s ease-in-out 1s infinite;
+}
+
+/* ─── Scrollbar ─── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply rounded-full bg-slate-300;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-slate-400;
+}
+
+/* ─── Typography Utilities ─── */
+.text-display {
+  @apply text-2xl font-semibold tracking-tight;
+}
+
+.text-stat {
+  @apply text-3xl font-bold;
+  font-variant-numeric: tabular-nums;
+}
+
+.text-label {
+  @apply text-xs font-medium uppercase tracking-wider text-slate-500;
+}
+
+.text-secondary {
+  @apply text-sm text-slate-500;
+}
+
+/* ─── Focus Ring ─── */
+.focus-ring {
+  @apply focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent;
+}
+
+/* ─── Transitions ─── */
+.transition-default {
+  @apply transition-all duration-150 ease-out;
 }

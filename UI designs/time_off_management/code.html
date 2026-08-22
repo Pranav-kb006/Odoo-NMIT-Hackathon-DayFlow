@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+
+<html class="h-full" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>TalentOS - Time Off</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&amp;family=Geist+Mono:wght@400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "surface": "#f8f9ff",
+                      "surface-bright": "#f8f9ff",
+                      "surface-container-high": "#dce9ff",
+                      "on-error": "#ffffff",
+                      "on-primary": "#ffffff",
+                      "tertiary": "#000000",
+                      "on-surface-variant": "#45464d",
+                      "surface-variant": "#d3e4fe",
+                      "secondary-fixed-dim": "#c4c6d1",
+                      "surface-container-highest": "#d3e4fe",
+                      "tertiary-fixed": "#fcdeb5",
+                      "primary-container": "#131b2e",
+                      "surface-tint": "#565e74",
+                      "error": "#ba1a1a",
+                      "on-secondary": "#ffffff",
+                      "secondary-container": "#dedfeb",
+                      "tertiary-container": "#271901",
+                      "primary": "#000000",
+                      "on-background": "#0b1c30",
+                      "on-tertiary-fixed-variant": "#574425",
+                      "surface-container": "#e5eeff",
+                      "surface-dim": "#cbdbf5",
+                      "on-primary-fixed": "#131b2e",
+                      "tertiary-fixed-dim": "#dec29a",
+                      "on-surface": "#0b1c30",
+                      "on-primary-container": "#7c839b",
+                      "on-secondary-fixed-variant": "#444650",
+                      "primary-fixed-dim": "#bec6e0",
+                      "surface-container-low": "#eff4ff",
+                      "background": "#f8f9ff",
+                      "inverse-surface": "#213145",
+                      "on-secondary-fixed": "#191b24",
+                      "error-container": "#ffdad6",
+                      "surface-container-lowest": "#ffffff",
+                      "on-secondary-container": "#60626c",
+                      "inverse-primary": "#bec6e0",
+                      "secondary": "#5c5e68",
+                      "outline": "#76777d",
+                      "outline-variant": "#c6c6cd",
+                      "on-error-container": "#93000a",
+                      "on-primary-fixed-variant": "#3f465c",
+                      "on-tertiary-container": "#98805d",
+                      "secondary-fixed": "#e1e2ed",
+                      "inverse-on-surface": "#eaf1ff",
+                      "primary-fixed": "#dae2fd",
+                      "on-tertiary-fixed": "#271901",
+                      "on-tertiary": "#ffffff"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "sm": "8px",
+                      "xs": "4px",
+                      "xl": "32px",
+                      "base": "4px",
+                      "gutter": "24px",
+                      "md": "16px",
+                      "margin": "32px",
+                      "lg": "24px",
+                      "xxl": "48px"
+              },
+              "fontFamily": {
+                      "display": [
+                              "Geist"
+                      ],
+                      "headline-md": [
+                              "Geist"
+                      ],
+                      "headline-lg": [
+                              "Geist"
+                      ],
+                      "mono-sm": [
+                              "Geist Mono"
+                      ],
+                      "label-md": [
+                              "Geist"
+                      ],
+                      "body-lg": [
+                              "Geist"
+                      ],
+                      "body-md": [
+                              "Geist"
+                      ]
+              },
+              "fontSize": {
+                      "display": [
+                              "36px",
+                              {
+                                      "lineHeight": "1.1",
+                                      "letterSpacing": "-0.03em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "headline-md": [
+                              "20px",
+                              {
+                                      "lineHeight": "28px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "headline-lg": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "mono-sm": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "letterSpacing": "0",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "label-md": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "letterSpacing": "0.01em",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "body-lg": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "letterSpacing": "-0.01em",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "body-md": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "letterSpacing": "-0.01em",
+                                      "fontWeight": "400"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+      </script>
+<style>
+        .material-symbols-outlined {
+          font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined[data-weight="fill"] {
+            font-variation-settings: 'FILL' 1;
+        }
+      </style>
+</head>
+<body class="bg-surface h-full flex antialiased text-on-surface selection:bg-surface-container-high selection:text-on-surface">
+<!-- SideNavBar -->
+<nav class="hidden md:flex bg-primary dark:bg-primary-container text-on-primary dark:text-on-primary-fixed font-body-md text-body-md fixed left-0 top-0 h-full w-[260px] bg-primary flex flex-col h-full py-lg z-20">
+<!-- Header -->
+<div class="px-gutter mb-margin">
+<div class="flex items-center gap-md">
+<div class="w-10 h-10 rounded-full bg-surface-container-low flex items-center justify-center text-primary font-bold overflow-hidden">
+<img alt="Company Logo" class="w-full h-full object-cover" data-alt="Minimalist abstract geometric logo in high contrast monochrome. A clean, sharp vector graphic suitable for a modern corporate identity, emphasizing structure and clarity. Isolated on a stark white background. No gradients, just solid black and white shapes conveying efficiency and HR management." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBrexunTGtt67ep9w0VpM8_DeyNQueE8aXUSVDP5vXHg3uTAMIYcv-QVMaFw1RWYA58-aphSuHa1L3rvVOklZv8TK3gIwtpO2N_1JufxXSRrj9DXceEci4Xphz4fVXbcca1_FP1StAw3_kVtqRk0eUirf2-XcOi2wBC7j0JJSc7Vn7zg__PnzyzvQkagFTz1l-3-Rui-EsPTpYXNIrdWghMc3ak1S01w-k9NeGJfX3grVdEE7s1LIzE"/>
+</div>
+<div>
+<h1 class="font-display text-headline-lg text-on-primary m-0 p-0 leading-none">TalentOS</h1>
+<p class="font-label-md text-label-md text-on-primary/60 mt-xs m-0">HR Management</p>
+</div>
+</div>
+</div>
+<!-- Navigation Links -->
+<ul class="flex-1 flex flex-col gap-xs px-sm m-0 p-0 list-none">
+<li>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-secondary-fixed-dim hover:text-white hover:bg-secondary-container/5 transition-colors duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span>Dashboard</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-secondary-fixed-dim hover:text-white hover:bg-secondary-container/5 transition-colors duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined" data-icon="contacts">contacts</span>
+<span>Directory</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-secondary-fixed-dim hover:text-white hover:bg-secondary-container/5 transition-colors duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined" data-icon="calendar_today">calendar_today</span>
+<span>Attendance</span>
+</a>
+</li>
+<!-- Active Tab -->
+<li>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-white bg-secondary-container/10 border-r-4 border-surface-container-highest transition-colors duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined" data-icon="event_busy">event_busy</span>
+<span>Time Off</span>
+</a>
+</li>
+</ul>
+<!-- Bottom Profile / Settings if needed could go here, omitting for stark minimalism -->
+</nav>
+<!-- TopNavBar -->
+<header class="hidden md:flex ml-[260px] bg-surface-lowest dark:bg-surface-container-lowest text-primary dark:text-on-surface font-body-md text-body-md docked full-width top-0 border-b border-outline-variant flat no shadows justify-between items-center h-16 px-gutter w-[calc(100%-260px)] fixed z-10 bg-white">
+<!-- Search on Left (from JSON intent) -->
+<div class="flex-1 max-w-md">
+<div class="relative flex items-center">
+<span class="material-symbols-outlined absolute left-md text-secondary" data-icon="search">search</span>
+<input class="w-full bg-surface-bright border border-outline-variant rounded-DEFAULT py-xs pl-xxl pr-md font-body-md text-body-md focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors h-10" placeholder="Search..." type="text"/>
+</div>
+</div>
+<!-- Trailing Actions -->
+<div class="flex items-center gap-md">
+<button class="p-xs text-secondary hover:text-primary transition-colors cursor-pointer duration-150 rounded-full hover:bg-surface-container-low">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="p-xs text-secondary hover:text-primary transition-colors cursor-pointer duration-150 rounded-full hover:bg-surface-container-low">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</button>
+<!-- Profile Avatar -->
+<button class="ml-sm w-8 h-8 rounded-full overflow-hidden border border-outline-variant hover:border-primary transition-colors focus:outline-none">
+<img alt="User Profile" class="w-full h-full object-cover" data-alt="A clean, professional headshot of an individual in a high-key studio environment. Stark white background, crisp modern lighting, sharp focus. The person is dressed in smart casual corporate attire. Minimalist, high contrast aesthetic fitting for an enterprise software avatar." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBz9C8__n8-v_6EtWbr4uZg6l8hLKCtgUjtplyYtQvyOox2Z9wBc21kLgomjvq8BOa3VIo1FQ-1FrHG-eMQJEZW8Zo_FvdFxjCVK-HAM5DJvkRsP7TfNf82jr_of5O43g7YF1lApGVtZfQDlN86WoVJNV9G4j8j5RBb92XZVV1RNjVE0JTQUrK33zrKceUzSmxUJNNB0Hd84kN-GTAYaZiBH6fjBwpNkFKAgraNzY1uy2gI78DMi-0A"/>
+</button>
+</div>
+</header>
+<!-- Main Canvas -->
+<main class="flex-1 ml-0 md:ml-[260px] mt-0 md:mt-16 bg-surface p-gutter md:p-margin min-h-screen">
+<!-- Page Header & Action -->
+<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-xl gap-md">
+<div>
+<h2 class="font-display text-display text-primary m-0">Time Off</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant mt-xs m-0">Manage your balances and request leaves.</p>
+</div>
+<button class="bg-primary text-on-primary font-label-md text-label-md px-lg py-sm rounded-DEFAULT hover:bg-primary/90 transition-colors flex items-center gap-xs shadow-sm h-10">
+<span class="material-symbols-outlined text-[18px]" data-icon="add">add</span>
+                Request Time Off
+            </button>
+</div>
+<!-- Balance Overview Cards (Bento-ish Grid) -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-gutter mb-xxl">
+<!-- Card 1 -->
+<div class="bg-surface-bright border border-outline-variant rounded-lg p-lg flex flex-col justify-between h-32 hover:border-outline transition-colors">
+<div class="flex justify-between items-start">
+<h3 class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider m-0">Annual Leave</h3>
+<span class="material-symbols-outlined text-secondary" data-icon="flight_takeoff">flight_takeoff</span>
+</div>
+<div class="flex items-baseline gap-xs">
+<span class="font-display text-display text-primary leading-none">12</span>
+<span class="font-body-md text-body-md text-secondary">days available</span>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="bg-surface-bright border border-outline-variant rounded-lg p-lg flex flex-col justify-between h-32 hover:border-outline transition-colors">
+<div class="flex justify-between items-start">
+<h3 class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider m-0">Sick Leave</h3>
+<span class="material-symbols-outlined text-secondary" data-icon="healing">healing</span>
+</div>
+<div class="flex items-baseline gap-xs">
+<span class="font-display text-display text-primary leading-none">5</span>
+<span class="font-body-md text-body-md text-secondary">days available</span>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="bg-surface-bright border border-outline-variant rounded-lg p-lg flex flex-col justify-between h-32 hover:border-outline transition-colors">
+<div class="flex justify-between items-start">
+<h3 class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider m-0">Personal Leave</h3>
+<span class="material-symbols-outlined text-secondary" data-icon="person">person</span>
+</div>
+<div class="flex items-baseline gap-xs">
+<span class="font-display text-display text-primary leading-none">2</span>
+<span class="font-body-md text-body-md text-secondary">days available</span>
+</div>
+</div>
+</div>
+<!-- Lower Section: Requests and Calendar -->
+<div class="grid grid-cols-1 xl:grid-cols-3 gap-gutter">
+<!-- Recent Requests List -->
+<div class="xl:col-span-2 flex flex-col">
+<h3 class="font-headline-md text-headline-md text-primary mb-md">Recent Requests</h3>
+<div class="bg-surface-bright border border-outline-variant rounded-lg overflow-hidden flex-1">
+<!-- Table Header -->
+<div class="grid grid-cols-12 gap-sm p-md bg-surface border-b border-outline-variant">
+<div class="col-span-4 font-label-md text-label-md text-on-surface-variant uppercase">Type</div>
+<div class="col-span-4 font-label-md text-label-md text-on-surface-variant uppercase">Dates</div>
+<div class="col-span-4 font-label-md text-label-md text-on-surface-variant uppercase text-right">Status</div>
+</div>
+<!-- List Items -->
+<div class="divide-y divide-outline-variant">
+<!-- Item 1 -->
+<div class="grid grid-cols-12 gap-sm p-md items-center hover:bg-surface-container-low transition-colors">
+<div class="col-span-4">
+<div class="font-body-md text-body-md text-primary font-medium">Annual Leave</div>
+<div class="font-mono-sm text-mono-sm text-secondary">REQ-0042</div>
+</div>
+<div class="col-span-4">
+<div class="font-body-md text-body-md text-on-surface">Oct 12 - Oct 15, 2023</div>
+<div class="font-mono-sm text-mono-sm text-secondary">4 Days</div>
+</div>
+<div class="col-span-4 flex justify-end">
+<span class="inline-flex items-center px-xs py-xs rounded bg-surface-container-high text-primary font-label-md text-label-md">
+<span class="w-1.5 h-1.5 rounded-full bg-primary mr-2"></span>
+                                    Approved
+                                </span>
+</div>
+</div>
+<!-- Item 2 -->
+<div class="grid grid-cols-12 gap-sm p-md items-center hover:bg-surface-container-low transition-colors">
+<div class="col-span-4">
+<div class="font-body-md text-body-md text-primary font-medium">Sick Leave</div>
+<div class="font-mono-sm text-mono-sm text-secondary">REQ-0041</div>
+</div>
+<div class="col-span-4">
+<div class="font-body-md text-body-md text-on-surface">Sep 28, 2023</div>
+<div class="font-mono-sm text-mono-sm text-secondary">1 Day</div>
+</div>
+<div class="col-span-4 flex justify-end">
+<span class="inline-flex items-center px-xs py-xs rounded bg-surface-variant text-on-surface-variant font-label-md text-label-md">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary mr-2"></span>
+                                    Pending
+                                </span>
+</div>
+</div>
+<!-- Item 3 -->
+<div class="grid grid-cols-12 gap-sm p-md items-center hover:bg-surface-container-low transition-colors">
+<div class="col-span-4">
+<div class="font-body-md text-body-md text-primary font-medium">Personal Leave</div>
+<div class="font-mono-sm text-mono-sm text-secondary">REQ-0038</div>
+</div>
+<div class="col-span-4">
+<div class="font-body-md text-body-md text-on-surface">Aug 05, 2023</div>
+<div class="font-mono-sm text-mono-sm text-secondary">0.5 Days</div>
+</div>
+<div class="col-span-4 flex justify-end">
+<span class="inline-flex items-center px-xs py-xs rounded bg-error-container text-on-error-container font-label-md text-label-md">
+<span class="w-1.5 h-1.5 rounded-full bg-error mr-2"></span>
+                                    Rejected
+                                </span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Team Calendar Overview -->
+<div class="xl:col-span-1 flex flex-col">
+<h3 class="font-headline-md text-headline-md text-primary mb-md">Team Schedule</h3>
+<div class="bg-surface-bright border border-outline-variant rounded-lg p-lg flex-1 flex flex-col">
+<!-- Calendar Header -->
+<div class="flex justify-between items-center mb-lg pb-sm border-b border-outline-variant">
+<span class="font-headline-md text-headline-md text-primary">October 2023</span>
+<div class="flex gap-xs">
+<button class="text-secondary hover:text-primary transition-colors">
+<span class="material-symbols-outlined" data-icon="chevron_left">chevron_left</span>
+</button>
+<button class="text-secondary hover:text-primary transition-colors">
+<span class="material-symbols-outlined" data-icon="chevron_right">chevron_right</span>
+</button>
+</div>
+</div>
+<!-- Mini Calendar Grid (Static representation for layout) -->
+<div class="grid grid-cols-7 gap-1 text-center mb-md">
+<div class="font-mono-sm text-mono-sm text-secondary pb-sm">Su</div>
+<div class="font-mono-sm text-mono-sm text-secondary pb-sm">Mo</div>
+<div class="font-mono-sm text-mono-sm text-secondary pb-sm">Tu</div>
+<div class="font-mono-sm text-mono-sm text-secondary pb-sm">We</div>
+<div class="font-mono-sm text-mono-sm text-secondary pb-sm">Th</div>
+<div class="font-mono-sm text-mono-sm text-secondary pb-sm">Fr</div>
+<div class="font-mono-sm text-mono-sm text-secondary pb-sm">Sa</div>
+<!-- Empty slots -->
+<div></div><div></div>
+<!-- Days -->
+<div class="p-xs font-body-md text-body-md text-on-surface hover:bg-surface-container-low rounded cursor-pointer">1</div>
+<div class="p-xs font-body-md text-body-md text-on-surface hover:bg-surface-container-low rounded cursor-pointer">2</div>
+<div class="p-xs font-body-md text-body-md text-on-surface hover:bg-surface-container-low rounded cursor-pointer">3</div>
+<div class="p-xs font-body-md text-body-md text-on-surface hover:bg-surface-container-low rounded cursor-pointer relative">
+                            4
+                            <div class="absolute bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-primary"></div>
+</div>
+<div class="p-xs font-body-md text-body-md text-on-surface hover:bg-surface-container-low rounded cursor-pointer">5</div>
+<div class="p-xs font-body-md text-body-md text-on-surface hover:bg-surface-container-low rounded cursor-pointer">6</div>
+<div class="p-xs font-body-md text-body-md text-on-surface hover:bg-surface-container-low rounded cursor-pointer">7</div>
+<!-- More days abbreviated for structural example -->
+<div class="p-xs font-body-md text-body-md text-on-surface hover:bg-surface-container-low rounded cursor-pointer">8</div>
+<div class="p-xs font-body-md text-body-md text-on-surface hover:bg-surface-container-low rounded cursor-pointer">9</div>
+<div class="p-xs font-body-md text-body-md text-on-surface bg-primary text-on-primary rounded font-medium shadow-sm">10</div>
+<div class="p-xs font-body-md text-body-md text-on-surface hover:bg-surface-container-low rounded cursor-pointer">11</div>
+<div class="p-xs font-body-md text-body-md text-on-surface hover:bg-surface-container-low rounded cursor-pointer">12</div>
+<div class="p-xs font-body-md text-body-md text-on-surface hover:bg-surface-container-low rounded cursor-pointer relative">
+                            13
+                            <div class="absolute bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-outline"></div>
+</div>
+</div>
+<!-- Upcoming Team Leaves list -->
+<div class="mt-auto border-t border-outline-variant pt-md">
+<h4 class="font-label-md text-label-md text-secondary uppercase mb-sm m-0">Upcoming (Team)</h4>
+<ul class="m-0 p-0 list-none space-y-sm">
+<li class="flex items-center gap-sm">
+<div class="w-6 h-6 rounded-full bg-surface-container overflow-hidden">
+<img alt="Team Member" class="w-full h-full object-cover" data-alt="A small circular avatar portrait of a professional corporate employee. Black and white aesthetic, high contrast, clean background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCSMjT5fsMlagAH4t2QwUZ7f8ZMcPdA8ISTTUURXolgKVvx3pyJlNg9NgLg6haDz1DjKRaY6NIC_wl2TvYWpbTjB9i7FAOiwruUCkvHRY2rgg070FLccmW5O4CJtXi-0Io7cZHA8GbiXHKS4cD9fG0pvWouqJTLfRTSQrsAD46gjxeDfgzN1dxNkZaOgApnwuyFm49vIn0w2gZVCnfLGnpGfX_mU3gAXkMKn3TGGAgyUfdbno5RBr8h"/>
+</div>
+<div class="flex-1 min-w-0">
+<p class="font-body-md text-body-md text-on-surface m-0 truncate">Jane Doe</p>
+</div>
+<span class="font-mono-sm text-mono-sm text-secondary whitespace-nowrap">Oct 13 - 14</span>
+</li>
+<li class="flex items-center gap-sm">
+<div class="w-6 h-6 rounded-full bg-surface-container overflow-hidden">
+<img alt="Team Member" class="w-full h-full object-cover" data-alt="A small circular avatar portrait of a professional corporate employee. Black and white aesthetic, high contrast, clean background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBsogz1Paa96Ekj0yjoX9eZAJomFne5h99nq20LKR_N4p05KjO_HAv9rOkJFBmhrBVf0uZGS0nYOLrUDfDEGsM4GlMusrxeL-MvftGpJjucLyf4s610oPBtSBeTsQXFEFuCCmDqljKLybzmS2xIXjuwT0loz_GxOoMl2DH5I8yaUtxnK3J4SZzX-1Qlo_Soh0B7jx_uyjpklaTpxUhvv8e7OTalc_HVhrLdLYf43URXvFj1sSq-JnFo"/>
+</div>
+<div class="flex-1 min-w-0">
+<p class="font-body-md text-body-md text-on-surface m-0 truncate">John Smith</p>
+</div>
+<span class="font-mono-sm text-mono-sm text-secondary whitespace-nowrap">Oct 20</span>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</main>
+</body></html>

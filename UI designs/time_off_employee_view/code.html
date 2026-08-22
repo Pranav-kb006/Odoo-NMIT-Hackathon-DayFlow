@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Time Off Management - HRMS Executive</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&amp;family=Geist+Mono:wght@400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary-container": "#131b2e",
+                        "tertiary-container": "#271901",
+                        "surface-container-low": "#eff4ff",
+                        "inverse-primary": "#bec6e0",
+                        "on-error-container": "#93000a",
+                        "on-secondary-fixed": "#191b24",
+                        "on-background": "#0b1c30",
+                        "tertiary-fixed": "#fcdeb5",
+                        "on-error": "#ffffff",
+                        "background": "#f8f9ff",
+                        "outline-variant": "#c6c6cd",
+                        "on-tertiary-fixed-variant": "#574425",
+                        "on-tertiary": "#ffffff",
+                        "surface": "#f8f9ff",
+                        "surface-tint": "#565e74",
+                        "error-container": "#ffdad6",
+                        "surface-dim": "#cbdbf5",
+                        "secondary-container": "#dedfeb",
+                        "secondary-fixed-dim": "#c4c6d1",
+                        "on-tertiary-container": "#98805d",
+                        "inverse-on-surface": "#eaf1ff",
+                        "tertiary": "#000000",
+                        "outline": "#76777d",
+                        "secondary": "#5c5e68",
+                        "primary-fixed-dim": "#bec6e0",
+                        "on-secondary-container": "#60626c",
+                        "on-primary": "#ffffff",
+                        "on-surface": "#0b1c30",
+                        "surface-variant": "#d3e4fe",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container-high": "#dce9ff",
+                        "surface-bright": "#f8f9ff",
+                        "on-primary-fixed": "#131b2e",
+                        "primary-fixed": "#dae2fd",
+                        "on-primary-fixed-variant": "#3f465c",
+                        "surface-container-highest": "#d3e4fe",
+                        "on-primary-container": "#7c839b",
+                        "error": "#ba1a1a",
+                        "primary": "#000000",
+                        "on-secondary-fixed-variant": "#444650",
+                        "secondary-fixed": "#e1e2ed",
+                        "on-tertiary-fixed": "#271901",
+                        "tertiary-fixed-dim": "#dec29a",
+                        "on-surface-variant": "#45464d",
+                        "surface-container": "#e5eeff",
+                        "inverse-surface": "#213145",
+                        "on-secondary": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter": "24px",
+                        "xs": "4px",
+                        "margin": "32px",
+                        "md": "16px",
+                        "base": "4px",
+                        "xl": "32px",
+                        "xxl": "48px",
+                        "lg": "24px",
+                        "sm": "8px"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Geist"],
+                        "body-lg": ["Geist"],
+                        "headline-lg": ["Geist"],
+                        "label-md": ["Geist"],
+                        "mono-sm": ["Geist Mono"],
+                        "headline-md": ["Geist"],
+                        "display": ["Geist"]
+                    },
+                    "fontSize": {
+                        "body-md": ["14px", { "lineHeight": "20px", "letterSpacing": "-0.01em", "fontWeight": "400" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "400" }],
+                        "headline-lg": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+                        "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.01em", "fontWeight": "500" }],
+                        "mono-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0", "fontWeight": "400" }],
+                        "headline-md": ["20px", { "lineHeight": "28px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+                        "display": ["36px", { "lineHeight": "1.1", "letterSpacing": "-0.03em", "fontWeight": "600" }]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Geist', sans-serif; background-color: #F8FAFB; }
+    </style>
+</head>
+<body class="flex bg-background min-h-screen">
+<!-- SideNavBar -->
+<nav class="flex flex-col h-screen py-xl px-md fixed left-0 top-0 z-40 fixed left-0 top-0 h-full w-[260px] bg-primary-container dark:bg-primary-container shadow-sm border-r-0">
+<div class="mb-xl px-md">
+<h1 class="font-headline-lg text-headline-lg text-white">Corporate HQ</h1>
+<p class="font-body-md text-body-md text-on-primary-container/70 mt-xs">HR Division</p>
+</div>
+<div class="flex-1 flex flex-col gap-sm">
+<a class="flex items-center gap-md px-md py-sm transition-transform duration-200 text-on-primary-container/70 font-body-md hover:bg-white/5 hover:text-white transition-all rounded-lg" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span>Dashboard</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm transition-transform duration-200 text-on-primary-container/70 font-body-md hover:bg-white/5 hover:text-white transition-all rounded-lg" href="#">
+<span class="material-symbols-outlined">groups</span>
+<span>Directory</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm transition-transform duration-200 text-on-primary-container/70 font-body-md hover:bg-white/5 hover:text-white transition-all rounded-lg" href="#">
+<span class="material-symbols-outlined">calendar_today</span>
+<span>Attendance</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm transition-transform duration-200 bg-white/10 text-white font-bold rounded-lg hover:bg-white/5 hover:text-white transition-all" href="#">
+<span class="material-symbols-outlined">event_busy</span>
+<span>Time Off</span>
+</a>
+</div>
+<div class="mt-auto flex flex-col gap-sm pt-md border-t border-white/10">
+<a class="flex items-center gap-md px-md py-sm transition-transform duration-200 text-on-primary-container/70 font-body-md hover:bg-white/5 hover:text-white transition-all rounded-lg" href="#">
+<span class="material-symbols-outlined">help</span>
+<span>Support</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm transition-transform duration-200 text-on-primary-container/70 font-body-md hover:bg-white/5 hover:text-white transition-all rounded-lg" href="#">
+<span class="material-symbols-outlined">logout</span>
+<span>Sign Out</span>
+</a>
+</div>
+</nav>
+<!-- Main Content Area -->
+<div class="ml-[260px] flex-1 flex flex-col">
+<!-- TopNavBar -->
+<header class="flex justify-between items-center w-full px-margin py-sm sticky top-0 z-50 bg-surface docked full-width top-0 bg-surface dark:bg-surface-container-low border-b border-outline-variant dark:border-outline shadow-none">
+<div class="font-headline-md text-headline-md font-bold text-primary dark:text-inverse-primary">
+                HRMS Executive
+            </div>
+<div class="flex items-center gap-lg">
+<button class="cursor-pointer active:opacity-80 hover:text-primary dark:hover:text-primary-fixed transition-colors text-secondary">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="cursor-pointer active:opacity-80 hover:text-primary dark:hover:text-primary-fixed transition-colors text-secondary">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<div class="w-8 h-8 rounded-full bg-surface-variant overflow-hidden border border-outline-variant">
+<img alt="Executive User Profile" class="w-full h-full object-cover" data-alt="A professional headshot of an executive user in a high-end, bright office setting. Corporate minimalism style with soft white lighting and neutral tones. Highly detailed, 8k resolution." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAYI61IDto25wFKs21sdb_Tlv3l5Gfe28AEpJptRReKm-oCBkrM2XCmyHwhHNovMPHMKwM5HDMlMhJQQY63isZ1MJ95WdHxRZhgJghpPpp5-B6nvV-rslJb-_W6bPGfFU3VmHMyaElGWRpOa6J5iVUobkLzUOTLzW03u5Rhb2j6HAqipiUNaP2GPD_5THMQr2b9kmG9ofaD7uGYMtfSMW0nL6vHZkOYzOlLF8KBzuaEc-rIyyyFGhGr"/>
+</div>
+</div>
+</header>
+<!-- Page Content -->
+<main class="flex-1 p-margin">
+<!-- Header & Action -->
+<div class="flex justify-between items-end mb-xl border-b border-outline-variant pb-md">
+<div>
+<h2 class="font-display text-display text-on-surface">Time Off</h2>
+<p class="font-body-lg text-body-lg text-secondary mt-xs">Manage your balances and requests.</p>
+</div>
+<button class="bg-primary text-on-primary px-lg py-sm rounded font-label-md text-label-md hover:bg-on-surface transition-colors">
+                    Request Time Off
+                </button>
+</div>
+<!-- Balances -->
+<div class="grid grid-cols-2 gap-lg mb-xxl">
+<!-- Paid Time Off Card -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded p-lg flex items-center justify-between">
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-xs">Paid Time Off</h3>
+<p class="font-body-md text-body-md text-secondary">24 Days Available</p>
+</div>
+<!-- Circular Progress Placeholder -->
+<div class="relative w-[80px] h-[80px] flex items-center justify-center rounded-full border-[4px] border-surface-variant">
+<svg class="absolute inset-0 w-full h-full -rotate-90" viewbox="0 0 36 36">
+<path class="text-primary" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-dasharray="70, 100" stroke-width="4"></path>
+</svg>
+<span class="font-headline-md text-headline-md font-bold text-primary">70%</span>
+</div>
+</div>
+<!-- Sick Time Off Card -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded p-lg flex items-center justify-between">
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-xs">Sick Time Off</h3>
+<p class="font-body-md text-body-md text-secondary">07 Days Available</p>
+</div>
+<!-- Circular Progress Placeholder -->
+<div class="relative w-[80px] h-[80px] flex items-center justify-center rounded-full border-[4px] border-surface-variant">
+<svg class="absolute inset-0 w-full h-full -rotate-90" viewbox="0 0 36 36">
+<path class="text-secondary" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-dasharray="30, 100" stroke-width="4"></path>
+</svg>
+<span class="font-headline-md text-headline-md font-bold text-secondary">30%</span>
+</div>
+</div>
+</div>
+<!-- Calendar Section -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded p-lg">
+<div class="flex justify-between items-center mb-lg border-b border-outline-variant pb-sm">
+<h3 class="font-headline-lg text-headline-lg text-on-surface">Annual Overview</h3>
+<div class="flex gap-md font-label-md text-label-md">
+<div class="flex items-center gap-xs"><span class="w-3 h-3 rounded-full bg-primary"></span> Paid Time Off</div>
+<div class="flex items-center gap-xs"><span class="w-3 h-3 rounded-full bg-surface-tint"></span> Sick Leave</div>
+<div class="flex items-center gap-xs"><span class="w-3 h-3 rounded-full border border-outline-variant bg-surface-variant"></span> Unpaid Leave</div>
+</div>
+</div>
+<!-- Simple Grid Representation of Calendar -->
+<div class="grid grid-cols-3 gap-xl">
+<!-- Month 1 -->
+<div>
+<h4 class="font-label-md text-label-md text-on-surface mb-sm">May</h4>
+<div class="grid grid-cols-7 gap-xs text-center font-mono-sm text-mono-sm text-secondary">
+<div>S</div><div>M</div><div>T</div><div>W</div><div>T</div><div>F</div><div>S</div>
+<div class="text-outline-variant">28</div><div class="text-outline-variant">29</div><div class="text-outline-variant">30</div><div class="py-1">1</div><div class="py-1">2</div><div class="py-1">3</div><div class="py-1">4</div>
+<div class="py-1">5</div><div class="py-1">6</div><div class="py-1">7</div><div class="py-1">8</div><div class="py-1">9</div><div class="py-1">10</div><div class="py-1">11</div>
+<div class="py-1">12</div><div class="py-1 bg-primary text-white rounded">13</div><div class="py-1 bg-primary text-white rounded">14</div><div class="py-1">15</div><div class="py-1">16</div><div class="py-1">17</div><div class="py-1">18</div>
+<div class="py-1">19</div><div class="py-1">20</div><div class="py-1">21</div><div class="py-1">22</div><div class="py-1">23</div><div class="py-1">24</div><div class="py-1">25</div>
+<div class="py-1">26</div><div class="py-1">27</div><div class="py-1">28</div><div class="py-1">29</div><div class="py-1">30</div><div class="py-1">31</div><div class="text-outline-variant">1</div>
+</div>
+</div>
+<!-- Month 2 -->
+<div>
+<h4 class="font-label-md text-label-md text-on-surface mb-sm">June</h4>
+<div class="grid grid-cols-7 gap-xs text-center font-mono-sm text-mono-sm text-secondary">
+<div>S</div><div>M</div><div>T</div><div>W</div><div>T</div><div>F</div><div>S</div>
+<div class="text-outline-variant">26</div><div class="text-outline-variant">27</div><div class="text-outline-variant">28</div><div class="text-outline-variant">29</div><div class="text-outline-variant">30</div><div class="text-outline-variant">31</div><div class="py-1">1</div>
+<div class="py-1">2</div><div class="py-1">3</div><div class="py-1">4</div><div class="py-1">5</div><div class="py-1">6</div><div class="py-1">7</div><div class="py-1">8</div>
+<div class="py-1">9</div><div class="py-1">10</div><div class="py-1 bg-surface-tint text-white rounded">11</div><div class="py-1">12</div><div class="py-1">13</div><div class="py-1">14</div><div class="py-1">15</div>
+<div class="py-1">16</div><div class="py-1">17</div><div class="py-1">18</div><div class="py-1">19</div><div class="py-1">20</div><div class="py-1">21</div><div class="py-1">22</div>
+<div class="py-1">23</div><div class="py-1">24</div><div class="py-1">25</div><div class="py-1">26</div><div class="py-1">27</div><div class="py-1">28</div><div class="py-1">29</div>
+</div>
+</div>
+<!-- Month 3 -->
+<div>
+<h4 class="font-label-md text-label-md text-on-surface mb-sm">July</h4>
+<div class="grid grid-cols-7 gap-xs text-center font-mono-sm text-mono-sm text-secondary">
+<div>S</div><div>M</div><div>T</div><div>W</div><div>T</div><div>F</div><div>S</div>
+<div class="text-outline-variant">30</div><div class="py-1">1</div><div class="py-1">2</div><div class="py-1">3</div><div class="py-1">4</div><div class="py-1">5</div><div class="py-1">6</div>
+<div class="py-1">7</div><div class="py-1">8</div><div class="py-1">9</div><div class="py-1">10</div><div class="py-1">11</div><div class="py-1">12</div><div class="py-1">13</div>
+<div class="py-1">14</div><div class="py-1">15</div><div class="py-1">16</div><div class="py-1">17</div><div class="py-1">18</div><div class="py-1">19</div><div class="py-1">20</div>
+<div class="py-1">21</div><div class="py-1 bg-surface-variant border border-outline-variant rounded">22</div><div class="py-1 bg-surface-variant border border-outline-variant rounded">23</div><div class="py-1 bg-surface-variant border border-outline-variant rounded">24</div><div class="py-1">25</div><div class="py-1">26</div><div class="py-1">27</div>
+<div class="py-1">28</div><div class="py-1">29</div><div class="py-1">30</div><div class="py-1">31</div><div class="text-outline-variant">1</div><div class="text-outline-variant">2</div><div class="text-outline-variant">3</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

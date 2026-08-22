@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Employee Profile - Salary Info</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&amp;family=Geist+Mono:wght@400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-error": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "outline": "#76777d",
+                        "on-secondary-fixed-variant": "#444650",
+                        "primary-fixed": "#dae2fd",
+                        "tertiary": "#000000",
+                        "outline-variant": "#c6c6cd",
+                        "secondary-container": "#dedfeb",
+                        "on-background": "#0b1c30",
+                        "on-tertiary-fixed-variant": "#574425",
+                        "surface-container-highest": "#d3e4fe",
+                        "primary-container": "#131b2e",
+                        "tertiary-fixed": "#fcdeb5",
+                        "surface-container-low": "#eff4ff",
+                        "background": "#f8f9ff",
+                        "on-secondary": "#ffffff",
+                        "on-tertiary-fixed": "#271901",
+                        "on-tertiary": "#ffffff",
+                        "surface-tint": "#565e74",
+                        "primary-fixed-dim": "#bec6e0",
+                        "on-primary": "#ffffff",
+                        "surface-container": "#e5eeff",
+                        "on-secondary-container": "#60626c",
+                        "on-surface": "#0b1c30",
+                        "inverse-primary": "#bec6e0",
+                        "surface-container-lowest": "#ffffff",
+                        "on-surface-variant": "#45464d",
+                        "on-primary-fixed": "#131b2e",
+                        "surface-bright": "#f8f9ff",
+                        "surface-variant": "#d3e4fe",
+                        "tertiary-container": "#271901",
+                        "on-primary-fixed-variant": "#3f465c",
+                        "surface": "#f8f9ff",
+                        "surface-dim": "#cbdbf5",
+                        "tertiary-fixed-dim": "#dec29a",
+                        "on-primary-container": "#7c839b",
+                        "on-secondary-fixed": "#191b24",
+                        "secondary-fixed": "#e1e2ed",
+                        "inverse-surface": "#213145",
+                        "secondary": "#5c5e68",
+                        "on-tertiary-container": "#98805d",
+                        "error-container": "#ffdad6",
+                        "primary": "#000000",
+                        "inverse-on-surface": "#eaf1ff",
+                        "secondary-fixed-dim": "#c4c6d1",
+                        "error": "#ba1a1a",
+                        "surface-container-high": "#dce9ff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "base": "4px",
+                        "margin": "32px",
+                        "xs": "4px",
+                        "sm": "8px",
+                        "gutter": "24px",
+                        "md": "16px",
+                        "xxl": "48px",
+                        "lg": "24px",
+                        "xl": "32px"
+                    },
+                    "fontFamily": {
+                        "body-lg": ["Geist"],
+                        "display": ["Geist"],
+                        "body-md": ["Geist"],
+                        "label-md": ["Geist"],
+                        "headline-md": ["Geist"],
+                        "mono-sm": ["Geist Mono"],
+                        "headline-lg": ["Geist"]
+                    },
+                    "fontSize": {
+                        "body-lg": ["16px", { "lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "400" }],
+                        "display": ["36px", { "lineHeight": "1.1", "letterSpacing": "-0.03em", "fontWeight": "600" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "letterSpacing": "-0.01em", "fontWeight": "400" }],
+                        "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.01em", "fontWeight": "500" }],
+                        "headline-md": ["20px", { "lineHeight": "28px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+                        "mono-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0", "fontWeight": "400" }],
+                        "headline-lg": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Geist', sans-serif; background-color: #f8f9ff; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+    </style>
+</head>
+<body class="bg-background text-on-background flex h-screen overflow-hidden">
+<!-- SideNavBar -->
+<nav class="hidden md:flex bg-primary dark:bg-primary-container text-on-primary dark:text-on-primary-fixed font-body-md text-body-md fixed left-0 top-0 h-full w-[260px] bg-primary flex-col py-lg z-50">
+<div class="px-gutter mb-xl flex items-center gap-sm">
+<span class="material-symbols-outlined text-3xl">corporate_fare</span>
+<div>
+<h1 class="font-display text-headline-lg text-on-primary">TalentOS</h1>
+<p class="text-secondary-fixed-dim text-label-md">HR Management</p>
+</div>
+</div>
+<div class="flex flex-col gap-sm flex-1">
+<a class="flex items-center gap-md px-gutter py-sm text-secondary-fixed-dim hover:text-white hover:bg-secondary-container/5 transition-colors duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+                Dashboard
+            </a>
+<a class="flex items-center gap-md px-gutter py-sm text-white bg-secondary-container/10 border-r-4 border-surface-container-highest hover:bg-secondary-container/5 transition-colors duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined" data-icon="contacts" data-weight="fill" style="font-variation-settings: 'FILL' 1;">contacts</span>
+                Directory
+            </a>
+<a class="flex items-center gap-md px-gutter py-sm text-secondary-fixed-dim hover:text-white hover:bg-secondary-container/5 transition-colors duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined" data-icon="calendar_today">calendar_today</span>
+                Attendance
+            </a>
+<a class="flex items-center gap-md px-gutter py-sm text-secondary-fixed-dim hover:text-white hover:bg-secondary-container/5 transition-colors duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined" data-icon="event_busy">event_busy</span>
+                Time Off
+            </a>
+</div>
+</nav>
+<!-- Main Content -->
+<main class="flex-1 ml-0 md:ml-[260px] flex flex-col h-full overflow-hidden bg-background">
+<!-- TopNavBar (Mobile only fallback, normally TopNav is used on desktop too but requested SideNav persistent, we'll keep TopAppBar structure for desktop without nav links) -->
+<header class="bg-surface-lowest dark:bg-surface-container-lowest text-primary dark:text-on-surface font-body-md text-body-md flex justify-between items-center h-16 px-gutter border-b border-outline-variant shrink-0">
+<div class="flex items-center gap-md md:hidden">
+<button class="text-on-surface p-sm hover:bg-surface-container-low transition-colors rounded">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<span class="font-headline-md text-headline-md text-primary font-bold">TalentOS</span>
+</div>
+<div class="hidden md:block flex-1 max-w-md ml-gutter">
+<div class="relative flex items-center">
+<span class="material-symbols-outlined absolute left-sm text-outline">search</span>
+<input class="w-full bg-surface border border-outline-variant rounded pl-10 pr-sm py-sm text-body-md focus:border-primary focus:ring-0 transition-colors" placeholder="Search employees..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-md ml-auto">
+<button class="p-sm text-secondary hover:text-primary hover:bg-surface-container-low transition-colors rounded relative cursor-pointer duration-150">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+<span class="absolute top-1 right-1 w-2 h-2 bg-error rounded-full"></span>
+</button>
+<button class="p-sm text-secondary hover:text-primary hover:bg-surface-container-low transition-colors rounded cursor-pointer duration-150">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</button>
+<div class="w-8 h-8 rounded bg-surface-dim border border-outline-variant overflow-hidden ml-sm shrink-0">
+<img alt="User Profile" class="w-full h-full object-cover" data-alt="A professional headshot of an administrator in a modern office setting, bright lighting, corporate minimalism style, high resolution." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAkaqo-_Vr5vgmQWi5DHmy_ckiY5KhUDo_reLO0f02_IRXzrFXnbjJUkjaimIAYmxaiqFjyAdJWGZirf0oPczW3gGdwp3JpF6gf8zR8_gRnRyYUaUlXZehAxqPT-sAvqbgSA_tCszNEnbNVkq9XdES9uRWdTrp5ZOstuGQ4mvG1fYMJUPGs2WVVRQDnDL6PYflpZOjQqRpTFYlLVMzUioZVi8NtArPMTgl-XqRuJWUq9rCylkkoK1Zz"/>
+</div>
+</div>
+</header>
+<!-- Scrollable Canvas -->
+<div class="flex-1 overflow-y-auto p-gutter lg:p-margin">
+<!-- Employee Header Card -->
+<div class="bg-surface-lowest border border-outline-variant rounded p-gutter mb-margin flex flex-col md:flex-row gap-lg items-start relative">
+<div class="w-24 h-24 rounded-full border border-outline-variant overflow-hidden shrink-0 relative group bg-surface-container">
+<img class="w-full h-full object-cover" data-alt="A professional corporate headshot of a female employee with dark hair, soft natural lighting, minimalist grey background, high resolution." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCA3ypajGtMHY13BIgiMi67EPFPmAEpdxapo-qxhbA71oDq3iKaTZgmh7oSEImbEPVbmsXJm46SOZdQmlsF4pMCTnqXmC1DOCXduNLnWnDyNtc4HYk8aew-8VRXGoV8LsDNqZeGEOTgjV8k9T7IRr48wVNJs2CNlk8dx00Ywl118QdCb8XY98kqATfA9eLxfe3wjgCrtX7xsw6KqibJ7bLV1sKMngDKNHC9yZidX9pgYG1yz3ACXjKM"/>
+<button class="absolute inset-0 bg-black/50 hidden group-hover:flex items-center justify-center text-white transition-opacity">
+<span class="material-symbols-outlined">edit</span>
+</button>
+</div>
+<div class="flex-1 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-y-sm gap-x-lg">
+<div class="md:col-span-2 lg:col-span-3 mb-sm">
+<h2 class="font-headline-lg text-headline-lg text-on-surface mb-xs">Sarah Jenkins</h2>
+<span class="inline-flex items-center px-2 py-1 rounded bg-secondary-container/20 text-on-surface text-label-md">Active</span>
+</div>
+<div class="flex flex-col">
+<span class="text-label-md text-secondary uppercase tracking-wider mb-xs">Login ID</span>
+<span class="font-body-md text-on-surface border-b border-outline-variant pb-xs">EMP-0924</span>
+</div>
+<div class="flex flex-col">
+<span class="text-label-md text-secondary uppercase tracking-wider mb-xs">Company</span>
+<span class="font-body-md text-on-surface border-b border-outline-variant pb-xs">Acme Corp Ltd.</span>
+</div>
+<div class="flex flex-col">
+<span class="text-label-md text-secondary uppercase tracking-wider mb-xs">Email</span>
+<span class="font-body-md text-on-surface border-b border-outline-variant pb-xs">sarah.j@acmecorp.com</span>
+</div>
+<div class="flex flex-col">
+<span class="text-label-md text-secondary uppercase tracking-wider mb-xs">Department</span>
+<span class="font-body-md text-on-surface border-b border-outline-variant pb-xs">Engineering</span>
+</div>
+<div class="flex flex-col">
+<span class="text-label-md text-secondary uppercase tracking-wider mb-xs">Mobile</span>
+<span class="font-body-md text-on-surface border-b border-outline-variant pb-xs">+1 (555) 123-4567</span>
+</div>
+<div class="flex flex-col">
+<span class="text-label-md text-secondary uppercase tracking-wider mb-xs">Manager</span>
+<span class="font-body-md text-on-surface border-b border-outline-variant pb-xs">David Chen</span>
+</div>
+<div class="flex flex-col">
+<span class="text-label-md text-secondary uppercase tracking-wider mb-xs">Location</span>
+<span class="font-body-md text-on-surface border-b border-outline-variant pb-xs">San Francisco, CA</span>
+</div>
+</div>
+</div>
+<!-- Tab Navigation -->
+<div class="border-b border-outline-variant mb-margin">
+<nav class="flex gap-lg">
+<a class="font-label-md text-label-md uppercase text-secondary pb-sm hover:text-primary transition-colors" href="#">Resume</a>
+<a class="font-label-md text-label-md uppercase text-secondary pb-sm hover:text-primary transition-colors" href="#">Private Info</a>
+<a class="font-label-md text-label-md uppercase text-primary border-b-2 border-primary pb-sm font-bold" href="#">Salary Info</a>
+</nav>
+</div>
+<!-- Salary Info Content Area -->
+<!-- Top Input Row (Summary) -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-gutter mb-margin">
+<div class="bg-surface-lowest border border-outline-variant rounded p-md">
+<label class="block text-label-md text-secondary uppercase mb-sm">Month Wage</label>
+<div class="flex items-center gap-sm">
+<span class="font-body-md text-secondary">$</span>
+<input class="w-full bg-transparent border-b border-outline-variant focus:border-primary focus:ring-0 font-body-md text-on-surface pb-xs" readonly="" type="text" value="8,500.00"/>
+</div>
+</div>
+<div class="bg-surface-lowest border border-outline-variant rounded p-md">
+<label class="block text-label-md text-secondary uppercase mb-sm">Yearly Wage</label>
+<div class="flex items-center gap-sm">
+<span class="font-body-md text-secondary">$</span>
+<input class="w-full bg-transparent border-b border-outline-variant focus:border-primary focus:ring-0 font-body-md text-on-surface pb-xs" readonly="" type="text" value="102,000.00"/>
+</div>
+</div>
+<div class="bg-surface-lowest border border-outline-variant rounded p-md">
+<label class="block text-label-md text-secondary uppercase mb-sm">Working Days / Week</label>
+<input class="w-full bg-transparent border-b border-outline-variant focus:border-primary focus:ring-0 font-body-md text-on-surface pb-xs" readonly="" type="text" value="5 Days"/>
+</div>
+<div class="bg-surface-lowest border border-outline-variant rounded p-md">
+<label class="block text-label-md text-secondary uppercase mb-sm">Break Time</label>
+<input class="w-full bg-transparent border-b border-outline-variant focus:border-primary focus:ring-0 font-body-md text-on-surface pb-xs" readonly="" type="text" value="60 Mins"/>
+</div>
+</div>
+<!-- Main Layout: 2 Columns -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-margin">
+<!-- Left Column: Salary Components -->
+<div class="lg:col-span-2">
+<div class="bg-surface-lowest border border-outline-variant rounded flex flex-col h-full">
+<div class="p-md border-b border-outline-variant flex justify-between items-center bg-surface-bright">
+<h3 class="font-headline-md text-headline-md text-on-surface">Salary Components</h3>
+<button class="text-primary hover:bg-surface-container-low p-xs rounded transition-colors">
+<span class="material-symbols-outlined">edit_square</span>
+</button>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-background border-b border-surface-variant font-label-md text-label-md text-secondary uppercase">
+<th class="p-md font-medium">Component</th>
+<th class="p-md font-medium">Monthly Amount</th>
+<th class="p-md font-medium">Yearly Amount</th>
+<th class="p-md font-medium">% of Total</th>
+</tr>
+</thead>
+<tbody class="font-body-md text-on-surface"><tr class="border-b border-surface-variant hover:bg-surface-container-lowest transition-colors"><td class="p-md"><div>Basic Salary</div><div class="text-label-md text-secondary">Define Basic salary from company cash compute it based on monthly wages</div></td><td class="p-md">$ 4,250.00</td><td class="p-md">$ 51,000.00</td><td class="p-md"><span class="bg-primary/5 text-primary px-2 py-1 rounded text-label-md">50%</span></td></tr><tr class="border-b border-surface-variant hover:bg-surface-container-lowest transition-colors"><td class="p-md"><div>House Rent Allowance (HRA)</div><div class="text-label-md text-secondary">HRA provided to employees 50% of the basic salary</div></td><td class="p-md">$ 2,125.00</td><td class="p-md">$ 25,500.00</td><td class="p-md"><span class="bg-primary/5 text-primary px-2 py-1 rounded text-label-md">25%</span></td></tr><tr class="border-b border-surface-variant hover:bg-surface-container-lowest transition-colors"><td class="p-md"><div>Standard Allowance</div><div class="text-label-md text-secondary">A standard allowance is a predetermined, fixed amount provided to employees as part of their salary</div></td><td class="p-md">$ 1,275.00</td><td class="p-md">$ 15,300.00</td><td class="p-md"><span class="bg-primary/5 text-primary px-2 py-1 rounded text-label-md">15%</span></td></tr><tr class="border-b border-surface-variant hover:bg-surface-container-lowest transition-colors"><td class="p-md"><div>Performance Bonus</div><div class="text-label-md text-secondary">Variable amount paid during payroll. The value defined by the company and calculated as a % of the basic salary</div></td><td class="p-md">$ 425.00</td><td class="p-md">$ 5,100.00</td><td class="p-md"><span class="bg-primary/5 text-primary px-2 py-1 rounded text-label-md">5%</span></td></tr><tr class="border-b border-surface-variant hover:bg-surface-container-lowest transition-colors"><td class="p-md"><div>Leave Travel Allowance</div><td class="p-md">$ 212.50</td><td class="p-md">$ 2,550.00</td><td class="p-md"><span class="bg-primary/5 text-primary px-2 py-1 rounded text-label-md">2.5%</span></td></td></tr><tr class="border-b border-surface-variant hover:bg-surface-container-lowest transition-colors"><td class="p-md"><div>Fixed Allowance</div><div class="text-label-md text-secondary">Fixed allowance portion of wages is determined after calculating all salary components</div></td><td class="p-md">$ 212.50</td><td class="p-md">$ 2,550.00</td><td class="p-md"><span class="bg-primary/5 text-primary px-2 py-1 rounded text-label-md">2.5%</span></td></tr></tbody>
+<tfoot>
+<tr class="bg-surface-bright font-medium text-on-surface border-t-2 border-outline-variant"><td class="p-md">Gross Earnings</td><td class="p-md">$ 8,500.00</td><td class="p-md">$ 102,000.00</td><td class="p-md">100%</td></tr>
+</tfoot>
+</table>
+</div>
+</div>
+</div>
+<!-- Right Column: Deductions & Contributions -->
+<div class="flex flex-col gap-margin">
+<!-- PF Contribution -->
+<div class="bg-surface-lowest border border-outline-variant rounded flex flex-col">
+<div class="p-md border-b border-outline-variant bg-surface-bright">
+<h3 class="font-headline-md text-headline-md text-on-surface">Provident Fund Contribution</h3>
+</div>
+<div class="p-md flex flex-col gap-sm">
+<div class="flex justify-between items-center border-b border-surface-variant pb-sm">
+<span class="font-body-md text-secondary">Employee PF (12%)</span>
+<span class="font-body-md text-on-surface font-medium">$ 510.00 / mo</span>
+</div>
+<div class="flex justify-between items-center border-b border-surface-variant pb-sm">
+<span class="font-body-md text-secondary">Employer PF (12%)</span>
+<span class="font-body-md text-on-surface font-medium">$ 510.00 / mo</span>
+</div>
+<div class="flex justify-between items-center pt-xs">
+<span class="font-label-md text-primary uppercase">Total Monthly PF</span>
+<span class="font-body-md text-on-surface font-bold">$ 1,020.00</span>
+</div>
+</div>
+</div>
+<!-- Tax Deductions -->
+<div class="bg-surface-lowest border border-outline-variant rounded flex flex-col">
+<div class="p-md border-b border-outline-variant bg-surface-bright">
+<h3 class="font-headline-md text-headline-md text-on-surface">Tax Deductions (Est.)</h3>
+</div>
+<div class="p-md flex flex-col gap-sm">
+<div class="flex justify-between items-center border-b border-surface-variant pb-sm">
+<span class="font-body-md text-secondary">Income Tax</span>
+<span class="font-body-md text-on-surface font-medium">$ 1,150.00 / mo</span>
+</div>
+<div class="flex justify-between items-center border-b border-surface-variant pb-sm">
+<span class="font-body-md text-secondary">Professional Tax</span>
+<span class="font-body-md text-on-surface font-medium">$ 25.00 / mo</span>
+</div>
+<div class="flex justify-between items-center pt-xs">
+<span class="font-label-md text-error uppercase">Total Deductions</span>
+<span class="font-body-md text-on-surface font-bold">$ 1,175.00</span>
+</div>
+</div>
+</div>
+<!-- Net Salary Summary Card -->
+<div class="bg-primary text-on-primary rounded p-lg flex flex-col gap-sm mt-auto">
+<span class="font-label-md uppercase tracking-wider text-primary-fixed-dim">Estimated Net Pay (Monthly)</span>
+<div class="font-display text-4xl mb-sm">$ 6,815.00</div>
+<p class="font-mono-sm text-primary-fixed-dim border-t border-primary-fixed/20 pt-sm">
+                            *Subject to actual tax regime and declarations.
+                        </p>
+</div>
+</div>
+</div>
+</div>
+</main>
+</body></html>

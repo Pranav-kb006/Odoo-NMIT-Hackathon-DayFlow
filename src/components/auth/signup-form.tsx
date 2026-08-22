@@ -2,14 +2,12 @@
 
 import { useState, useTransition, type FormEvent } from "react";
 import { signUpAction } from "@/app/actions/auth";
-import { uploadLogo } from "@/lib/storage";
 
 export default function SignupForm() {
   const [error, setError] = useState<string | undefined>();
   const [pending, startTransition] = useTransition();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
-  const [logoUrl, setLogoUrl] = useState<string | null>(null);
 
   const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -21,14 +19,6 @@ export default function SignupForm() {
     if (pw && cpw && pw !== cpw) {
       setError("Passwords do not match.");
       return;
-    }
-
-    const file = formData.get("logo") as File | null;
-    if (file && file.size > 0) {
-      const res = await uploadLogo(file);
-      if (!res.ok) return setError(`Logo upload failed: ${res.error}`);
-      setLogoUrl(res.url);
-      formData.set("logoUrl", res.url);
     }
 
     startTransition(async () => {
@@ -89,7 +79,6 @@ export default function SignupForm() {
           accept="image/png,image/jpeg,image/webp,image/svg+xml"
           className="block w-full text-sm text-slate-500 file:mr-3 file:h-10 file:rounded-lg file:border-0 file:bg-surface-container-high file:px-4 file:text-sm file:font-medium file:text-primary hover:file:bg-surface-variant cursor-pointer"
         />
-        {logoUrl && <p className="mt-1 text-xs text-primary">Logo uploaded ✓</p>}
       </div>
 
       {/* Full Name */}

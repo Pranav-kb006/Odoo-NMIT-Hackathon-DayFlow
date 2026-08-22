@@ -67,9 +67,18 @@ create policy "read own company" on public.companies
   );
 
 -- profiles: read everyone in your company; update only yourself (admins via service role/seed)
+-- NOTE: the company-scope read uses a SECURITY DEFINER helper to avoid the
+-- infinite-recursion trap (a policy selecting profiles that itself selects
+-- profiles re-enters RLS forever, SQLSTATE 42P17).
+create or replace function public.get_my_company_id()
+returns uuid language sql stable security definer set search_path = public as $$
+  select company_id from public.profiles where id = auth.uid();
+$$;
+grant execute on function public.get_my_company_id() to authenticated, anon;
+
 create policy "read company profiles" on public.profiles
   for select using (
-    company_id = (select company_id from public.profiles where id = auth.uid())
+    company_id = public.get_my_company_id()
   );
 create policy "update own profile" on public.profiles
   for update using (id = auth.uid());

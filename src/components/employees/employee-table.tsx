@@ -15,7 +15,17 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
-import { Pencil, Users, Search } from "lucide-react";
+import {
+  Pencil,
+  Users,
+  Search,
+  LayoutGrid,
+  List,
+  Briefcase,
+  Mail,
+  Calendar,
+  Eye,
+} from "lucide-react";
 import type { Employee } from "./types";
 
 type Props = {
@@ -68,6 +78,7 @@ export function EmployeeTable({
   const [search, setSearch] = useState("");
   const [department, setDepartment] = useState("All");
   const [status, setStatus] = useState("All");
+  const [viewMode, setViewMode] = useState<"grid" | "table">("grid");
 
   const departments = useMemo(() => deriveDepartments(employees), [employees]);
 
@@ -142,8 +153,9 @@ export function EmployeeTable({
   }
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+    <div className="space-y-5">
+      {/* Search and Filters Bar */}
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center justify-between">
         <div className="relative flex-1">
           <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
           <Input
@@ -157,7 +169,7 @@ export function EmployeeTable({
             aria-label="Search employees"
           />
         </div>
-        <div className="flex gap-2">
+        <div className="flex items-center gap-2">
           <select
             value={department}
             onChange={(event) => setDepartment(event.target.value)}
@@ -181,11 +193,137 @@ export function EmployeeTable({
             <option value="active">Active</option>
             <option value="inactive">Inactive</option>
           </select>
+
+          {/* View Mode Toggle (Grid vs Table) */}
+          <div className="flex items-center rounded-lg border border-slate-200 bg-slate-100 p-1">
+            <button
+              onClick={() => setViewMode("grid")}
+              className={`rounded-md p-1.5 transition-colors ${
+                viewMode === "grid"
+                  ? "bg-white text-slate-900 shadow-sm"
+                  : "text-slate-500 hover:text-slate-900"
+              }`}
+              title="Card Grid View"
+              aria-label="Card Grid View"
+            >
+              <LayoutGrid className="h-4 w-4" />
+            </button>
+            <button
+              onClick={() => setViewMode("table")}
+              className={`rounded-md p-1.5 transition-colors ${
+                viewMode === "table"
+                  ? "bg-white text-slate-900 shadow-sm"
+                  : "text-slate-500 hover:text-slate-900"
+              }`}
+              title="Table List View"
+              aria-label="Table List View"
+            >
+              <List className="h-4 w-4" />
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* Desktop table */}
-      <div className="hidden md:block">
+      {/* Grid Card Structure */}
+      {viewMode === "grid" ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+          {filtered.map((employee) => {
+            const isActive = employee.status === "active";
+            const fullName = getDisplayName(employee);
+
+            return (
+              <div
+                key={employee.id}
+                className="group relative flex flex-col justify-between rounded-xl border border-slate-200 bg-white p-5 shadow-sm transition-all duration-200 hover:border-blue-400 hover:shadow-md"
+              >
+                {/* Status Dot Top-Right */}
+                <div className="absolute right-4 top-4 flex items-center gap-1.5">
+                  <span
+                    className={`h-2.5 w-2.5 rounded-full ${
+                      isActive ? "bg-emerald-500" : "bg-slate-300"
+                    }`}
+                    title={isActive ? "Active" : "Inactive"}
+                  />
+                  <span className="text-[11px] font-medium text-slate-500 capitalize">
+                    {employee.status ?? "active"}
+                  </span>
+                </div>
+
+                {/* Profile Header (Avatar + Name + Designation) */}
+                <div className="flex flex-col items-center text-center pt-2">
+                  {employee.avatar_url ? (
+                    <img
+                      src={employee.avatar_url}
+                      alt={fullName}
+                      className="h-16 w-16 rounded-full object-cover ring-2 ring-slate-100 shadow-inner"
+                    />
+                  ) : (
+                    <div className="flex h-16 w-16 items-center justify-center rounded-full bg-blue-50 text-base font-bold text-blue-700 ring-2 ring-slate-100 shadow-inner">
+                      {getInitials(employee)}
+                    </div>
+                  )}
+
+                  <h3 className="mt-3 text-base font-semibold text-slate-900 group-hover:text-blue-600 transition-colors line-clamp-1">
+                    {fullName}
+                  </h3>
+                  <p className="text-xs text-slate-500 font-medium line-clamp-1 mt-0.5">
+                    {employee.job_position || "Team Member"}
+                  </p>
+                  <span className="mt-1 font-mono text-[11px] text-slate-400">
+                    ID: {employee.login_id}
+                  </span>
+                </div>
+
+                {/* Details Section */}
+                <div className="my-4 border-t border-b border-slate-100 py-3 space-y-2 text-xs text-slate-600">
+                  <div className="flex items-center gap-2">
+                    <Briefcase className="h-3.5 w-3.5 text-slate-400 shrink-0" />
+                    <span className="font-medium text-slate-700 truncate">
+                      {employee.department || "General"}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <Mail className="h-3.5 w-3.5 text-slate-400 shrink-0" />
+                    <span className="text-slate-500 truncate" title={employee.work_email}>
+                      {employee.work_email || "—"}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <Calendar className="h-3.5 w-3.5 text-slate-400 shrink-0" />
+                    <span className="text-slate-500 truncate">
+                      Joined {formatJoiningDate(employee.date_of_joining)}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Card Action Buttons */}
+                <div className="grid grid-cols-2 gap-2 mt-auto pt-1">
+                  <Link
+                    href={`/dashboard/employees/${employee.id}`}
+                    className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-blue-50 hover:text-blue-700 hover:border-blue-200 transition-colors"
+                  >
+                    <Eye className="h-3.5 w-3.5" />
+                    Profile
+                  </Link>
+
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    className="w-full text-xs h-8"
+                    onClick={() => onEdit(employee)}
+                  >
+                    <Pencil className="mr-1 h-3 w-3" />
+                    Edit
+                  </Button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      ) : (
+        /* Table View */
         <Card>
           <CardContent className="p-0">
             <Table>
@@ -238,14 +376,23 @@ export function EmployeeTable({
                       </Badge>
                     </TableCell>
                     <TableCell className="text-right">
-                      <Button
-                        variant="secondary"
-                        size="sm"
-                        onClick={() => onEdit(employee)}
-                      >
-                        <Pencil className="mr-1 h-3.5 w-3.5" />
-                        Edit
-                      </Button>
+                      <div className="flex items-center justify-end gap-2">
+                        <Link
+                          href={`/dashboard/employees/${employee.id}`}
+                          className="inline-flex items-center gap-1 rounded-md border border-slate-200 bg-white px-2.5 py-1 text-xs font-medium text-slate-700 hover:bg-slate-50"
+                        >
+                          <Eye className="h-3 w-3" />
+                          View
+                        </Link>
+                        <Button
+                          variant="secondary"
+                          size="sm"
+                          onClick={() => onEdit(employee)}
+                        >
+                          <Pencil className="mr-1 h-3.5 w-3.5" />
+                          Edit
+                        </Button>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -253,141 +400,31 @@ export function EmployeeTable({
             </Table>
           </CardContent>
         </Card>
-      </div>
-
-      {/* Mobile stacked cards */}
-      <div className="space-y-3 md:hidden">
-        {filtered.map((employee) => (
-          <Card key={employee.id}>
-            <Link href={`/dashboard/employees/${employee.id}`} className="block">
-              <CardContent className="p-4">
-                <div className="flex items-center gap-3">
-                  <span
-                    aria-hidden
-                    className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-50 text-sm font-semibold text-blue-700"
-                  >
-                    {getInitials(employee)}
-                  </span>
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate font-medium text-slate-900">
-                      {getDisplayName(employee)}
-                    </p>
-                    <p className="truncate text-xs text-slate-500">
-                      {employee.login_id}
-                    </p>
-                  </div>
-                  <Badge variant={getStatusVariant(employee.status)}>
-                    {employee.status === "active" ? "Active" : "Inactive"}
-                  </Badge>
-                </div>
-                <dl className="mt-3 space-y-1 text-sm text-slate-600">
-                  <div className="flex justify-between gap-2">
-                    <dt className="text-slate-400">Department</dt>
-                    <dd className="truncate">{employee.department || "—"}</dd>
-                  </div>
-                  <div className="flex justify-between gap-2">
-                    <dt className="text-slate-400">Position</dt>
-                    <dd className="truncate">{employee.job_position || "—"}</dd>
-                  </div>
-                  <div className="flex justify-between gap-2">
-                    <dt className="text-slate-400">Joined</dt>
-                    <dd className="tabular-nums">
-                      {formatJoiningDate(employee.date_of_joining)}
-                    </dd>
-                  </div>
-                </dl>
-              </CardContent>
-            </Link>
-            <div className="border-t border-slate-100 p-3">
-              <Button
-                variant="secondary"
-                size="sm"
-                className="w-full"
-                onClick={() => onEdit(employee)}
-              >
-                <Pencil className="mr-1 h-3.5 w-3.5" />
-                Edit
-              </Button>
-            </div>
-          </Card>
-        ))}
-      </div>
+      )}
     </div>
   );
 }
 
 function TableSkeleton() {
   return (
-    <>
-      <div className="hidden md:block">
-        <Card>
-          <CardContent className="p-0">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Employee</TableHead>
-                  <TableHead>Department</TableHead>
-                  <TableHead>Job Position</TableHead>
-                  <TableHead>Joining Date</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {Array.from({ length: 6 }).map((_, i) => (
-                  <TableRow key={i}>
-                    <TableCell>
-                      <div className="flex items-center gap-3">
-                        <div className="h-9 w-9 animate-pulse rounded-full bg-slate-200" />
-                        <div className="space-y-1">
-                          <div className="h-3 w-32 animate-pulse rounded bg-slate-200" />
-                          <div className="h-2 w-20 animate-pulse rounded bg-slate-100" />
-                        </div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="h-3 w-24 animate-pulse rounded bg-slate-200" />
-                    </TableCell>
-                    <TableCell>
-                      <div className="h-3 w-28 animate-pulse rounded bg-slate-200" />
-                    </TableCell>
-                    <TableCell>
-                      <div className="h-3 w-20 animate-pulse rounded bg-slate-200" />
-                    </TableCell>
-                    <TableCell>
-                      <div className="h-5 w-16 animate-pulse rounded-full bg-slate-200" />
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="ml-auto h-8 w-16 animate-pulse rounded-lg bg-slate-200" />
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </CardContent>
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+      {Array.from({ length: 8 }).map((_, i) => (
+        <Card key={i} className="p-5 space-y-4">
+          <div className="flex flex-col items-center gap-3">
+            <div className="h-16 w-16 animate-pulse rounded-full bg-slate-200" />
+            <div className="space-y-1 w-full text-center flex flex-col items-center">
+              <div className="h-4 w-28 animate-pulse rounded bg-slate-200" />
+              <div className="h-3 w-20 animate-pulse rounded bg-slate-100" />
+            </div>
+          </div>
+          <div className="space-y-2 pt-2 border-t border-slate-100">
+            <div className="h-3 w-full animate-pulse rounded bg-slate-100" />
+            <div className="h-3 w-3/4 animate-pulse rounded bg-slate-100" />
+          </div>
+          <div className="h-8 w-full animate-pulse rounded bg-slate-200" />
         </Card>
-      </div>
-      <div className="mt-3 space-y-3 md:hidden">
-        {Array.from({ length: 4 }).map((_, i) => (
-          <Card key={i}>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <div className="h-10 w-10 animate-pulse rounded-full bg-slate-200" />
-                <div className="flex-1 space-y-1">
-                  <div className="h-3 w-32 animate-pulse rounded bg-slate-200" />
-                  <div className="h-2 w-20 animate-pulse rounded bg-slate-100" />
-                </div>
-                <div className="h-5 w-16 animate-pulse rounded-full bg-slate-200" />
-              </div>
-              <div className="mt-3 space-y-2">
-                <div className="h-3 w-full animate-pulse rounded bg-slate-200" />
-                <div className="h-3 w-2/3 animate-pulse rounded bg-slate-200" />
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-    </>
+      ))}
+    </div>
   );
 }
 

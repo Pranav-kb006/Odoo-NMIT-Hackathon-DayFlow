@@ -98,6 +98,7 @@ export async function POST(request: Request) {
         start_date: validated.startDate,
         end_date: validated.endDate,
         reason: validated.reason,
+        attachment_url: validated.attachmentUrl || null,
         status: "pending",
       })
       .select()

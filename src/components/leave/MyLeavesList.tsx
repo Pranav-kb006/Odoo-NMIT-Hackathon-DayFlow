@@ -93,18 +93,19 @@ export function MyLeavesList({ requests, loading = false }: MyLeavesListProps) {
               <th className="px-6 py-3.5">Reason</th>
               <th className="px-6 py-3.5">Applied On</th>
               <th className="px-6 py-3.5">Status</th>
+              <th className="px-6 py-3.5">Doc</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100 text-slate-700">
             {loading ? (
               <tr>
-                <td colSpan={5} className="py-8 text-center text-slate-400">
+                <td colSpan={6} className="py-8 text-center text-slate-400">
                   Loading leave history...
                 </td>
               </tr>
             ) : filteredRequests.length === 0 ? (
               <tr>
-                <td colSpan={5} className="py-8 text-center text-slate-400">
+                <td colSpan={6} className="py-8 text-center text-slate-400">
                   No leave requests found.
                 </td>
               </tr>
@@ -132,6 +133,20 @@ export function MyLeavesList({ requests, loading = false }: MyLeavesListProps) {
                     </td>
                     <td className="px-6 py-4 text-xs text-slate-400">{appliedDate}</td>
                     <td className="px-6 py-4">{getStatusBadge(req.status)}</td>
+                    <td className="px-6 py-4">
+                      {req.attachment_url ? (
+                        <a
+                          href={req.attachment_url}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-flex items-center gap-1 text-xs font-medium text-blue-600 hover:underline"
+                        >
+                          View
+                        </a>
+                      ) : (
+                        <span className="text-xs text-slate-300">—</span>
+                      )}
+                    </td>
                   </tr>
                 );
               })

@@ -18,6 +18,7 @@ export type LeaveRequest = {
   end_date: string;
   reason: string;
   status: LeaveStatus;
+  attachment_url: string | null;
   reviewed_by: string | null;
   reviewed_at: string | null;
   created_at: string;

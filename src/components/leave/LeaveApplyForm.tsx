@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { Calendar, AlertCircle, CheckCircle2, Send, AlertTriangle } from "lucide-react";
+import { Calendar, AlertCircle, CheckCircle2, Send, AlertTriangle, Paperclip } from "lucide-react";
 import { workingDaysBetween } from "@/lib/utils";
 import { showToast } from "@/components/ui/Toast";
+import { uploadLeaveAttachment } from "@/lib/storage";
 
 interface LeaveApplyFormProps {
   onSuccess?: () => void;
@@ -13,6 +14,7 @@ export function LeaveApplyForm({ onSuccess }: LeaveApplyFormProps) {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [reason, setReason] = useState("");
+  const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
@@ -47,6 +49,13 @@ export function LeaveApplyForm({ onSuccess }: LeaveApplyFormProps) {
 
     setLoading(true);
     try {
+      let attachmentUrl: string | null = null;
+      if (file) {
+        const up = await uploadLeaveAttachment(file);
+        if (!up.ok) throw new Error(up.error);
+        attachmentUrl = up.url;
+      }
+
       const res = await fetch("/api/leave-requests", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -54,6 +63,7 @@ export function LeaveApplyForm({ onSuccess }: LeaveApplyFormProps) {
           startDate,
           endDate,
           reason: reason.trim(),
+          attachmentUrl: attachmentUrl ?? "",
         }),
       });
 
@@ -67,6 +77,7 @@ export function LeaveApplyForm({ onSuccess }: LeaveApplyFormProps) {
       setStartDate("");
       setEndDate("");
       setReason("");
+      setFile(null);
       onSuccess?.();
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "An error occurred";
@@ -161,6 +172,23 @@ export function LeaveApplyForm({ onSuccess }: LeaveApplyFormProps) {
             className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-800 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
           />
           <span className="text-[11px] text-slate-400">Minimum 10 characters</span>
+        </div>
+
+        <div>
+          <label className="block text-xs font-medium text-slate-700 mb-1">
+            Attachment (optional)
+          </label>
+          <label className="flex items-center gap-2 cursor-pointer rounded-lg border border-dashed border-slate-300 px-3 py-2.5 text-sm text-slate-600 hover:border-blue-400 hover:bg-slate-50 transition-colors">
+            <Paperclip className="h-4 w-4 text-slate-400" />
+            <span className="truncate">{file ? file.name : "Upload medical certificate / document"}</span>
+            <input
+              type="file"
+              accept="image/png,image/jpeg,image/webp,application/pdf"
+              onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+              className="hidden"
+            />
+          </label>
+          <span className="text-[11px] text-slate-400">PNG, JPG, WEBP or PDF · max 5MB</span>
         </div>
 
         <div className="pt-2">

@@ -21,6 +21,7 @@ export const leaveApplySchema = z
     startDate: z.string().date(),
     endDate: z.string().date(),
     reason: z.string().min(10, "Give a reason (10+ chars)"),
+    attachmentUrl: z.string().url().optional().or(z.literal("")),
   })
   .refine((v) => v.endDate >= v.startDate, {
     message: "End date before start date",

@@ -5,9 +5,9 @@ import Link from "next/link";
 import {
   Table,
   TableHeader,
-  TableBody,
   TableRow,
   TableHead,
+  TableBody,
   TableCell,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
@@ -35,6 +35,8 @@ type Props = {
   onImport: () => void;
   onFilteredChange?: (rows: Employee[]) => void;
   loading?: boolean;
+  isAdmin?: boolean;
+  currentUserId?: string;
 };
 
 const dateFormatter = new Intl.DateTimeFormat("en-IN", { dateStyle: "medium" });
@@ -74,6 +76,8 @@ export function EmployeeTable({
   onImport,
   onFilteredChange,
   loading = false,
+  isAdmin = true,
+  currentUserId,
 }: Props) {
   const [search, setSearch] = useState("");
   const [department, setDepartment] = useState("All");
@@ -126,12 +130,14 @@ export function EmployeeTable({
         title="No employees yet"
         description="Add your first team member manually or import a batch from CSV."
         action={
-          <div className="flex flex-col gap-2 sm:flex-row">
-            <Button onClick={onAdd}>Add employee</Button>
-            <Button variant="secondary" onClick={onImport}>
-              Import CSV
-            </Button>
-          </div>
+          isAdmin ? (
+            <div className="flex flex-col gap-2 sm:flex-row">
+              <Button onClick={onAdd}>Add employee</Button>
+              <Button variant="secondary" onClick={onImport}>
+                Import CSV
+              </Button>
+            </div>
+          ) : undefined
         }
       />
     );
@@ -299,24 +305,26 @@ export function EmployeeTable({
                 </div>
 
                 {/* Card Action Buttons */}
-                <div className="grid grid-cols-2 gap-2 mt-auto pt-1">
+                <div className={`grid ${isAdmin ? "grid-cols-2" : "grid-cols-1"} gap-2 mt-auto pt-1`}>
                   <Link
                     href={`/dashboard/employees/${employee.id}`}
-                    className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-blue-50 hover:text-blue-700 hover:border-blue-200 transition-colors"
+                    className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-blue-50 hover:text-blue-700 hover:border-blue-200 transition-colors w-full"
                   >
                     <Eye className="h-3.5 w-3.5" />
-                    Profile
+                    {currentUserId === employee.id ? "My Profile" : "View Profile"}
                   </Link>
 
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    className="w-full text-xs h-8"
-                    onClick={() => onEdit(employee)}
-                  >
-                    <Pencil className="mr-1 h-3 w-3" />
-                    Edit
-                  </Button>
+                  {isAdmin && (
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      className="w-full text-xs h-8"
+                      onClick={() => onEdit(employee)}
+                    >
+                      <Pencil className="mr-1 h-3 w-3" />
+                      Edit
+                    </Button>
+                  )}
                 </div>
               </div>
             );
@@ -384,14 +392,16 @@ export function EmployeeTable({
                           <Eye className="h-3 w-3" />
                           View
                         </Link>
-                        <Button
-                          variant="secondary"
-                          size="sm"
-                          onClick={() => onEdit(employee)}
-                        >
-                          <Pencil className="mr-1 h-3.5 w-3.5" />
-                          Edit
-                        </Button>
+                        {isAdmin && (
+                          <Button
+                            variant="secondary"
+                            size="sm"
+                            onClick={() => onEdit(employee)}
+                          >
+                            <Pencil className="mr-1 h-3.5 w-3.5" />
+                            Edit
+                          </Button>
+                        )}
                       </div>
                     </TableCell>
                   </TableRow>

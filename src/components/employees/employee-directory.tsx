@@ -24,6 +24,8 @@ type Props = {
   initialEmployees: Employee[];
   managers: Employee[];
   initialStats: EmployeeStats;
+  isAdmin?: boolean;
+  currentUserId?: string;
 };
 
 function deriveStats(list: Employee[], base: EmployeeStats): EmployeeStats {
@@ -39,6 +41,8 @@ export function EmployeeDirectory({
   initialEmployees,
   managers,
   initialStats,
+  isAdmin = true,
+  currentUserId,
 }: Props) {
   const router = useRouter();
 
@@ -79,7 +83,6 @@ export function EmployeeDirectory({
     setError(null);
     try {
       const data = await postEmployee(values);
-      // API returns a raw profiles row — map to UI shape BEFORE state
       const mapped = mapProfileToEmployee(data.employee as unknown as ProfileRow);
       const next = [...employees, mapped];
       setEmployees(next);
@@ -119,7 +122,6 @@ export function EmployeeDirectory({
         body && typeof body === "object" && "employee" in body
           ? (body as { employee: unknown }).employee
           : (body as Employee);
-      // map raw profiles row → UI shape before it hits the table
       const updated: Employee = mapProfileToEmployee(
         rawEmployee as unknown as ProfileRow,
       );
@@ -222,18 +224,22 @@ export function EmployeeDirectory({
       ) : null}
 
       <div className="flex flex-wrap items-center gap-2">
-        <Button onClick={openAddForm}>
-          <Plus className="mr-1 h-4 w-4" />
-          Add employee
-        </Button>
-        <Button variant="secondary" onClick={() => setCsvOpen(true)}>
-          <Upload className="mr-1 h-4 w-4" />
-          Import CSV
-        </Button>
-        <Button variant="secondary" onClick={handleExport}>
-          <Download className="mr-1 h-4 w-4" />
-          Export
-        </Button>
+        {isAdmin && (
+          <>
+            <Button onClick={openAddForm}>
+              <Plus className="mr-1 h-4 w-4" />
+              Add employee
+            </Button>
+            <Button variant="secondary" onClick={() => setCsvOpen(true)}>
+              <Upload className="mr-1 h-4 w-4" />
+              Import CSV
+            </Button>
+            <Button variant="secondary" onClick={handleExport}>
+              <Download className="mr-1 h-4 w-4" />
+              Export
+            </Button>
+          </>
+        )}
         <Button variant="secondary" onClick={handleRefresh}>
           <RefreshCw className="mr-1 h-4 w-4" />
           Refresh
@@ -246,29 +252,35 @@ export function EmployeeDirectory({
         onEdit={openEditForm}
         onImport={() => setCsvOpen(true)}
         onFilteredChange={setFilteredEmployees}
+        isAdmin={isAdmin}
+        currentUserId={currentUserId}
       />
 
-      <EmployeeFormModal
-        open={formOpen}
-        mode={formMode}
-        employee={editingEmployee ?? undefined}
-        managers={managers}
-        submitting={submitting}
-        error={error}
-        onClose={() => setFormOpen(false)}
-        onSubmit={handleFormSubmit}
-      />
+      {isAdmin && (
+        <>
+          <EmployeeFormModal
+            open={formOpen}
+            mode={formMode}
+            employee={editingEmployee ?? undefined}
+            managers={managers}
+            submitting={submitting}
+            error={error}
+            onClose={() => setFormOpen(false)}
+            onSubmit={handleFormSubmit}
+          />
 
-      <CredentialDialog
-        credentials={credentials}
-        onClose={() => setCredentials(null)}
-      />
+          <CredentialDialog
+            credentials={credentials}
+            onClose={() => setCredentials(null)}
+          />
 
-      <CsvImportDialog
-        open={csvOpen}
-        onClose={() => setCsvOpen(false)}
-        onImport={handleCsvImport}
-      />
+          <CsvImportDialog
+            open={csvOpen}
+            onClose={() => setCsvOpen(false)}
+            onImport={handleCsvImport}
+          />
+        </>
+      )}
     </div>
   );
 }

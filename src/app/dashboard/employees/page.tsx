@@ -15,10 +15,10 @@ export default async function EmployeesPage() {
   } = await db.auth.getUser();
   if (!user) return null;
 
-  // Resolve the caller's company from their own profile (server-side only).
+  // Resolve the caller's company & role from their profile
   const { data: me } = await db
     .from("profiles")
-    .select("company_id")
+    .select("id, company_id, role")
     .eq("id", user.id)
     .single();
 
@@ -34,7 +34,7 @@ export default async function EmployeesPage() {
   const { data, error } = await db
     .from("profiles")
     .select(
-      "id, company_id, full_name, email, role, department, designation, joined_on, phone, avatar_url, login_id, status, created_at",
+      "id, company_id, full_name, email, role, department, designation, joined_on, phone, avatar_url, status, created_at",
     )
     .eq("company_id", me.company_id)
     .order("created_at", { ascending: true });
@@ -51,14 +51,13 @@ export default async function EmployeesPage() {
   const rows = (data ?? []) as ProfileRow[];
   const initialEmployees: Employee[] = rows.map(mapProfileToEmployee);
 
-  // Any employee can be referenced as a manager, so use the full list.
   const managers: Employee[] = initialEmployees;
 
   const initialStats: EmployeeStats = {
     total: initialEmployees.length,
     active: initialEmployees.filter((e) => e.status !== "inactive").length,
-    present: 0, // live presence lives on the attendance dashboard
-    onLeave: 0, // computed live on the leave page
+    present: 0,
+    onLeave: 0,
   };
 
   return (
@@ -66,6 +65,8 @@ export default async function EmployeesPage() {
       initialEmployees={initialEmployees}
       managers={managers}
       initialStats={initialStats}
+      isAdmin={me.role === "admin"}
+      currentUserId={user.id}
     />
   );
 }

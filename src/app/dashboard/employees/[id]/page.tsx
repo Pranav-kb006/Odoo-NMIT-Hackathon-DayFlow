@@ -19,19 +19,6 @@ type ProfileRow = {
   created_at: string;
 };
 
-type PrivateInfoRow = {
-  date_of_birth: string | null;
-  residing_address: string | null;
-  gender: string | null;
-  nationality: string | null;
-  marital_status: string | null;
-  bank_account_number: string | null;
-  bank_name: string | null;
-  ifsc_code: string | null;
-  pan_no: string | null;
-  uan_no: string | null;
-};
-
 type DocumentRow = {
   id: string;
   doc_type: "resume" | "certification" | "other";
@@ -100,34 +87,22 @@ export default async function EmployeeProfilePage({
   const canViewPrivateInfo = me.role === "admin" || me.id === id;
 
   try {
-    const [{ data: empRow, error: empError }, { data: companyRow }] =
-      await Promise.all([
-        db
-          .from("profiles")
-          .select("*")
-          .eq("id", id)
-          .eq("company_id", callerCompanyId)
-          .single(),
-        db
-          .from("companies")
-          .select("name")
-          .eq("id", callerCompanyId)
-          .single(),
-      ]);
+    const { data: empRow, error: empError } = await db
+      .from("profiles")
+      .select("*")
+      .eq("id", id)
+      .eq("company_id", callerCompanyId)
+      .single();
 
     if (empError || !empRow) return notFound();
 
     const employee = mapRow(empRow as ProfileRow);
 
-    let privateInfo: PrivateInfoRow | null = null;
-    if (canViewPrivateInfo) {
-      const { data: pi } = await db
-        .from("user_private_info")
-        .select("*")
-        .eq("user_id", id)
-        .maybeSingle();
-      privateInfo = (pi as PrivateInfoRow) ?? null;
-    }
+    const { data: companyRow } = await db
+      .from("companies")
+      .select("name")
+      .eq("id", callerCompanyId)
+      .single();
 
     const { data: docs } = await db
       .from("user_documents")
@@ -139,10 +114,11 @@ export default async function EmployeeProfilePage({
       <main className="p-2 sm:p-4">
         <EmployeeDetail
           employee={employee}
-          companyName={companyRow?.name || "—"}
-          privateInfo={privateInfo}
+          companyName={companyRow?.name || "Dayflow Global"}
           documents={(docs as DocumentRow[]) ?? []}
           canViewPrivateInfo={canViewPrivateInfo}
+          isCurrentUser={me.id === id}
+          isAdmin={me.role === "admin"}
         />
       </main>
     );

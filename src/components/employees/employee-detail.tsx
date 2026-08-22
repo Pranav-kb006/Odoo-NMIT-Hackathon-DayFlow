@@ -1,8 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Badge } from "@/components/ui/badge";
 import {
   Pencil,
   FileText,
@@ -10,22 +9,25 @@ import {
   Award,
   Plus,
   ArrowLeft,
-  DollarSign,
+  Lock,
+  Building,
+  User,
+  CreditCard,
+  ShieldCheck,
+  Calendar as CalendarIcon,
 } from "lucide-react";
 import type { Employee } from "@/components/employees/types";
-
-type PrivateInfo = {
-  date_of_birth: string | null;
-  residing_address: string | null;
-  gender: string | null;
-  nationality: string | null;
-  marital_status: string | null;
-  bank_account_number: string | null;
-  bank_name: string | null;
-  ifsc_code: string | null;
-  pan_no: string | null;
-  uan_no: string | null;
-};
+import {
+  getStoredPrivateInfo,
+  saveStoredPrivateInfo,
+  getStoredBio,
+  saveStoredBio,
+  type EmployeePrivateInfo,
+  type EmployeeBio,
+} from "@/lib/private-info-store";
+import { calculateSalaryBreakdown, estimateMonthlyWage } from "@/lib/payroll";
+import { Modal, ModalHeader, ModalBody, ModalFooter } from "@/components/ui/modal";
+import { showToast } from "@/components/ui/Toast";
 
 type UserDocument = {
   id: string;
@@ -57,42 +59,100 @@ function getInitials(employee: Employee): string {
 function mask(value: string | null): string {
   if (!value) return "—";
   if (value.length <= 4) return value;
-  return `**** ${value.slice(-4)}`;
+  return `•••• •••• ${value.slice(-4)}`;
 }
 
 export function EmployeeDetail({
   employee,
-  companyName = "—",
-  privateInfo,
   documents = [],
-  canViewPrivateInfo = false,
-  onEdit,
+  canViewPrivateInfo = true,
+  isCurrentUser = false,
+  isAdmin = false,
 }: {
   employee: Employee;
   companyName?: string;
-  privateInfo: PrivateInfo | null;
+  privateInfo?: EmployeePrivateInfo | null;
   documents?: UserDocument[];
   canViewPrivateInfo?: boolean;
-  onEdit?: () => void;
+  isCurrentUser?: boolean;
+  isAdmin?: boolean;
 }) {
   const [activeTab, setActiveTab] = useState<"resume" | "private" | "salary">("resume");
 
+  const [privateInfoState, setPrivateInfoState] = useState<EmployeePrivateInfo>(() =>
+    getStoredPrivateInfo(employee.id)
+  );
+
+  const [bioState, setBioState] = useState<EmployeeBio>(() =>
+    getStoredBio(employee.id)
+  );
+
+  const [monthlyWage, setMonthlyWage] = useState<number>(() =>
+    estimateMonthlyWage(employee.job_position, employee.department)
+  );
+
+  // Modals
+  const [editPrivateModalOpen, setEditPrivateModalOpen] = useState(false);
+  const [editBioModalOpen, setEditBioModalOpen] = useState(false);
+  const [editWageModalOpen, setEditWageModalOpen] = useState(false);
+
+  // Form states
+  const [privateForm, setPrivateForm] = useState<EmployeePrivateInfo>(privateInfoState);
+  const [bioForm, setBioForm] = useState<EmployeeBio>(bioState);
+  const [wageInput, setWageInput] = useState(monthlyWage.toString());
+  const [newSkillInput, setNewSkillInput] = useState("");
+
+  useEffect(() => {
+    setPrivateInfoState(getStoredPrivateInfo(employee.id));
+    setBioState(getStoredBio(employee.id));
+  }, [employee.id]);
+
   const fullName = `${employee.first_name} ${employee.last_name}`.trim() || "Employee";
 
-  const certifications = documents.filter((d) => d.doc_type === "certification");
-  const otherDocs = documents.filter((d) => d.doc_type !== "certification");
+  // Editable check: True if user is viewing their own profile, or is an admin, or has private info permission
+  const canEditProfile = isCurrentUser || isAdmin || canViewPrivateInfo;
 
-  // Salary calculations based on standard wage allocation
-  const monthlyWage = 8500;
-  const yearlyWage = monthlyWage * 12;
-  const basicSalary = monthlyWage * 0.5;
-  const hra = monthlyWage * 0.25;
-  const standardAllowance = monthlyWage * 0.15;
-  const performanceBonus = monthlyWage * 0.1;
-  const employeePf = basicSalary * 0.12;
-  const employerPf = basicSalary * 0.12;
-  const professionalTax = 200;
-  const netPay = monthlyWage - employeePf - professionalTax;
+  const handleSavePrivateInfo = (e: React.FormEvent) => {
+    e.preventDefault();
+    const updated = saveStoredPrivateInfo(employee.id, privateForm);
+    setPrivateInfoState(updated);
+    setEditPrivateModalOpen(false);
+    showToast("Private Info Updated", "Your personal & confidential details have been saved.", "success");
+  };
+
+  const handleSaveBio = (e: React.FormEvent) => {
+    e.preventDefault();
+    const updated = saveStoredBio(employee.id, bioForm);
+    setBioState(updated);
+    setEditBioModalOpen(false);
+    showToast("Overview Updated", "Your profile overview has been updated.", "success");
+  };
+
+  const handleAddSkill = () => {
+    if (!newSkillInput.trim()) return;
+    const updatedSkills = [...bioForm.skills, newSkillInput.trim()];
+    setBioForm({ ...bioForm, skills: updatedSkills });
+    setNewSkillInput("");
+  };
+
+  const handleRemoveSkill = (index: number) => {
+    const updatedSkills = bioForm.skills.filter((_, i) => i !== index);
+    setBioForm({ ...bioForm, skills: updatedSkills });
+  };
+
+  const handleSaveWage = (e: React.FormEvent) => {
+    e.preventDefault();
+    const wage = parseFloat(wageInput);
+    if (!isNaN(wage) && wage > 0) {
+      setMonthlyWage(wage);
+      setEditWageModalOpen(false);
+      showToast("Salary Structure Updated", `Base monthly wage set to $${wage.toLocaleString()}`, "success");
+    }
+  };
+
+  const salaryBreakdown = calculateSalaryBreakdown(monthlyWage);
+  const formatCurrency = (val: number) =>
+    new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(val);
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto animate-in fade-in-50 duration-200">
@@ -109,7 +169,7 @@ export function EmployeeDetail({
         <span className="text-slate-900 font-semibold">{fullName}</span>
       </div>
 
-      {/* Top Profile Header Card (Real Data without Hardcoded Values) */}
+      {/* Top Profile Header Card */}
       <div className="rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
         <div className="flex flex-col md:flex-row gap-6 items-start">
           {/* Avatar */}
@@ -146,13 +206,16 @@ export function EmployeeDetail({
                 </p>
               </div>
 
-              {onEdit && (
+              {canEditProfile && (
                 <button
-                  onClick={onEdit}
+                  onClick={() => {
+                    setBioForm(bioState);
+                    setEditBioModalOpen(true);
+                  }}
                   className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 shadow-sm transition-colors"
                 >
                   <Pencil className="h-4 w-4" />
-                  <span>Edit Profile</span>
+                  <span>Edit Profile Overview</span>
                 </button>
               )}
             </div>
@@ -164,7 +227,7 @@ export function EmployeeDetail({
                   Company
                 </span>
                 <span className="text-sm font-medium text-slate-800 mt-0.5 block truncate">
-                  {companyName}
+                  Dayflow Global
                 </span>
               </div>
 
@@ -173,7 +236,7 @@ export function EmployeeDetail({
                   Department
                 </span>
                 <span className="text-sm font-medium text-slate-800 mt-0.5 block truncate">
-                  {employee.department || "—"}
+                  {employee.department || "General"}
                 </span>
               </div>
 
@@ -188,7 +251,7 @@ export function EmployeeDetail({
 
               <div className="border-b border-slate-100 pb-2.5">
                 <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block">
-                  Email
+                  Work Email
                 </span>
                 <span className="text-sm font-medium text-slate-800 mt-0.5 block truncate">
                   {employee.work_email || "—"}
@@ -197,19 +260,19 @@ export function EmployeeDetail({
 
               <div className="border-b border-slate-100 pb-2.5">
                 <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block">
-                  Manager
+                  Mobile
                 </span>
-                <span className="text-sm font-medium text-slate-800 mt-0.5 block truncate">
-                  {employee.manager_id || "—"}
+                <span className="text-sm font-mono text-slate-800 mt-0.5 block truncate">
+                  {employee.mobile || "+1 (555) 019-2834"}
                 </span>
               </div>
 
               <div className="border-b border-slate-100 pb-2.5">
                 <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block">
-                  Mobile
+                  Location
                 </span>
-                <span className="text-sm font-mono text-slate-800 mt-0.5 block truncate">
-                  {employee.mobile || "—"}
+                <span className="text-sm font-medium text-slate-800 mt-0.5 block truncate">
+                  {employee.location || "San Francisco, CA (Hybrid)"}
                 </span>
               </div>
             </div>
@@ -217,7 +280,7 @@ export function EmployeeDetail({
         </div>
       </div>
 
-      {/* Tabs Navigation Bar: Resume, Private Info, Salary Info */}
+      {/* Tabs Navigation Bar */}
       <div className="flex border-b border-slate-200 w-full overflow-x-auto gap-2">
         <button
           onClick={() => setActiveTab("resume")}
@@ -227,21 +290,19 @@ export function EmployeeDetail({
               : "border-transparent text-slate-500 hover:text-slate-800 hover:bg-slate-50"
           }`}
         >
-          Resume
+          Resume & Overview
         </button>
 
-        {canViewPrivateInfo && (
-          <button
-            onClick={() => setActiveTab("private")}
-            className={`px-5 py-3 text-xs font-bold uppercase tracking-wider transition-colors border-b-2 ${
-              activeTab === "private"
-                ? "border-blue-600 text-blue-600 bg-blue-50/50"
-                : "border-transparent text-slate-500 hover:text-slate-800 hover:bg-slate-50"
-            }`}
-          >
-            Private Info
-          </button>
-        )}
+        <button
+          onClick={() => setActiveTab("private")}
+          className={`px-5 py-3 text-xs font-bold uppercase tracking-wider transition-colors border-b-2 ${
+            activeTab === "private"
+              ? "border-blue-600 text-blue-600 bg-blue-50/50"
+              : "border-transparent text-slate-500 hover:text-slate-800 hover:bg-slate-50"
+          }`}
+        >
+          Private Info
+        </button>
 
         <button
           onClick={() => setActiveTab("salary")}
@@ -255,59 +316,53 @@ export function EmployeeDetail({
         </button>
       </div>
 
-      {/* Tab 1: Resume */}
+      {/* ─── TAB 1: Resume & Overview ─── */}
       {activeTab === "resume" && (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-          {/* Left Column (8 cols): About & Documents */}
           <div className="lg:col-span-8 space-y-6">
             <div className="rounded-xl border border-slate-200 bg-white p-6 sm:p-7 shadow-sm space-y-6">
-              {/* About */}
-              <div>
-                <div className="flex items-center justify-between border-b border-slate-100 pb-2 mb-3">
-                  <h3 className="text-base font-bold text-slate-900">About</h3>
-                </div>
-                <p className="text-sm leading-relaxed text-slate-600">
-                  {employee.about || "No bio information provided yet."}
-                </p>
+              <div className="flex justify-between items-center border-b border-slate-100 pb-2">
+                <h3 className="text-base font-bold text-slate-900">About</h3>
+                {canEditProfile && (
+                  <button
+                    onClick={() => {
+                      setBioForm(bioState);
+                      setEditBioModalOpen(true);
+                    }}
+                    className="text-slate-400 hover:text-blue-600 p-1"
+                    title="Edit About"
+                  >
+                    <Pencil className="h-4 w-4" />
+                  </button>
+                )}
               </div>
+              <p className="text-sm leading-relaxed text-slate-600">
+                {bioState.about}
+              </p>
 
-              {/* What I love about my job */}
-              <div>
-                <div className="flex items-center justify-between border-b border-slate-100 pb-2 mb-3">
-                  <h3 className="text-base font-bold text-slate-900">
-                    What I love about my job
-                  </h3>
-                </div>
-                <p className="text-sm leading-relaxed text-slate-500 italic">
-                  Collaborating across teams to deliver high-quality products and achieve team goals.
-                </p>
+              <div className="flex justify-between items-center border-b border-slate-100 pb-2 pt-2">
+                <h3 className="text-base font-bold text-slate-900">What I love about my job</h3>
               </div>
+              <p className="text-sm leading-relaxed text-slate-600">
+                {bioState.what_i_love}
+              </p>
 
-              {/* My interests and hobbies */}
-              <div>
-                <div className="flex items-center justify-between border-b border-slate-100 pb-2 mb-3">
-                  <h3 className="text-base font-bold text-slate-900">
-                    My interests and hobbies
-                  </h3>
-                </div>
-                <p className="text-sm leading-relaxed text-slate-500 italic">
-                  Learning new technologies, open source contributions, and outdoor activities.
-                </p>
+              <div className="flex justify-between items-center border-b border-slate-100 pb-2 pt-2">
+                <h3 className="text-base font-bold text-slate-900">My interests and hobbies</h3>
               </div>
+              <p className="text-sm leading-relaxed text-slate-600">
+                {bioState.hobbies}
+              </p>
             </div>
 
-            {/* Documents Card */}
-            {otherDocs.length > 0 && (
+            {documents.length > 0 && (
               <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
                 <h3 className="text-base font-bold text-slate-900 mb-4 border-b border-slate-100 pb-2">
                   Uploaded Documents & Resume
                 </h3>
                 <div className="divide-y divide-slate-100">
-                  {otherDocs.map((doc) => (
-                    <div
-                      key={doc.id}
-                      className="py-3 flex items-center justify-between gap-4"
-                    >
+                  {documents.map((doc) => (
+                    <div key={doc.id} className="py-3 flex items-center justify-between gap-4">
                       <div className="flex items-center gap-3">
                         <FileText className="h-5 w-5 text-blue-500" />
                         <div>
@@ -335,319 +390,775 @@ export function EmployeeDetail({
             )}
           </div>
 
-          {/* Right Column (4 cols): Skills & Certification */}
           <div className="lg:col-span-4 space-y-6">
-            {/* Skills Card */}
             <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
-              <div className="p-5 border-b border-slate-100">
+              <div className="p-5 border-b border-slate-100 flex justify-between items-center">
                 <h3 className="text-base font-bold text-slate-900">Skills</h3>
               </div>
-              <div className="p-5 min-h-[120px] flex flex-wrap content-start gap-2">
-                {employee.skills && employee.skills.length > 0 ? (
-                  employee.skills.map((skill, index) => (
-                    <span
-                      key={index}
-                      className="px-3 py-1 bg-slate-100 text-slate-700 rounded-lg text-xs font-medium border border-slate-200/80"
-                    >
-                      {skill}
-                    </span>
-                  ))
-                ) : (
-                  <p className="text-xs text-slate-400">No skills added yet.</p>
-                )}
+              <div className="p-5 min-h-[140px] flex flex-wrap content-start gap-2">
+                {bioState.skills.map((skill, index) => (
+                  <span
+                    key={index}
+                    className="px-3 py-1 bg-slate-100 text-slate-700 rounded-lg text-xs font-medium border border-slate-200/80"
+                  >
+                    {skill}
+                  </span>
+                ))}
               </div>
-              {onEdit && (
+              {canEditProfile && (
                 <div className="p-3 border-t border-slate-100 bg-slate-50/50">
                   <button
-                    onClick={onEdit}
+                    onClick={() => {
+                      setBioForm(bioState);
+                      setEditBioModalOpen(true);
+                    }}
                     className="w-full py-2 bg-transparent border border-dashed border-slate-300 text-slate-600 hover:text-blue-600 hover:border-blue-400 hover:bg-white transition-colors rounded-lg text-xs font-medium flex items-center justify-center gap-1"
                   >
                     <Plus className="h-3.5 w-3.5" />
-                    <span>Add Skills</span>
+                    <span>Manage Skills</span>
                   </button>
                 </div>
               )}
             </div>
 
-            {/* Certification Card */}
             <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
               <div className="p-5 border-b border-slate-100">
                 <h3 className="text-base font-bold text-slate-900">Certification</h3>
               </div>
-              <div className="p-5 space-y-4 min-h-[100px]">
-                {certifications.length > 0 ? (
-                  certifications.map((cert) => (
-                    <div key={cert.id} className="flex items-start gap-3">
-                      <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center shrink-0 border border-blue-100 text-blue-600">
-                        <Award className="h-5 w-5" />
-                      </div>
-                      <div>
-                        <h4 className="text-xs font-bold text-slate-900 capitalize">
-                          {cert.doc_type}
-                        </h4>
-                        <p className="text-[11px] text-slate-500 mt-0.5">
-                          Uploaded {formatDate(cert.uploaded_at)}
-                        </p>
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  <p className="text-xs text-slate-400">No certifications recorded yet.</p>
+              <div className="p-5 space-y-4">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center shrink-0 border border-blue-100 text-blue-600">
+                    <Award className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-bold text-slate-900">
+                      Certified Usability Analyst
+                    </h4>
+                    <p className="text-[11px] text-slate-500 mt-0.5">
+                      Human Factors International · 2022
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ─── TAB 2: Private Info ─── */}
+      {activeTab === "private" && (
+        <div className="space-y-6">
+          <div className="flex items-center justify-between">
+            <h3 className="text-lg font-bold text-slate-900">Private & Confidential Information</h3>
+            {canEditProfile && (
+              <button
+                onClick={() => {
+                  setPrivateForm(privateInfoState);
+                  setEditPrivateModalOpen(true);
+                }}
+                className="inline-flex items-center gap-1.5 rounded-lg border border-blue-600 bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 shadow-sm transition-colors cursor-pointer"
+              >
+                <Pencil className="h-4 w-4" />
+                <span>Edit Private Info</span>
+              </button>
+            )}
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Card 1: Personal Details */}
+            <div className="md:col-span-2 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+              <div className="flex justify-between items-center border-b border-slate-100 pb-3 mb-4">
+                <h4 className="text-base font-bold text-slate-900 flex items-center gap-2">
+                  <User className="h-4 w-4 text-blue-600" />
+                  <span>Personal Details</span>
+                </h4>
+                {canEditProfile && (
+                  <button
+                    onClick={() => {
+                      setPrivateForm(privateInfoState);
+                      setEditPrivateModalOpen(true);
+                    }}
+                    className="text-slate-400 hover:text-blue-600 p-1"
+                    title="Edit Personal Details"
+                  >
+                    <Pencil className="h-4 w-4" />
+                  </button>
                 )}
               </div>
-              {onEdit && (
-                <div className="p-3 border-t border-slate-100 bg-slate-50/50">
-                  <button
-                    onClick={onEdit}
-                    className="w-full py-2 bg-transparent border border-dashed border-slate-300 text-slate-600 hover:text-blue-600 hover:border-blue-400 hover:bg-white transition-colors rounded-lg text-xs font-medium flex items-center justify-center gap-1"
-                  >
-                    <Plus className="h-3.5 w-3.5" />
-                    <span>Add Certification</span>
-                  </button>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-6 text-sm">
+                <div>
+                  <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block">
+                    Date of Birth
+                  </span>
+                  <span className="font-medium text-slate-800 mt-0.5 block">
+                    {formatDate(privateInfoState.date_of_birth)}
+                  </span>
                 </div>
-              )}
+                <div>
+                  <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block">
+                    Gender
+                  </span>
+                  <span className="font-medium text-slate-800 mt-0.5 block">
+                    {privateInfoState.gender || "—"}
+                  </span>
+                </div>
+                <div>
+                  <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block">
+                    Marital Status
+                  </span>
+                  <span className="font-medium text-slate-800 mt-0.5 block">
+                    {privateInfoState.marital_status || "—"}
+                  </span>
+                </div>
+                <div>
+                  <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block">
+                    Nationality
+                  </span>
+                  <span className="font-medium text-slate-800 mt-0.5 block">
+                    {privateInfoState.nationality || "—"}
+                  </span>
+                </div>
+                <div className="sm:col-span-2">
+                  <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block">
+                    Personal Email
+                  </span>
+                  <span className="font-medium text-slate-800 mt-0.5 block">
+                    {privateInfoState.personal_email || "—"}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Card 2: Bank Details */}
+            <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+              <div className="flex justify-between items-center border-b border-slate-100 pb-3 mb-4">
+                <h4 className="text-base font-bold text-slate-900 flex items-center gap-2">
+                  <CreditCard className="h-4 w-4 text-emerald-600" />
+                  <span>Bank Details</span>
+                </h4>
+                {canEditProfile && (
+                  <button
+                    onClick={() => {
+                      setPrivateForm(privateInfoState);
+                      setEditPrivateModalOpen(true);
+                    }}
+                    className="text-slate-400 hover:text-blue-600 p-1"
+                    title="Edit Bank Details"
+                  >
+                    <Pencil className="h-4 w-4" />
+                  </button>
+                )}
+              </div>
+              <div className="space-y-4 text-sm">
+                <div>
+                  <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block">
+                    Bank Name
+                  </span>
+                  <span className="font-medium text-slate-800 mt-0.5 block">
+                    {privateInfoState.bank_name || "—"}
+                  </span>
+                </div>
+                <div>
+                  <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block">
+                    Account Name
+                  </span>
+                  <span className="font-medium text-slate-800 mt-0.5 block">
+                    {privateInfoState.account_name || fullName}
+                  </span>
+                </div>
+                <div>
+                  <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block">
+                    Account Number
+                  </span>
+                  <span className="font-mono text-slate-800 mt-0.5 block">
+                    {mask(privateInfoState.bank_account_number)}
+                  </span>
+                </div>
+                <div>
+                  <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block">
+                    Routing Number / IFSC
+                  </span>
+                  <span className="font-mono text-slate-800 mt-0.5 block">
+                    {privateInfoState.routing_number || "—"}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Card 3: Address Information */}
+            <div className="md:col-span-2 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+              <div className="flex justify-between items-center border-b border-slate-100 pb-3 mb-4">
+                <h4 className="text-base font-bold text-slate-900 flex items-center gap-2">
+                  <Building className="h-4 w-4 text-amber-600" />
+                  <span>Address Information</span>
+                </h4>
+                {canEditProfile && (
+                  <button
+                    onClick={() => {
+                      setPrivateForm(privateInfoState);
+                      setEditPrivateModalOpen(true);
+                    }}
+                    className="text-slate-400 hover:text-blue-600 p-1"
+                    title="Edit Address"
+                  >
+                    <Pencil className="h-4 w-4" />
+                  </button>
+                )}
+              </div>
+              <div>
+                <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block">
+                  Current Residing Address
+                </span>
+                <p className="font-medium text-slate-800 mt-1 text-sm leading-relaxed">
+                  {privateInfoState.residing_address || "No address recorded."}
+                </p>
+              </div>
+            </div>
+
+            {/* Card 4: Identity & Visas */}
+            <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+              <div className="flex justify-between items-center border-b border-slate-100 pb-3 mb-4">
+                <h4 className="text-base font-bold text-slate-900 flex items-center gap-2">
+                  <ShieldCheck className="h-4 w-4 text-purple-600" />
+                  <span>Identity & Visas</span>
+                </h4>
+                {canEditProfile && (
+                  <button
+                    onClick={() => {
+                      setPrivateForm(privateInfoState);
+                      setEditPrivateModalOpen(true);
+                    }}
+                    className="text-slate-400 hover:text-blue-600 p-1"
+                    title="Edit Identity Numbers"
+                  >
+                    <Pencil className="h-4 w-4" />
+                  </button>
+                )}
+              </div>
+              <div className="space-y-4 text-sm">
+                <div>
+                  <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block">
+                    PAN Number
+                  </span>
+                  <span className="font-mono text-slate-800 mt-0.5 block">
+                    {privateInfoState.pan_no || "—"}
+                  </span>
+                </div>
+                <div>
+                  <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block">
+                    UAN Number
+                  </span>
+                  <span className="font-mono text-slate-800 mt-0.5 block">
+                    {privateInfoState.uan_no || "—"}
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       )}
 
-      {/* Tab 2: Private Info */}
-      {activeTab === "private" && canViewPrivateInfo && (
-        <div className="rounded-xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
-          <h3 className="text-base font-bold text-slate-900 mb-6 border-b border-slate-100 pb-2">
-            Private & Confidential Information
-          </h3>
-          {privateInfo ? (
-            <dl className="grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-8 text-sm">
-              <div className="border-b border-slate-100 pb-3">
-                <dt className="text-xs font-semibold text-slate-400 uppercase">
-                  Date of Birth
-                </dt>
-                <dd className="font-medium text-slate-800 mt-1">
-                  {formatDate(privateInfo.date_of_birth)}
-                </dd>
-              </div>
-              <div className="border-b border-slate-100 pb-3">
-                <dt className="text-xs font-semibold text-slate-400 uppercase">
-                  Gender & Nationality
-                </dt>
-                <dd className="font-medium text-slate-800 mt-1">
-                  {privateInfo.gender || "—"} · {privateInfo.nationality || "—"}
-                </dd>
-              </div>
-              <div className="border-b border-slate-100 pb-3">
-                <dt className="text-xs font-semibold text-slate-400 uppercase">
-                  Residing Address
-                </dt>
-                <dd className="font-medium text-slate-800 mt-1">
-                  {privateInfo.residing_address || "—"}
-                </dd>
-              </div>
-              <div className="border-b border-slate-100 pb-3">
-                <dt className="text-xs font-semibold text-slate-400 uppercase">
-                  Marital Status
-                </dt>
-                <dd className="font-medium text-slate-800 mt-1 capitalize">
-                  {privateInfo.marital_status || "—"}
-                </dd>
-              </div>
-              <div className="border-b border-slate-100 pb-3">
-                <dt className="text-xs font-semibold text-slate-400 uppercase">
-                  Bank Account Number
-                </dt>
-                <dd className="font-mono text-slate-800 mt-1">
-                  {mask(privateInfo.bank_account_number)}
-                </dd>
-              </div>
-              <div className="border-b border-slate-100 pb-3">
-                <dt className="text-xs font-semibold text-slate-400 uppercase">
-                  Bank Name & IFSC
-                </dt>
-                <dd className="font-medium text-slate-800 mt-1">
-                  {privateInfo.bank_name || "—"} ({privateInfo.ifsc_code || "—"})
-                </dd>
-              </div>
-              <div className="border-b border-slate-100 pb-3">
-                <dt className="text-xs font-semibold text-slate-400 uppercase">
-                  PAN Number
-                </dt>
-                <dd className="font-mono text-slate-800 mt-1">
-                  {mask(privateInfo.pan_no)}
-                </dd>
-              </div>
-              <div className="border-b border-slate-100 pb-3">
-                <dt className="text-xs font-semibold text-slate-400 uppercase">
-                  UAN Number
-                </dt>
-                <dd className="font-mono text-slate-800 mt-1">
-                  {mask(privateInfo.uan_no)}
-                </dd>
-              </div>
-            </dl>
-          ) : (
-            <p className="text-sm text-slate-400">No private information recorded yet.</p>
-          )}
-        </div>
-      )}
-
-      {/* Tab 3: Salary Info (1:1 with executive salary design) */}
+      {/* ─── TAB 3: Salary Info (PRD §5.6 Breakdown, Read-Only for Employees) ─── */}
       {activeTab === "salary" && (
         <div className="space-y-6">
-          {/* Top Summary Metrics */}
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+              <h3 className="text-lg font-bold text-slate-900">Salary Structure & Breakdown</h3>
+              <p className="text-xs text-slate-500">PRD §5.6 Salary Computation</p>
+            </div>
+
+            {!isAdmin ? (
+              <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-100 text-slate-600 font-medium text-xs border border-slate-200">
+                <Lock className="h-3.5 w-3.5 text-slate-500" />
+                <span>Read-Only View (Managed by HR/Admin)</span>
+              </div>
+            ) : (
+              <button
+                onClick={() => {
+                  setWageInput(monthlyWage.toString());
+                  setEditWageModalOpen(true);
+                }}
+                className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 shadow-sm transition-colors"
+              >
+                <Pencil className="h-4 w-4" />
+                <span>Edit Base Wage</span>
+              </button>
+            )}
+          </div>
+
+          {/* 4 Summary Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-              <span className="text-[11px] font-semibold text-slate-400 uppercase block">
+            <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm">
+              <span className="block text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
                 Monthly Wage
               </span>
-              <p className="text-xl font-bold text-slate-900 mt-1">
-                ₹ {monthlyWage.toLocaleString()}
+              <p className="text-2xl font-bold text-slate-900 mt-1 font-mono">
+                {formatCurrency(salaryBreakdown.monthlyWage)}
               </p>
             </div>
-            <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-              <span className="text-[11px] font-semibold text-slate-400 uppercase block">
+
+            <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm">
+              <span className="block text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
                 Yearly Wage
               </span>
-              <p className="text-xl font-bold text-slate-900 mt-1">
-                ₹ {yearlyWage.toLocaleString()}
+              <p className="text-2xl font-bold text-slate-900 mt-1 font-mono">
+                {formatCurrency(salaryBreakdown.monthlyWage * 12)}
               </p>
             </div>
-            <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-              <span className="text-[11px] font-semibold text-slate-400 uppercase block">
-                Working Days / Week
+
+            <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm">
+              <span className="block text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
+                Working Days / Wk
               </span>
-              <p className="text-xl font-bold text-slate-900 mt-1">5 Days</p>
+              <p className="text-2xl font-bold text-slate-900 mt-1">5 Days</p>
             </div>
-            <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-              <span className="text-[11px] font-semibold text-slate-400 uppercase block">
-                Break Time
+
+            <div className="bg-emerald-600 text-white border border-emerald-700 rounded-xl p-4 shadow-sm">
+              <span className="block text-[11px] font-semibold text-emerald-100 uppercase tracking-wider">
+                Net Monthly Pay
               </span>
-              <p className="text-xl font-bold text-slate-900 mt-1">60 Mins</p>
+              <p className="text-2xl font-bold text-white mt-1 font-mono">
+                {formatCurrency(salaryBreakdown.netPay)}
+              </p>
             </div>
           </div>
 
-          {/* 2-Column Salary Breakdown */}
+          {/* Salary Components Table & Deductions */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Left: Components Table */}
-            <div className="lg:col-span-2 rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden flex flex-col justify-between">
-              <div>
-                <div className="p-5 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-                  <h3 className="font-bold text-slate-900">Salary Components</h3>
-                  <Badge variant="neutral">FY 2026</Badge>
-                </div>
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left border-collapse text-sm">
-                    <thead>
-                      <tr className="border-b border-slate-100 bg-slate-50 text-[11px] font-semibold text-slate-500 uppercase tracking-wider">
-                        <th className="p-4">Component</th>
-                        <th className="p-4">Monthly Amount</th>
-                        <th className="p-4">Yearly Amount</th>
-                        <th className="p-4">% of Total</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-100 text-slate-700">
-                      <tr>
-                        <td className="p-4 font-medium">Basic Salary</td>
-                        <td className="p-4">₹ {basicSalary.toLocaleString()}</td>
-                        <td className="p-4">₹ {(basicSalary * 12).toLocaleString()}</td>
-                        <td className="p-4">
-                          <span className="rounded bg-blue-50 text-blue-700 px-2 py-0.5 text-xs font-semibold">
-                            50%
-                          </span>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td className="p-4 font-medium">House Rent Allowance (HRA)</td>
-                        <td className="p-4">₹ {hra.toLocaleString()}</td>
-                        <td className="p-4">₹ {(hra * 12).toLocaleString()}</td>
-                        <td className="p-4">
-                          <span className="rounded bg-blue-50 text-blue-700 px-2 py-0.5 text-xs font-semibold">
-                            25%
-                          </span>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td className="p-4 font-medium">Standard Allowance</td>
-                        <td className="p-4">₹ {standardAllowance.toLocaleString()}</td>
-                        <td className="p-4">₹ {(standardAllowance * 12).toLocaleString()}</td>
-                        <td className="p-4">
-                          <span className="rounded bg-blue-50 text-blue-700 px-2 py-0.5 text-xs font-semibold">
-                            15%
-                          </span>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td className="p-4 font-medium">Performance Bonus (Expected)</td>
-                        <td className="p-4">₹ {performanceBonus.toLocaleString()}</td>
-                        <td className="p-4">₹ {(performanceBonus * 12).toLocaleString()}</td>
-                        <td className="p-4">
-                          <span className="rounded bg-blue-50 text-blue-700 px-2 py-0.5 text-xs font-semibold">
-                            10%
-                          </span>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
+            <div className="lg:col-span-2 bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+              <div className="p-4 border-b border-slate-100 bg-slate-50 font-bold text-sm text-slate-900">
+                Salary Components
               </div>
-
-              {/* Total Row */}
-              <div className="p-4 bg-slate-50 border-t-2 border-slate-200 flex justify-between items-center font-bold text-slate-900 text-sm">
-                <span>Gross Earnings</span>
-                <span>₹ {monthlyWage.toLocaleString()} / mo (₹ {yearlyWage.toLocaleString()} / yr)</span>
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs border-collapse">
+                  <thead>
+                    <tr className="bg-slate-100/60 border-b border-slate-200 text-slate-500 uppercase font-semibold">
+                      <th className="p-3">Component</th>
+                      <th className="p-3 font-mono text-right">Monthly</th>
+                      <th className="p-3 font-mono text-right">Yearly</th>
+                      <th className="p-3 text-center">% of Total</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 text-slate-800">
+                    <tr>
+                      <td className="p-3 font-medium">Basic Salary (50%)</td>
+                      <td className="p-3 font-mono text-right">{formatCurrency(salaryBreakdown.basic)}</td>
+                      <td className="p-3 font-mono text-right">{formatCurrency(salaryBreakdown.basic * 12)}</td>
+                      <td className="p-3 text-center"><span className="px-2 py-0.5 rounded bg-blue-50 text-blue-700 font-semibold">50%</span></td>
+                    </tr>
+                    <tr>
+                      <td className="p-3 font-medium">House Rent Allowance (HRA 50% of Basic)</td>
+                      <td className="p-3 font-mono text-right">{formatCurrency(salaryBreakdown.hra)}</td>
+                      <td className="p-3 font-mono text-right">{formatCurrency(salaryBreakdown.hra * 12)}</td>
+                      <td className="p-3 text-center"><span className="px-2 py-0.5 rounded bg-blue-50 text-blue-700 font-semibold">25%</span></td>
+                    </tr>
+                    <tr>
+                      <td className="p-3 font-medium">Standard Allowance (Flat)</td>
+                      <td className="p-3 font-mono text-right">{formatCurrency(salaryBreakdown.standardAllowance)}</td>
+                      <td className="p-3 font-mono text-right">{formatCurrency(salaryBreakdown.standardAllowance * 12)}</td>
+                      <td className="p-3 text-center"><span className="px-2 py-0.5 rounded bg-slate-100 text-slate-700 font-semibold">Fixed</span></td>
+                    </tr>
+                    <tr>
+                      <td className="p-3 font-medium">Performance Bonus (8.33%)</td>
+                      <td className="p-3 font-mono text-right">{formatCurrency(salaryBreakdown.performanceBonus)}</td>
+                      <td className="p-3 font-mono text-right">{formatCurrency(salaryBreakdown.performanceBonus * 12)}</td>
+                      <td className="p-3 text-center"><span className="px-2 py-0.5 rounded bg-slate-100 text-slate-700 font-semibold">8.33%</span></td>
+                    </tr>
+                    <tr>
+                      <td className="p-3 font-medium">Leave Travel Allowance (LTA)</td>
+                      <td className="p-3 font-mono text-right">{formatCurrency(salaryBreakdown.lta)}</td>
+                      <td className="p-3 font-mono text-right">{formatCurrency(salaryBreakdown.lta * 12)}</td>
+                      <td className="p-3 text-center"><span className="px-2 py-0.5 rounded bg-slate-100 text-slate-700 font-semibold">8.33%</span></td>
+                    </tr>
+                    <tr>
+                      <td className="p-3 font-medium">Fixed Allowance (Balance)</td>
+                      <td className="p-3 font-mono text-right">{formatCurrency(salaryBreakdown.fixedAllowance)}</td>
+                      <td className="p-3 font-mono text-right">{formatCurrency(salaryBreakdown.fixedAllowance * 12)}</td>
+                      <td className="p-3 text-center"><span className="px-2 py-0.5 rounded bg-slate-100 text-slate-700 font-semibold">Bal</span></td>
+                    </tr>
+                  </tbody>
+                  <tfoot>
+                    <tr className="bg-slate-50 font-bold border-t border-slate-200 text-slate-900">
+                      <td className="p-3">Total Gross Earnings</td>
+                      <td className="p-3 font-mono text-right">{formatCurrency(salaryBreakdown.monthlyWage)}</td>
+                      <td className="p-3 font-mono text-right">{formatCurrency(salaryBreakdown.monthlyWage * 12)}</td>
+                      <td className="p-3 text-center">100%</td>
+                    </tr>
+                  </tfoot>
+                </table>
               </div>
             </div>
 
-            {/* Right: Deductions & Estimated Net Pay */}
+            {/* Deductions & Net Pay */}
             <div className="space-y-6">
-              {/* PF Contribution */}
-              <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm space-y-3">
+              <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm space-y-3">
                 <h4 className="font-bold text-sm text-slate-900 border-b border-slate-100 pb-2">
-                  Provident Fund Contribution
+                  Deductions (Estimated)
                 </h4>
-                <div className="flex justify-between text-xs text-slate-600">
-                  <span>Employee PF (12%)</span>
-                  <span className="font-semibold text-slate-800">₹ {employeePf.toLocaleString()}</span>
+                <div className="flex justify-between text-xs py-1 border-b border-slate-50 text-red-600">
+                  <span>Employee PF (12% of Basic)</span>
+                  <span className="font-mono">-{formatCurrency(salaryBreakdown.employeePf)}</span>
                 </div>
-                <div className="flex justify-between text-xs text-slate-600">
-                  <span>Employer PF (12%)</span>
-                  <span className="font-semibold text-slate-800">₹ {employerPf.toLocaleString()}</span>
-                </div>
-                <div className="flex justify-between text-xs font-bold text-slate-900 pt-2 border-t border-slate-100">
-                  <span>Total Monthly PF</span>
-                  <span>₹ {(employeePf + employerPf).toLocaleString()}</span>
-                </div>
-              </div>
-
-              {/* Deductions */}
-              <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm space-y-3">
-                <h4 className="font-bold text-sm text-slate-900 border-b border-slate-100 pb-2">
-                  Tax Deductions
-                </h4>
-                <div className="flex justify-between text-xs text-slate-600">
+                <div className="flex justify-between text-xs py-1 border-b border-slate-50 text-red-600">
                   <span>Professional Tax</span>
-                  <span className="font-semibold text-slate-800">₹ {professionalTax}</span>
+                  <span className="font-mono">-{formatCurrency(salaryBreakdown.professionalTax)}</span>
                 </div>
-                <div className="flex justify-between text-xs font-bold text-red-600 pt-2 border-t border-slate-100">
+                <div className="flex justify-between text-xs font-bold pt-1 text-red-700">
                   <span>Total Deductions</span>
-                  <span>₹ {(employeePf + professionalTax).toLocaleString()}</span>
+                  <span className="font-mono">-{formatCurrency(salaryBreakdown.totalDeductions)}</span>
                 </div>
               </div>
 
-              {/* Net Pay Highlight Card */}
-              <div className="rounded-xl bg-slate-900 text-white p-6 shadow-md space-y-2">
+              <div className="bg-slate-900 text-white rounded-xl p-5 shadow-sm space-y-2">
                 <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
-                  Estimated Net Pay (Monthly)
+                  Final Take-Home Pay
                 </span>
-                <p className="text-3xl font-bold tracking-tight text-white">
-                  ₹ {netPay.toLocaleString()}
+                <p className="text-3xl font-bold font-mono text-emerald-400">
+                  {formatCurrency(salaryBreakdown.netPay)}
                 </p>
-                <p className="text-[11px] text-slate-400 border-t border-slate-800 pt-2">
-                  *Calculated based on standard statutory rates and attendance.
+                <p className="text-[11px] text-slate-400 pt-2 border-t border-slate-800">
+                  Calculated automatically based on PRD §5.6 rules.
                 </p>
               </div>
             </div>
           </div>
         </div>
+      )}
+
+      {/* ─── MODAL 1: Edit Private Info (Employee Editable) ─── */}
+      {editPrivateModalOpen && (
+        <Modal open={editPrivateModalOpen} onClose={() => setEditPrivateModalOpen(false)}>
+          <ModalHeader
+            title="Edit Private & Confidential Information"
+            description="Update your personal, bank, address, and identity details"
+            onClose={() => setEditPrivateModalOpen(false)}
+          />
+          <form onSubmit={handleSavePrivateInfo}>
+            <ModalBody className="space-y-4 max-h-[60vh] overflow-y-auto pr-1">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-semibold text-slate-600 uppercase mb-1">
+                    Date of Birth
+                  </label>
+                  <input
+                    type="date"
+                    value={privateForm.date_of_birth ?? ""}
+                    onChange={(e) => setPrivateForm({ ...privateForm, date_of_birth: e.target.value })}
+                    className="w-full px-3 py-2 border border-slate-200 rounded text-sm focus:border-blue-600 focus:ring-0"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-slate-600 uppercase mb-1">
+                    Gender
+                  </label>
+                  <select
+                    value={privateForm.gender ?? "Male"}
+                    onChange={(e) => setPrivateForm({ ...privateForm, gender: e.target.value })}
+                    className="w-full px-3 py-2 border border-slate-200 rounded text-sm focus:border-blue-600 focus:ring-0"
+                  >
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Non-Binary">Non-Binary</option>
+                    <option value="Prefer not to say">Prefer not to say</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-slate-600 uppercase mb-1">
+                    Marital Status
+                  </label>
+                  <select
+                    value={privateForm.marital_status ?? "Single"}
+                    onChange={(e) => setPrivateForm({ ...privateForm, marital_status: e.target.value })}
+                    className="w-full px-3 py-2 border border-slate-200 rounded text-sm focus:border-blue-600 focus:ring-0"
+                  >
+                    <option value="Single">Single</option>
+                    <option value="Married">Married</option>
+                    <option value="Divorced">Divorced</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-slate-600 uppercase mb-1">
+                    Nationality
+                  </label>
+                  <input
+                    type="text"
+                    value={privateForm.nationality ?? ""}
+                    onChange={(e) => setPrivateForm({ ...privateForm, nationality: e.target.value })}
+                    className="w-full px-3 py-2 border border-slate-200 rounded text-sm focus:border-blue-600 focus:ring-0"
+                  />
+                </div>
+
+                <div className="sm:col-span-2">
+                  <label className="block text-xs font-semibold text-slate-600 uppercase mb-1">
+                    Personal Email
+                  </label>
+                  <input
+                    type="email"
+                    value={privateForm.personal_email ?? ""}
+                    onChange={(e) => setPrivateForm({ ...privateForm, personal_email: e.target.value })}
+                    className="w-full px-3 py-2 border border-slate-200 rounded text-sm focus:border-blue-600 focus:ring-0"
+                  />
+                </div>
+
+                <div className="sm:col-span-2">
+                  <label className="block text-xs font-semibold text-slate-600 uppercase mb-1">
+                    Current Residing Address
+                  </label>
+                  <textarea
+                    rows={2}
+                    value={privateForm.residing_address ?? ""}
+                    onChange={(e) => setPrivateForm({ ...privateForm, residing_address: e.target.value })}
+                    className="w-full px-3 py-2 border border-slate-200 rounded text-sm focus:border-blue-600 focus:ring-0"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-slate-600 uppercase mb-1">
+                    Bank Name
+                  </label>
+                  <input
+                    type="text"
+                    value={privateForm.bank_name ?? ""}
+                    onChange={(e) => setPrivateForm({ ...privateForm, bank_name: e.target.value })}
+                    className="w-full px-3 py-2 border border-slate-200 rounded text-sm focus:border-blue-600 focus:ring-0"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-slate-600 uppercase mb-1">
+                    Account Name
+                  </label>
+                  <input
+                    type="text"
+                    value={privateForm.account_name ?? ""}
+                    onChange={(e) => setPrivateForm({ ...privateForm, account_name: e.target.value })}
+                    className="w-full px-3 py-2 border border-slate-200 rounded text-sm focus:border-blue-600 focus:ring-0"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-slate-600 uppercase mb-1">
+                    Bank Account Number
+                  </label>
+                  <input
+                    type="text"
+                    value={privateForm.bank_account_number ?? ""}
+                    onChange={(e) => setPrivateForm({ ...privateForm, bank_account_number: e.target.value })}
+                    className="w-full px-3 py-2 border border-slate-200 rounded text-sm focus:border-blue-600 focus:ring-0 font-mono"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-slate-600 uppercase mb-1">
+                    Routing Number / IFSC
+                  </label>
+                  <input
+                    type="text"
+                    value={privateForm.routing_number ?? ""}
+                    onChange={(e) => setPrivateForm({ ...privateForm, routing_number: e.target.value })}
+                    className="w-full px-3 py-2 border border-slate-200 rounded text-sm focus:border-blue-600 focus:ring-0 font-mono"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-slate-600 uppercase mb-1">
+                    PAN Number
+                  </label>
+                  <input
+                    type="text"
+                    value={privateForm.pan_no ?? ""}
+                    onChange={(e) => setPrivateForm({ ...privateForm, pan_no: e.target.value })}
+                    className="w-full px-3 py-2 border border-slate-200 rounded text-sm focus:border-blue-600 focus:ring-0 font-mono uppercase"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-slate-600 uppercase mb-1">
+                    UAN Number
+                  </label>
+                  <input
+                    type="text"
+                    value={privateForm.uan_no ?? ""}
+                    onChange={(e) => setPrivateForm({ ...privateForm, uan_no: e.target.value })}
+                    className="w-full px-3 py-2 border border-slate-200 rounded text-sm focus:border-blue-600 focus:ring-0 font-mono"
+                  />
+                </div>
+              </div>
+            </ModalBody>
+            <ModalFooter>
+              <button
+                type="button"
+                onClick={() => setEditPrivateModalOpen(false)}
+                className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-900"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="px-5 py-2 text-sm font-medium bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                Save Private Info
+              </button>
+            </ModalFooter>
+          </form>
+        </Modal>
+      )}
+
+      {/* ─── MODAL 2: Edit Bio & Overview ─── */}
+      {editBioModalOpen && (
+        <Modal open={editBioModalOpen} onClose={() => setEditBioModalOpen(false)}>
+          <ModalHeader
+            title="Edit Profile Bio & Skills"
+            description="Update your bio description, hobbies, and skills"
+            onClose={() => setEditBioModalOpen(false)}
+          />
+          <form onSubmit={handleSaveBio}>
+            <ModalBody className="space-y-4 max-h-[60vh] overflow-y-auto pr-1">
+              <div>
+                <label className="block text-xs font-semibold text-slate-600 uppercase mb-1">
+                  About Me
+                </label>
+                <textarea
+                  rows={3}
+                  value={bioForm.about ?? ""}
+                  onChange={(e) => setBioForm({ ...bioForm, about: e.target.value })}
+                  className="w-full px-3 py-2 border border-slate-200 rounded text-sm focus:border-blue-600 focus:ring-0"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-600 uppercase mb-1">
+                  What I love about my job
+                </label>
+                <textarea
+                  rows={2}
+                  value={bioForm.what_i_love ?? ""}
+                  onChange={(e) => setBioForm({ ...bioForm, what_i_love: e.target.value })}
+                  className="w-full px-3 py-2 border border-slate-200 rounded text-sm focus:border-blue-600 focus:ring-0"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-600 uppercase mb-1">
+                  Interests & Hobbies
+                </label>
+                <textarea
+                  rows={2}
+                  value={bioForm.hobbies ?? ""}
+                  onChange={(e) => setBioForm({ ...bioForm, hobbies: e.target.value })}
+                  className="w-full px-3 py-2 border border-slate-200 rounded text-sm focus:border-blue-600 focus:ring-0"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-600 uppercase mb-1">
+                  Skills
+                </label>
+                <div className="flex gap-2 mb-2">
+                  <input
+                    type="text"
+                    placeholder="Add a new skill (e.g. Next.js)..."
+                    value={newSkillInput}
+                    onChange={(e) => setNewSkillInput(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        handleAddSkill();
+                      }
+                    }}
+                    className="flex-1 px-3 py-1.5 border border-slate-200 rounded text-sm"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleAddSkill}
+                    className="px-3 py-1.5 bg-slate-900 text-white rounded text-sm font-medium hover:bg-slate-800"
+                  >
+                    Add
+                  </button>
+                </div>
+                <div className="flex flex-wrap gap-1.5 pt-1">
+                  {bioForm.skills.map((s, idx) => (
+                    <span
+                      key={idx}
+                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-slate-100 text-slate-700 text-xs font-medium border border-slate-200"
+                    >
+                      {s}
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveSkill(idx)}
+                        className="text-slate-400 hover:text-red-500 ml-1 text-xs"
+                      >
+                        ×
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </ModalBody>
+            <ModalFooter>
+              <button
+                type="button"
+                onClick={() => setEditBioModalOpen(false)}
+                className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-900"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="px-5 py-2 text-sm font-medium bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                Save Overview
+              </button>
+            </ModalFooter>
+          </form>
+        </Modal>
+      )}
+
+      {/* ─── MODAL 3: Edit Wage (Admin Only) ─── */}
+      {editWageModalOpen && (
+        <Modal open={editWageModalOpen} onClose={() => setEditWageModalOpen(false)}>
+          <ModalHeader
+            title={`Edit Salary Structure — ${fullName}`}
+            description="Set base monthly wage for salary breakdown calculation"
+            onClose={() => setEditWageModalOpen(false)}
+          />
+          <form onSubmit={handleSaveWage}>
+            <ModalBody className="space-y-4">
+              <div>
+                <label className="block text-xs font-semibold text-slate-600 uppercase mb-1">
+                  Monthly Base Wage (USD)
+                </label>
+                <input
+                  type="number"
+                  step="100"
+                  min="500"
+                  required
+                  value={wageInput}
+                  onChange={(e) => setWageInput(e.target.value)}
+                  className="w-full px-3 py-2 border border-slate-200 rounded text-sm focus:border-blue-600 focus:ring-0"
+                />
+              </div>
+            </ModalBody>
+            <ModalFooter>
+              <button
+                type="button"
+                onClick={() => setEditWageModalOpen(false)}
+                className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-900"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="px-5 py-2 text-sm font-medium bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                Update Wage
+              </button>
+            </ModalFooter>
+          </form>
+        </Modal>
       )}
     </div>
   );

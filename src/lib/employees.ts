@@ -14,6 +14,7 @@ export type ProfileRow = {
   avatar_url: string | null;
   status: "active" | "inactive" | string;
   created_at: string;
+  login_id?: string | null;
 };
 
 function splitName(full: string): { first: string; last: string } {
@@ -33,7 +34,7 @@ export function mapProfileToEmployee(row: ProfileRow): Employee {
   return {
     id: row.id,
     role: row.role === "admin" ? "admin" : "employee",
-    login_id: row.id.slice(0, 8),
+    login_id: row.login_id ?? row.id.slice(0, 8),
     first_name: first,
     last_name: last,
     personal_email: null,

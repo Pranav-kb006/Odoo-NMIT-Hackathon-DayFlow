@@ -10,9 +10,11 @@ import { showToast } from "@/components/ui/Toast";
 
 interface TopbarProps {
   profile: Profile;
+  logoUrl?: string | null;
+  companyName?: string | null;
 }
 
-export function Topbar({ profile }: TopbarProps) {
+export function Topbar({ profile, logoUrl, companyName }: TopbarProps) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [attendance, setAttendance] = useState<AttendanceRow | null>(null);
   const [loading, setLoading] = useState(false);
@@ -75,7 +77,18 @@ export function Topbar({ profile }: TopbarProps) {
   return (
     <header className="md:ml-[260px] flex justify-between items-center h-16 px-gutter bg-surface-container-lowest text-primary font-body-md text-body-md border-b border-outline-variant fixed top-0 right-0 left-0 z-10">
       <div className="flex items-center gap-lg pl-12 md:pl-0">
-        <h2 className="font-headline-md text-headline-md text-primary font-bold">Dayflow</h2>
+        {logoUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={logoUrl}
+            alt={companyName ?? "Company"}
+            className="h-7 w-auto max-w-[160px] object-contain"
+          />
+        ) : (
+          <h2 className="font-headline-md text-headline-md text-primary font-bold">
+            {companyName ?? "Dayflow"}
+          </h2>
+        )}
       </div>
 
       <div className="flex items-center gap-md">

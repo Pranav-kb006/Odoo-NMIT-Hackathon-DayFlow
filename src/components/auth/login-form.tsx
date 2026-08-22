@@ -58,7 +58,7 @@ export default function LoginForm() {
           >
             Password
           </label>
-          <a className="font-label-md text-label-md text-primary hover:underline" href="#">
+          <a className="font-label-md text-label-md text-primary hover:underline" href="/forgot-password">
             Forgot password?
           </a>
         </div>

@@ -94,6 +94,7 @@ export function MyLeavesList({ requests, loading = false }: MyLeavesListProps) {
               <th className="px-6 py-3.5">Attachment</th>
               <th className="px-6 py-3.5">Applied On</th>
               <th className="px-6 py-3.5">Status</th>
+              <th className="px-6 py-3.5">Doc</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100 text-slate-700">
@@ -148,6 +149,20 @@ export function MyLeavesList({ requests, loading = false }: MyLeavesListProps) {
                     </td>
                     <td className="px-6 py-4 text-xs text-slate-400">{appliedDate}</td>
                     <td className="px-6 py-4">{getStatusBadge(req.status)}</td>
+                    <td className="px-6 py-4">
+                      {req.attachment_url ? (
+                        <a
+                          href={req.attachment_url}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-flex items-center gap-1 text-xs font-medium text-blue-600 hover:underline"
+                        >
+                          View
+                        </a>
+                      ) : (
+                        <span className="text-xs text-slate-300">—</span>
+                      )}
+                    </td>
                   </tr>
                 );
               })

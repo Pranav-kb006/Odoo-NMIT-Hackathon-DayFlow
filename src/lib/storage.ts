@@ -1,9 +1,7 @@
 import { createClient } from "@/lib/supabase/client";
 
 const LOGO_BUCKET = "logos";
-const LEAVE_DOC_BUCKET = "leave-attachments";
-const MAX_DOCUMENT_BYTES = 5 * 1024 * 1024; // 5MB
-const DOCUMENT_EXTENSIONS = ["pdf", "jpg", "jpeg", "png"];
+const DOCS_BUCKET = "documents";
 
 export type UploadResult = { ok: true; url: string } | { ok: false; error: string };
 
@@ -29,36 +27,35 @@ export async function uploadLogo(file: File): Promise<UploadResult> {
 }
 
 /**
- * Upload a leave-proof document (PDF/JPG/PNG, max 5MB) to the public
- * `leave-attachments` bucket under the signed-in user's own folder. Returns
- * the public URL so the employee and reviewers can open it directly.
+ * Upload a leave attachment (medical cert, etc.) to the private `documents`
+ * bucket at `<uid>/<file>`. Returns a time-limited signed URL for download.
+ * The path prefix enforces storage RLS (owners read their own folder; admins
+ * in the same company read any).
  */
-export async function uploadLeaveDocument(file: File): Promise<UploadResult> {
+export async function uploadLeaveAttachment(file: File): Promise<UploadResult> {
   if (!file) return { ok: false, error: "No file selected" };
-  if (file.size > MAX_DOCUMENT_BYTES) {
-    return { ok: false, error: "File must be 5MB or smaller" };
-  }
-  const ext = file.name.split(".").pop()?.toLowerCase() || "";
-  if (!DOCUMENT_EXTENSIONS.includes(ext)) {
-    return { ok: false, error: "Only PDF, JPG, or PNG files are allowed" };
-  }
 
   const db = createClient();
   const {
     data: { user },
   } = await db.auth.getUser();
-  if (!user) {
-    return { ok: false, error: "You must be signed in to upload a document" };
-  }
+  if (!user) return { ok: false, error: "Not signed in" };
 
-  const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "-").slice(0, 60);
+  const ext = file.name.split(".").pop()?.toLowerCase() || "bin";
+  const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_").slice(0, 60);
   const path = `${user.id}/${Date.now()}-${safeName}`;
 
-  const { error: uploadError } = await db.storage
-    .from(LEAVE_DOC_BUCKET)
-    .upload(path, file, { cacheControl: "3600", upsert: false });
+  const { error: uploadError } = await db.storage.from(DOCS_BUCKET).upload(path, file, {
+    cacheControl: "3600",
+    upsert: false,
+    contentType: file.type || "application/octet-stream",
+  });
   if (uploadError) return { ok: false, error: uploadError.message };
 
-  const { data } = db.storage.from(LEAVE_DOC_BUCKET).getPublicUrl(path);
-  return { ok: true, url: data.publicUrl };
+  const { data, error: signError } = await db.storage
+    .from(DOCS_BUCKET)
+    .createSignedUrl(path, 60 * 60 * 24 * 7); // 7-day link
+  if (signError || !data) return { ok: false, error: signError?.message ?? "Sign failed" };
+
+  return { ok: true, url: data.signedUrl };
 }

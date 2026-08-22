@@ -146,8 +146,7 @@ export default async function EmployeeProfilePage({
     const fullName = `${employee.first_name} ${employee.last_name}`.trim();
 
     return (
-      <main className="p-6">
-        <h1 className="mb-4 text-xl font-semibold">{fullName}</h1>
+      <main className="p-2 sm:p-4">
         <EmployeeDetail
           employee={employee}
           privateInfo={null}

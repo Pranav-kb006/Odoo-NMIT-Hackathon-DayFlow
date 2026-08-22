@@ -27,6 +27,25 @@ export function CheckInOutCard({
     }
   }, [initialAttendance]);
 
+  // Sync with Topbar or external check-in actions
+  useEffect(() => {
+    const fetchLatest = async () => {
+      try {
+        const res = await fetch("/api/attendance/today");
+        if (res.ok) {
+          const data = await res.json();
+          setAttendance(data.attendance ?? null);
+          if (data.attendance) onStatusChange?.(data.attendance);
+        }
+      } catch (err) {
+        console.error("Failed to sync attendance card:", err);
+      }
+    };
+
+    window.addEventListener("attendance-updated", fetchLatest);
+    return () => window.removeEventListener("attendance-updated", fetchLatest);
+  }, [onStatusChange]);
+
   const isCheckedIn = Boolean(attendance?.check_in);
   const isCheckedOut = Boolean(attendance?.check_out);
   const isActiveShift = isCheckedIn && !isCheckedOut;
@@ -84,6 +103,7 @@ export function CheckInOutCard({
       setAttendance(data.attendance);
       showToast("Checked In Successfully", "Your shift timer has started.", "success");
       onStatusChange?.(data.attendance);
+      window.dispatchEvent(new Event("attendance-updated"));
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Error checking in";
       setError(msg);
@@ -103,6 +123,7 @@ export function CheckInOutCard({
       setAttendance(data.attendance);
       showToast("Checked Out Successfully", "Your work duration for today has been logged.", "success");
       onStatusChange?.(data.attendance);
+      window.dispatchEvent(new Event("attendance-updated"));
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Error checking out";
       setError(msg);

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { LeaveRequest } from "@/lib/types";
 import { workingDaysBetween } from "@/lib/utils";
-import { Clock, CheckCircle2, XCircle, Calendar } from "lucide-react";
+import { Clock, CheckCircle2, XCircle, Calendar, FileText } from "lucide-react";
 
 interface MyLeavesListProps {
   requests: LeaveRequest[];
@@ -91,6 +91,7 @@ export function MyLeavesList({ requests, loading = false }: MyLeavesListProps) {
               <th className="px-6 py-3.5">Duration</th>
               <th className="px-6 py-3.5">Days</th>
               <th className="px-6 py-3.5">Reason</th>
+              <th className="px-6 py-3.5">Attachment</th>
               <th className="px-6 py-3.5">Applied On</th>
               <th className="px-6 py-3.5">Status</th>
               <th className="px-6 py-3.5">Doc</th>
@@ -130,6 +131,21 @@ export function MyLeavesList({ requests, loading = false }: MyLeavesListProps) {
                     </td>
                     <td className="px-6 py-4 max-w-xs truncate text-slate-600" title={req.reason}>
                       {req.reason}
+                    </td>
+                    <td className="px-6 py-4">
+                      {req.attachment_url ? (
+                        <a
+                          href={req.attachment_url}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-flex items-center gap-1 text-xs font-medium text-blue-600 hover:text-blue-800 hover:underline"
+                        >
+                          <FileText className="h-3.5 w-3.5" />
+                          View
+                        </a>
+                      ) : (
+                        <span className="text-xs text-slate-400">—</span>
+                      )}
                     </td>
                     <td className="px-6 py-4 text-xs text-slate-400">{appliedDate}</td>
                     <td className="px-6 py-4">{getStatusBadge(req.status)}</td>

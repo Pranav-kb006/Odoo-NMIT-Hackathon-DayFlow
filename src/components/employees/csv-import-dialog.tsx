@@ -105,12 +105,11 @@ export function CsvImportDialog({ open, onClose, onImport }: Props) {
     setImportError(null);
     setProgress({ done: 0, total: validRows.length });
 
-    // `source_row` is a client-only field for result reporting; it must
-    // never cross the API boundary. Strip it defensively here so the
-    // contract holds regardless of parent behavior.
-    const apiRows = validRows.map(({ source_row, ...rest }) => rest);
+    // Pass the full `validRows` (still containing `source_row`) to the
+    // orchestrator. It needs `source_row` to report which CSV row failed,
+    // and strips it at its own API boundary before the network call.
     try {
-      const summary = await onImport(apiRows as CsvEmployeeRow[]);
+      const summary = await onImport(validRows);
       setImportSummary(summary);
       setProgress({ done: validRows.length, total: validRows.length });
       setPhase("done");

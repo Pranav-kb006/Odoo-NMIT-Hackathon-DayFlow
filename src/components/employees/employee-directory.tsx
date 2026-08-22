@@ -76,11 +76,9 @@ export function EmployeeDirectory({
     setError(null);
     try {
       const data = await postEmployee(values);
-      setEmployees((prev) => {
-        const next = [...prev, data.employee];
-        setStats(deriveStats(next, initialStats));
-        return next;
-      });
+      const next = [...employees, data.employee];
+      setEmployees(next);
+      setStats(deriveStats(next, initialStats));
       setFormOpen(false);
       setCredentials(data.credentials);
     } catch (e) {
@@ -116,11 +114,9 @@ export function EmployeeDirectory({
         body && typeof body === "object" && "employee" in body
           ? (body as { employee: Employee }).employee
           : (body as Employee);
-      setEmployees((prev) => {
-        const next = prev.map((e) => (e.id === id ? updated : e));
-        setStats(deriveStats(next, initialStats));
-        return next;
-      });
+      const next = employees.map((e) => (e.id === id ? updated : e));
+      setEmployees(next);
+      setStats(deriveStats(next, initialStats));
       setFormOpen(false);
     } catch (e) {
       setError(
@@ -156,11 +152,9 @@ export function EmployeeDirectory({
     }
 
     if (newEmployees.length > 0) {
-      setEmployees((prev) => {
-        const next = [...prev, ...newEmployees];
-        setStats(deriveStats(next, initialStats));
-        return next;
-      });
+      const next = [...employees, ...newEmployees];
+      setEmployees(next);
+      setStats(deriveStats(next, initialStats));
     }
 
     return { created, failures };

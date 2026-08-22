@@ -27,7 +27,7 @@ export async function GET() {
 
   const { data, error } = await db
     .from("profiles")
-    .select("id, company_id, full_name, email, role, department, designation, joined_on, phone, avatar_url, status, created_at")
+    .select("id, company_id, full_name, email, role, department, designation, joined_on, phone, avatar_url, login_id, status, created_at")
     .eq("company_id", me.company_id)
     .order("created_at", { ascending: true });
 
@@ -79,6 +79,32 @@ function normalizeCreateInput(raw: Record<string, unknown>) {
   };
 }
 
+/** Split "First Last" → { first, last } treating all after first as last. */
+function parseFullName(full: string): { first: string; last: string } {
+  const parts = (full ?? "").trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return { first: "", last: "" };
+  if (parts.length === 1) return { first: parts[0], last: "X" };
+  return { first: parts[0], last: parts.slice(1).join("") };
+}
+
+/**
+ * PRD login-id format:
+ * {CompanyCode}{first2(first)}{first2(last)}{yearOfJoining}{4-digit serial}
+ * e.g. DFJODO20260001
+ */
+function buildLoginId(
+  companyCode: string,
+  fullName: string,
+  joinedOn: string,
+  serial: number,
+): string {
+  const { first, last } = parseFullName(fullName);
+  const year = joinedOn.slice(0, 4) || new Date().getFullYear().toString();
+  const first2 = (code: string) => code.slice(0, 2).toUpperCase().padEnd(2, "X");
+  const code = (companyCode || "DF").toUpperCase().slice(0, 4);
+  return `${code}${first2(first)}${first2(last)}${year}${serial.toString().padStart(4, "0")}`;
+}
+
 /**
  * POST /api/employees — admin-only. Creates an auth user (confirmed, with the
  * given or generated password), then their profile row. Email is mirrored onto
@@ -115,6 +141,20 @@ export async function POST(request: Request) {
     const password = parsed.password ?? "Dayflow#2026"; // demo default; admin should reset
 
     const admin = createAdminClient();
+
+    // Company code + serial for the login_id ({code}{first2}{last2}{year}{serial}).
+    const { data: company } = await admin
+      .from("companies")
+      .select("code")
+      .eq("id", me.company_id)
+      .single();
+    const { count: existingCount } = await admin
+      .from("profiles")
+      .select("*", { count: "exact", head: true })
+      .eq("company_id", me.company_id);
+    const serial = (existingCount ?? 0) + 1;
+    const companyCode = (company?.code ?? "DF").toUpperCase();
+
     const { data: created, error: createError } = await admin.auth.admin.createUser({
       email: parsed.email,
       password,
@@ -128,6 +168,8 @@ export async function POST(request: Request) {
     }
     if (!created.user) throw new Error("No user returned");
 
+    const loginId = buildLoginId(companyCode, parsed.fullName, joinedOn, serial);
+
     const { data: profile, error: profileError } = await admin
       .from("profiles")
       .insert({
@@ -140,6 +182,7 @@ export async function POST(request: Request) {
         designation: parsed.designation ?? null,
         phone: parsed.phone ?? null,
         joined_on: joinedOn,
+        login_id: loginId,
         status: "active",
       })
       .select()
@@ -156,6 +199,7 @@ export async function POST(request: Request) {
         employee: profile,
         credentials: {
           login_email: parsed.email,
+          login_id: loginId,
           temporary_password: password,
         },
       },

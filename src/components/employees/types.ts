@@ -36,7 +36,7 @@ export type EmployeeFormValues = {
 
 export type EmployeeCreateResponse = {
   employee: Employee;
-  credentials: { login_email: string; temporary_password: string };
+  credentials: { login_email: string; login_id: string; temporary_password: string };
 };
 
 export type CsvRowError = { row: number; field?: string; message: string };

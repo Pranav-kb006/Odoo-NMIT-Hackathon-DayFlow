@@ -177,3 +177,16 @@ body {
 .transition-default {
   @apply transition-all duration-150 ease-out;
 }
+
+/* ─── SVG draw-line animation ─── */
+@keyframes draw-line {
+  from { stroke-dashoffset: 400; }
+  to   { stroke-dashoffset: 0; }
+}
+
+.animate-draw-line {
+  stroke-dasharray: 400;
+  stroke-dashoffset: 400;
+  animation: draw-line 1.5s ease-out 0.8s forwards;
+}
+

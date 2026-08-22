@@ -4,7 +4,9 @@ import { useEffect, useState, useCallback } from "react";
 import { LeaveApplyForm } from "@/components/leave/LeaveApplyForm";
 import { MyLeavesList } from "@/components/leave/MyLeavesList";
 import { TeamLeaveQueue } from "@/components/leave/TeamLeaveQueue";
+import { LeaveBalanceCards } from "@/components/leave/LeaveBalanceCards";
 import { LeaveRequest, LeaveRequestWithProfile, Role } from "@/lib/types";
+import { workingDaysBetween } from "@/lib/utils";
 import { RefreshCw, Users, User } from "lucide-react";
 
 export default function LeavePage() {
@@ -45,6 +47,13 @@ export default function LeavePage() {
   useEffect(() => {
     fetchLeaveData();
   }, [fetchLeaveData]);
+
+  // Compute metrics
+  const approvedDaysTaken = myRequests
+    .filter((r) => r.status === "approved")
+    .reduce((sum, r) => sum + workingDaysBetween(r.start_date, r.end_date), 0);
+
+  const pendingRequestsCount = myRequests.filter((r) => r.status === "pending").length;
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
@@ -109,15 +118,25 @@ export default function LeavePage() {
           onReviewed={() => fetchLeaveData()}
         />
       ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-1">
-            <LeaveApplyForm onSuccess={() => fetchLeaveData()} />
+        <>
+          <LeaveBalanceCards
+            paidAvailable={Math.max(0, 12 - approvedDaysTaken)}
+            sickAvailable={7}
+            totalTaken={approvedDaysTaken}
+            pendingCount={pendingRequestsCount}
+          />
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-1">
+              <LeaveApplyForm onSuccess={() => fetchLeaveData()} />
+            </div>
+            <div className="lg:col-span-2">
+              <MyLeavesList requests={myRequests} loading={loading} />
+            </div>
           </div>
-          <div className="lg:col-span-2">
-            <MyLeavesList requests={myRequests} loading={loading} />
-          </div>
-        </div>
+        </>
       )}
     </div>
   );
 }
+

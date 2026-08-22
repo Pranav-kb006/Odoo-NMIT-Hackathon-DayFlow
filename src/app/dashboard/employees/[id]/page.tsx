@@ -1,24 +1,20 @@
 import { createClient } from "@/lib/supabase/server";
+import { getCurrentProfile } from "@/lib/auth";
 import { EmployeeDetail } from "@/components/employees/employee-detail";
 import type { Employee } from "@/components/employees/types";
 
-type DirectoryRow = {
+type ProfileRow = {
   id: string;
-  role: string;
-  login_id: string;
-  first_name: string;
-  last_name: string;
-  personal_email: string | null;
-  work_email: string;
-  mobile: string | null;
+  company_id: string;
+  full_name: string;
+  email: string | null;
+  role: "admin" | "employee" | string;
   department: string | null;
-  job_position: string | null;
-  manager_id: string | null;
-  location: string | null;
-  date_of_joining: string;
-  about: string | null;
-  skills: string[] | null;
+  designation: string | null;
+  joined_on: string | null;
+  phone: string | null;
   avatar_url: string | null;
+  status: "active" | "inactive" | string;
   created_at: string;
 };
 
@@ -60,30 +56,33 @@ type LeaveRow = {
   reviewer_comment: string | null;
 };
 
-const USER_SELECT =
-  "id, role, login_id, first_name, last_name, personal_email, work_email, mobile, department, job_position, manager_id, location, date_of_joining, about, skills, avatar_url, created_at";
+function splitName(full: string): { first: string; last: string } {
+  const parts = full.trim().split(/\s+/);
+  if (parts.length === 1) return { first: parts[0], last: "" };
+  return { first: parts[0], last: parts.slice(1).join(" ") };
+}
 
-function mapRow(row: DirectoryRow): Employee {
-  const role: Employee["role"] = row.role === "admin" ? "admin" : "employee";
+function mapRow(row: ProfileRow): Employee {
+  const { first, last } = splitName(row.full_name);
   return {
     id: row.id,
-    role,
-    login_id: row.login_id,
-    first_name: row.first_name,
-    last_name: row.last_name,
-    personal_email: row.personal_email ?? null,
-    work_email: row.work_email,
-    mobile: row.mobile ?? null,
-    department: row.department ?? null,
-    job_position: row.job_position ?? null,
-    manager_id: row.manager_id ?? null,
-    location: row.location ?? null,
-    date_of_joining: row.date_of_joining,
-    about: row.about ?? null,
-    skills: row.skills ?? null,
-    avatar_url: row.avatar_url ?? null,
+    role: row.role === "admin" ? "admin" : "employee",
+    login_id: row.id.slice(0, 8),
+    first_name: first,
+    last_name: last,
+    personal_email: null,
+    work_email: row.email ?? "—",
+    mobile: row.phone,
+    department: row.department,
+    job_position: row.designation,
+    manager_id: null,
+    location: null,
+    date_of_joining: row.joined_on ?? "",
+    about: null,
+    skills: null,
+    avatar_url: row.avatar_url,
     created_at: row.created_at,
-    status: "active",
+    status: row.status === "inactive" ? "inactive" : "active",
   };
 }
 
@@ -98,9 +97,7 @@ function notFound() {
 function errorState() {
   return (
     <main className="p-6">
-      <p className="text-sm text-slate-600">
-        Could not load this employee.
-      </p>
+      <p className="text-sm text-slate-600">Could not load this employee profile.</p>
     </main>
   );
 }
@@ -111,56 +108,42 @@ export default async function EmployeeProfilePage({
   params: { id: string };
 }) {
   const { id } = params;
-  const db = createClient();
+  const me = await getCurrentProfile();
+  if (!me) return null;
 
-  const {
-    data: { user },
-  } = await db.auth.getUser();
-  if (!user) return null;
+  const db = createClient();
+  const callerCompanyId = me.company_id;
+  const canViewPrivateInfo = me.role === "admin" || me.id === id;
 
   try {
-    const { data: me, error: meError } = await db
-      .from("users")
-      .select("company_id, role")
-      .eq("auth_id", user.id)
-      .single();
-
-    if (meError || !me) return errorState();
-
-    const callerCompanyId = me.company_id as string;
-    const canViewPrivateInfo = me.role === "admin";
-
     const { data: empRow, error: empError } = await db
-      .from("users")
-      .select(USER_SELECT)
+      .from("profiles")
+      .select("*")
       .eq("id", id)
       .eq("company_id", callerCompanyId)
       .single();
 
     if (empError || !empRow) return notFound();
 
-    const employee = mapRow(empRow as DirectoryRow);
+    const employee = mapRow(empRow as ProfileRow);
 
     let privateInfo: PrivateInfoRow | null = null;
     if (canViewPrivateInfo) {
-      const { data: pi, error: piError } = await db
+      const { data: pi } = await db
         .from("user_private_info")
         .select("*")
         .eq("user_id", id)
         .maybeSingle();
-      if (piError) return errorState();
       privateInfo = (pi as PrivateInfoRow) ?? null;
     }
 
-    const { data: docs, error: docsError } = await db
+    const { data: docs } = await db
       .from("user_documents")
       .select("id, doc_type, file_url, file_size_bytes, uploaded_at")
       .eq("user_id", id)
       .eq("company_id", callerCompanyId);
 
-    if (docsError) return errorState();
-
-    const { data: attendance, error: attError } = await db
+    const { data: attendance } = await db
       .from("attendance")
       .select("work_date, check_in, check_out, status")
       .eq("user_id", id)
@@ -168,19 +151,13 @@ export default async function EmployeeProfilePage({
       .order("work_date", { ascending: false })
       .limit(50);
 
-    if (attError) return errorState();
-
-    const { data: leaves, error: leaveError } = await db
+    const { data: leaves } = await db
       .from("leave_requests")
-      .select(
-        "id, leave_type, start_date, end_date, days_requested, status, reviewer_comment",
-      )
+      .select("id, leave_type, start_date, end_date, days_requested, status, reviewer_comment")
       .eq("user_id", id)
       .eq("company_id", callerCompanyId)
       .order("start_date", { ascending: false })
       .limit(50);
-
-    if (leaveError) return errorState();
 
     const fullName = `${employee.first_name} ${employee.last_name}`.trim();
 

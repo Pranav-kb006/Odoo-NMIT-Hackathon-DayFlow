@@ -15,7 +15,7 @@ export default async function DashboardLayout({
 
   return (
     <div className="min-h-screen bg-surface">
-      <Sidebar role={profile.role} />
+      <Sidebar role={profile.role} profile={profile} />
       <Topbar profile={profile} />
       <main className="md:ml-[260px] mt-16 p-xl max-w-[1440px] mx-auto animate-fade-in">
         {children}

@@ -25,6 +25,7 @@ export function Sidebar({ role, profile }: SidebarProps) {
     { href: "/dashboard/employees", label: "Directory", icon: "contacts", adminOnly: true },
     { href: "/dashboard/attendance", label: "Attendance", icon: "calendar_today" },
     { href: "/dashboard/leave", label: "Time Off", icon: "event_busy" },
+    { href: "/dashboard/payroll", label: "Payroll", icon: "payments", adminOnly: true },
     { href: "/dashboard/approvals", label: "Approvals", icon: "assignment_turned_in", adminOnly: true },
   ];
 

@@ -58,12 +58,10 @@ export default function Landing() {
             </span>
           </div>
 
-          <h1 className="mx-auto max-w-3xl text-4xl font-bold tracking-tight text-slate-900 sm:text-5xl lg:text-6xl">
-            Every workday,{" "}
+          <h1 className="mx-auto max-w-3xl text-5xl font-bold tracking-tight text-slate-900 sm:text-6xl lg:text-7xl">
             <span className="bg-gradient-to-r from-accent to-blue-600 bg-clip-text text-transparent">
-              perfectly aligned
+              Dayflow
             </span>
-            .
           </h1>
           <p className="mx-auto mt-5 max-w-xl text-lg text-slate-500">
             Attendance, leave, and your whole team — one calm dashboard. Built

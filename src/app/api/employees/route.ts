@@ -154,7 +154,10 @@ export async function POST(request: Request) {
     return NextResponse.json(
       {
         employee: profile,
-        credentials: { login_id: created.user.id.slice(0, 8), temporary_password: password },
+        credentials: {
+          login_email: parsed.email,
+          temporary_password: password,
+        },
       },
       { status: 201 },
     );

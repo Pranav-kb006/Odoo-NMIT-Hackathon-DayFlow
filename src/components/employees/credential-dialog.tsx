@@ -4,12 +4,18 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Modal } from "@/components/ui/modal";
 
+type Credentials = {
+  /** The email the employee logs in with (their work email). */
+  login_email: string;
+  temporary_password: string;
+};
+
 type Props = {
-  credentials: { login_id: string; temporary_password: string } | null;
+  credentials: Credentials | null;
   onClose: () => void;
 };
 
-type CopyState = "idle" | "login_id" | "password";
+type CopyState = "idle" | "email" | "password";
 
 export function CredentialDialog({ credentials, onClose }: Props) {
   const [copied, setCopied] = useState<CopyState>("idle");
@@ -36,42 +42,39 @@ export function CredentialDialog({ credentials, onClose }: Props) {
 
   return (
     <Modal open={Boolean(credentials)} onClose={onClose}>
-      {/* B4 Modal contract assumption: Modal renders a dialog surface and
-          accepts `open`/`onClose`; header/body/footer are composed as
-          children. Adjust if B4 ships ModalHeader/ModalContent/ModalFooter. */}
       <div className="border-b border-slate-200 px-5 py-4">
         <h2 className="text-lg font-semibold text-slate-900">
-          Employee credentials created
+          Employee created — share these credentials
         </h2>
       </div>
 
       <div className="space-y-4 px-5 py-4">
         <p className="text-sm text-slate-600">
-          Share these credentials with the employee. The temporary password
-          must be changed on first login.
+          The employee signs in with their work email and this temporary
+          password.
         </p>
 
         <div>
           <label
-            htmlFor="login_id"
+            htmlFor="login_email"
             className="text-sm font-medium text-slate-700"
           >
-            Login ID
+            Email (login)
           </label>
           <div className="mt-1 flex items-center gap-2">
             <input
-              id="login_id"
+              id="login_email"
               readOnly
-              value={credentials.login_id}
+              value={credentials.login_email}
               className="h-10 w-full rounded-lg border border-slate-300 bg-slate-50 px-3 font-mono text-sm text-slate-800 focus:outline-none"
             />
             <Button
               type="button"
               variant="secondary"
               size="sm"
-              onClick={() => copy(credentials.login_id, "login_id")}
+              onClick={() => copy(credentials.login_email, "email")}
             >
-              {copied === "login_id" ? "Copied!" : "Copy"}
+              {copied === "email" ? "Copied!" : "Copy"}
             </Button>
           </div>
         </div>

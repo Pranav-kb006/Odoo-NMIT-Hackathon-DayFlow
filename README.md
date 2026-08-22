@@ -23,7 +23,7 @@ pnpm dev                      # http://localhost:3000
 | Role | Email | Password |
 |---|---|---|
 | Admin | admin@acme.test | see seed.sql |
-| Employee | employee@acme.test | see seed.sql |
+| Employee | ravi@acme.test | see seed.sql |
 
 ## Docs
 
@@ -38,12 +38,12 @@ Everything is in [`docs/`](docs/). Read in this order:
 
 ## Team
 
-| Person | Domain |
-|---|---|
-| Pranav | Lead / Auth + Integrations |
-| Builder 2 | Attendance + Leave |
-| Builder 3 | Employees + Directory |
-| Builder 4 | Dashboard + Design System |
+| Builder | Name | Domain |
+|---|---|---|
+| 1 | md | Lead / Auth + Integrations |
+| 2 | Pranav | Attendance + Leave |
+| 3 | Nithin | Employees + Directory |
+| 4 | Lokaksha | Dashboard + Design System |
 
 ## License
 

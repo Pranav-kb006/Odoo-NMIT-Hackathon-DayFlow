@@ -1,8 +1,8 @@
 /**
  * Dashboard shell — sidebar + topbar.
- * TODO(B4): build real nav from DESIGN.md (240px sidebar, active = accent-50).
- * TODO(Pranav): fetch profile via getCurrentProfile() for topbar user menu;
- *               redirect to /login if null.
+ * TODO(B4 Lokaksha): build real nav from DESIGN.md (240px sidebar, active = accent-50).
+ * TODO(B1 md): fetch profile via getCurrentProfile() for topbar user menu;
+ *              redirect to /login if null.
  */
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (

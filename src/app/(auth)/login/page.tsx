@@ -1,4 +1,4 @@
-/** TODO(Pranav): email+password login form using loginSchema + db.auth.signInWithPassword, redirect /dashboard */
+/** TODO(B1 md): email+password login form using loginSchema + db.auth.signInWithPassword, redirect /dashboard */
 export default function LoginPage() {
-  return <main className="grid min-h-screen place-items-center"><p className="text-slate-400">login — owner: Pranav</p></main>;
+  return <main className="grid min-h-screen place-items-center"><p className="text-slate-400">login — owner: B1 (md)</p></main>;
 }

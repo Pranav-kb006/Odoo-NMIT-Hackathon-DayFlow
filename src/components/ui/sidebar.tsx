@@ -6,25 +6,30 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import type { Role } from "@/lib/types";
 import { signOutAction } from "@/app/actions/auth";
+import type { Profile } from "@/lib/auth";
 
 interface SidebarProps {
   role: Role;
+  profile?: Profile;
 }
 
-const NAV_ITEMS = [
-  { href: "/dashboard", label: "Dashboard", icon: "dashboard" },
-  { href: "/dashboard/employees", label: "Directory", icon: "contacts", adminOnly: true },
-  { href: "/dashboard/attendance", label: "Attendance", icon: "calendar_today" },
-  { href: "/dashboard/leave", label: "Time Off", icon: "event_busy" },
-  { href: "/dashboard/approvals", label: "Approvals", icon: "assignment_turned_in", adminOnly: true },
-];
-
-export function Sidebar({ role }: SidebarProps) {
+export function Sidebar({ role, profile }: SidebarProps) {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  const filteredNav = NAV_ITEMS.filter(
-    (item) => !item.adminOnly || role === "admin"
+  const baseNavItems = [
+    { href: "/dashboard", label: "Dashboard", icon: "dashboard" },
+    ...(profile?.id
+      ? [{ href: `/dashboard/employees/${profile.id}`, label: "My Profile", icon: "person" }]
+      : []),
+    { href: "/dashboard/employees", label: "Directory", icon: "contacts", adminOnly: true },
+    { href: "/dashboard/attendance", label: "Attendance", icon: "calendar_today" },
+    { href: "/dashboard/leave", label: "Time Off", icon: "event_busy" },
+    { href: "/dashboard/approvals", label: "Approvals", icon: "assignment_turned_in", adminOnly: true },
+  ];
+
+  const filteredNav = baseNavItems.filter(
+    (item) => !("adminOnly" in item && item.adminOnly) || role === "admin"
   );
 
   const navContent = (
@@ -39,7 +44,7 @@ export function Sidebar({ role }: SidebarProps) {
           const isActive =
             item.href === "/dashboard"
               ? pathname === "/dashboard"
-              : pathname.startsWith(item.href);
+              : pathname === item.href || (item.href !== "/dashboard" && pathname.startsWith(item.href));
 
           return (
             <Link

@@ -1,11 +1,18 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
+import type { CookieOptions } from "@supabase/ssr";
 
 const PUBLIC_PREFIXES = ["/login", "/signup"];
+const LANDING_PATH = "/"; // always server-rendered, no redirect
 
-/** Redirects: logged-in users away from auth pages, everyone else to /login. */
+/**
+ * Redirects: logged-in users away from auth pages to /dashboard; logged-out
+ * users away from everything else (except the public landing page) to /login.
+ */
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+
+  const isPublic = PUBLIC_PREFIXES.some((p) => pathname === p || pathname.startsWith(p + "/"));
 
   let response = NextResponse.next({ request });
 
@@ -17,7 +24,7 @@ export async function middleware(request: NextRequest) {
         getAll() {
           return request.cookies.getAll();
         },
-        setAll(cookiesToSet) {
+        setAll(cookiesToSet: { name: string; value: string; options: CookieOptions }[]) {
           cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
           response = NextResponse.next({ request });
           cookiesToSet.forEach(({ name, value, options }) =>
@@ -32,17 +39,15 @@ export async function middleware(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const isPublic = PUBLIC_PREFIXES.some((p) => pathname.startsWith(p));
-
-  if (!user && !isPublic) {
-    const url = request.nextUrl.clone();
-    url.pathname = "/login";
-    return NextResponse.redirect(url);
-  }
-
   if (user && isPublic) {
     const url = request.nextUrl.clone();
     url.pathname = "/dashboard";
+    return NextResponse.redirect(url);
+  }
+
+  if (!user && !isPublic && pathname !== LANDING_PATH) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/login";
     return NextResponse.redirect(url);
   }
 

@@ -164,6 +164,7 @@ export default async function EmployeeProfilePage({
       .from("attendance")
       .select("work_date, check_in, check_out, status")
       .eq("user_id", id)
+      .eq("company_id", callerCompanyId)
       .order("work_date", { ascending: false })
       .limit(50);
 
@@ -175,6 +176,7 @@ export default async function EmployeeProfilePage({
         "id, leave_type, start_date, end_date, days_requested, status, reviewer_comment",
       )
       .eq("user_id", id)
+      .eq("company_id", callerCompanyId)
       .order("start_date", { ascending: false })
       .limit(50);
 

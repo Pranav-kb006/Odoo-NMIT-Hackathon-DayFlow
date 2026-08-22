@@ -29,3 +29,30 @@ export type Company = {
   code: string;
   created_at: string;
 };
+
+export type LeaveBalance = {
+  id: string;
+  user_id: string;
+  company_id: string;
+  leave_type: "paid" | "sick" | "unpaid";
+  days_available: number;
+};
+
+export type ProfileSummary = {
+  id: string;
+  full_name: string;
+  department: string | null;
+  designation: string | null;
+  avatar_url: string | null;
+  role: Role;
+};
+
+export type LeaveRequestWithProfile = LeaveRequest & {
+  profiles?: ProfileSummary | null;
+  reviewer?: ProfileSummary | null;
+};
+
+export type AttendanceWithProfile = AttendanceRow & {
+  profiles?: ProfileSummary | null;
+  duration_minutes?: number | null;
+};

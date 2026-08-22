@@ -39,10 +39,10 @@ export function Modal({ open, onClose, children, className }: ModalProps) {
       {/* Backdrop */}
       <div className="absolute inset-0 bg-slate-900/50 backdrop-blur-sm" />
 
-      {/* Content */}
+      {/* Content — max-h + overflow-y so tall forms scroll, not clip */}
       <div
         className={cn(
-          "relative z-10 w-full max-w-lg rounded-xl border border-slate-200 bg-white shadow-sm animate-scale-in",
+          "relative z-10 max-h-[calc(100vh-2rem)] w-full max-w-lg overflow-y-auto rounded-xl border border-slate-200 bg-white shadow-sm",
           className
         )}
       >

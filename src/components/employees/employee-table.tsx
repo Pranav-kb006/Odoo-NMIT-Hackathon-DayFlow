@@ -46,8 +46,8 @@ function formatJoiningDate(value: string): string {
 }
 
 function getInitials(employee: Employee): string {
-  const first = employee.first_name.trim().charAt(0);
-  const last = employee.last_name.trim().charAt(0);
+  const first = (employee.first_name ?? "").trim().charAt(0);
+  const last = (employee.last_name ?? "").trim().charAt(0);
   return (first + last).toUpperCase() || "—";
 }
 
